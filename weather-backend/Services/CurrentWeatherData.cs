@@ -24,6 +24,7 @@ namespace weather_backend.Services
 
         /**
          * Reference API: https://openweathermap.org/current "By city ID"
+         * Return weather information in metric form
          */
         public async Task<WeatherData> GetCurrentWeatherDataByCityId(double cityId)
         {
@@ -33,6 +34,7 @@ namespace weather_backend.Services
             NameValueCollection queryCollection = HttpUtility.ParseQueryString(uriBuilder.Query);
             queryCollection["id"] = Convert.ToString(cityId);
             queryCollection["appid"] = apiKey;
+            queryCollection["units"] = "metric";
             uriBuilder.Query = queryCollection.ToString();
             string url = uriBuilder.ToString();
 

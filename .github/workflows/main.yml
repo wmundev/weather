@@ -17,9 +17,13 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+    - name: Change directory
+      run: cd weather-backend
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Change directory
+      run: cd .. && cd weather-backend
     - name: Test
       run: dotnet test --no-build --verbosity normal

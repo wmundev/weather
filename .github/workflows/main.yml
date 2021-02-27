@@ -28,7 +28,10 @@ jobs:
         chmod 600 ~/.ssh/known_hosts
         tar czf - weather-backend | ssh admin@$SSH_URL "cd /home/admin && tar xvzf -"
         cd weather-backend
-        ssh admin@"$SSH_URL" bash -s' < ci-scripts/startup.sh
+        ssh ubuntu@"$SSH_URL" 'cd /home/admin/weather-backend && sudo docker-compose build'
+        ssh ubuntu@"$SSH_URL" 'cd /home/admin/weather-backend && sudo docker-compose down'
+        ssh ubuntu@"$SSH_URL" 'cd /home/admin/weather-backend && sudo docker-compose pull'
+        ssh ubuntu@"$SSH_URL" 'cd /home/admin/weather-backend && sudo docker-compose up -d'
       env:
         SSH_URL: ${{ secrets.SSH_URL }}
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}

@@ -26,6 +26,7 @@ jobs:
         chmod 700 ~/.ssh
         ssh-keyscan "$SSH_URL" >> ~/.ssh/known_hosts
         chmod 600 ~/.ssh/known_hosts
+        ssh admin@"$SSH_URL" 'rm -rf /home/admin/weather'
         cd ..
         tar czf - weather | ssh admin@$SSH_URL "cd /home/admin && tar xvzf -"
         cd weather

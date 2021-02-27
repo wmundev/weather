@@ -26,12 +26,13 @@ jobs:
         chmod 700 ~/.ssh
         ssh-keyscan "$SSH_URL" >> ~/.ssh/known_hosts
         chmod 600 ~/.ssh/known_hosts
-        tar czf - weather-backend | ssh admin@$SSH_URL "cd /home/admin && tar xvzf -"
-        cd weather-backend
-        ssh admin@"$SSH_URL" 'cd /home/admin/weather-backend && sudo docker-compose build'
-        ssh admin@"$SSH_URL" 'cd /home/admin/weather-backend && sudo docker-compose down'
-        ssh admin@"$SSH_URL" 'cd /home/admin/weather-backend && sudo docker-compose pull'
-        ssh admin@"$SSH_URL" 'cd /home/admin/weather-backend && sudo docker-compose up -d'
+        cd ..
+        tar czf - weather | ssh admin@$SSH_URL "cd /home/admin && tar xvzf -"
+        cd weather
+        ssh admin@"$SSH_URL" 'cd /home/admin/weather/weather-backend && sudo docker-compose build'
+        ssh admin@"$SSH_URL" 'cd /home/admin/weather/weather-backend && sudo docker-compose down'
+        ssh admin@"$SSH_URL" 'cd /home/admin/weather/weather-backend && sudo docker-compose pull'
+        ssh admin@"$SSH_URL" 'cd /home/admin/weather/weather-backend && sudo docker-compose up -d'
       env:
         SSH_URL: ${{ secrets.SSH_URL }}
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}

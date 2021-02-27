@@ -3,8 +3,8 @@ name: .NET
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
+#  pull_request:
+#    branches: [ master ]
 
 jobs:
   build:
@@ -17,14 +17,30 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
-    - name: Restore dependencies
+    - name: deploy
+      timeout-minutes: 30
       run: |
+        eval $(ssh-agent -s)
+        echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+        mkdir -p ~/.ssh
+        chmod 700 ~/.ssh
+        ssh-keyscan "$SSH_URL" >> ~/.ssh/known_hosts
+        chmod 600 ~/.ssh/known_hosts
+        tar czf - weather-backend | ssh admin@$SSH_URL "cd /home/admin && tar xvzf -"
         cd weather-backend
-        dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: |
-        cd .. 
-        cd weather-test
-        dotnet test --no-build --verbosity normal
+        ssh admin@"$SSH_URL" bash -s' < ci-scripts/startup.sh
+      env:
+        SSH_URL: ${{ secrets.SSH_URL }}
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+#    - name: Restore dependencies
+#      run: |
+#        cd weather-backend
+#        dotnet restore
+#    - name: Build
+#      run: dotnet build --no-restore
+#    - name: Test
+#      run: |
+#        cd .. 
+#        cd weather-test
+#        dotnet test --no-build --verbosity normal

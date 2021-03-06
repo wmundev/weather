@@ -1,16 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using weather_backend.Services;
 
 namespace weather_backend
 {
@@ -26,11 +21,14 @@ namespace weather_backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
+            services.AddTransient<EmailService>();
+            services.AddTransient<CurrentWeatherData>();
+            services.AddTransient<HttpClient>();
+            services.AddHostedService<Scheduler>();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "weather_backend", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"});
             });
         }
 
@@ -46,14 +44,13 @@ namespace weather_backend
 
             app.UseHttpsRedirection();
 
+            // app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
     }
 }

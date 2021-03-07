@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using weather_backend.Models;
 using Newtonsoft.Json;
 
@@ -14,10 +15,12 @@ namespace weather_backend.Services
     {
         private HttpClient _httpClient;
         private IConfiguration _configuration;
+        private readonly ILogger<CurrentWeatherData> _logger;
         private const string BaseUrl = "https://api.openweathermap.org/data/2.5/weather";
 
-        public CurrentWeatherData(IConfiguration configuration, HttpClient httpClient)
+        public CurrentWeatherData(IConfiguration configuration, HttpClient httpClient, ILogger<CurrentWeatherData> logger)
         {
+            _logger = logger;
             _configuration = configuration;
             _httpClient = httpClient;
         }

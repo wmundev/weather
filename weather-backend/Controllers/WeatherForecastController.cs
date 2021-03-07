@@ -18,12 +18,12 @@ namespace weather_backend.Controllers
         private IConfiguration _configuration;
         private EmailService _emailService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration, CurrentWeatherData currentWeatherData, EmailService emailService)
         {
             _logger = logger;
             _configuration = configuration;
-            _currentWeatherData = new CurrentWeatherData(configuration, new HttpClient());
-            _emailService = new EmailService(configuration);
+            _currentWeatherData = currentWeatherData;
+            _emailService = emailService;
         }
 
         [HttpGet]

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using weather_backend.Controllers;
 using weather_backend.Services;
 
 namespace weather_backend
@@ -22,9 +23,12 @@ namespace weather_backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddHttpClient();
+            
             services.AddTransient<EmailService>();
             services.AddTransient<CurrentWeatherData>();
             services.AddTransient<HttpClient>();
+            services.AddTransient<WeatherForecastController>();
             services.AddHostedService<Scheduler>();
             services.AddSwaggerGen(c =>
             {

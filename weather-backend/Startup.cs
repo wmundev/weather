@@ -29,6 +29,25 @@ namespace weather_backend
             services.AddTransient<CurrentWeatherData>();
             services.AddTransient<HttpClient>();
             services.AddTransient<WeatherForecastController>();
+            services.AddTransient<CityList>();
+
+            //TODO: doesn't work, will break email sending
+            // services.AddTransient<SmtpClient>((serviceProvider) =>
+            // {
+            //     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            //     string emailUsername = configuration.GetValue<string>("SMTPUsername");
+            //     string emailPassword = configuration.GetValue<string>("SMTPPassword");
+            //     string emailHost = configuration.GetValue<string>("SMTPHost");
+            //     int emailPort = configuration.GetValue<int>("SMTPPort");
+            //     return new SmtpClient()
+            //     {
+            //         Host = emailHost,
+            //         Port = emailPort,
+            //         Credentials = new NetworkCredential(emailUsername, emailPassword),
+            //         EnableSsl = true
+            //     };
+            // });
+            
             services.AddHostedService<Scheduler>();
             services.AddSwaggerGen(c =>
             {

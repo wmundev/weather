@@ -17,13 +17,16 @@ namespace weather_backend.Controllers
         private CurrentWeatherData _currentWeatherData;
         private IConfiguration _configuration;
         private EmailService _emailService;
+        private readonly CityList _cityList;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration, CurrentWeatherData currentWeatherData, EmailService emailService)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration,
+            CurrentWeatherData currentWeatherData, EmailService emailService, CityList cityList)
         {
             _logger = logger;
             _configuration = configuration;
             _currentWeatherData = currentWeatherData;
             _emailService = emailService;
+            _cityList = cityList;
         }
 
         [HttpGet]
@@ -40,6 +43,14 @@ namespace weather_backend.Controllers
                 $"Current Temperature: {weatherData.main.temp}, Humidity: {weatherData.main.humidity}",
                 _configuration.GetValue<string>("SMTPUsername"));
             return weatherData;
+        }
+
+        [HttpGet]
+        [Route("/city/all")]
+        public async Task<string> GetCities()
+        {
+            _cityList.GetAllCitiesInAustralia();
+            return "nice";
         }
     }
 }

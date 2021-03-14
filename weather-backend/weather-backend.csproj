@@ -14,7 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Assets" />
     <Folder Include="Services\Scheduler\Jobs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Assets\city.list.json" />
   </ItemGroup>
 
 </Project>

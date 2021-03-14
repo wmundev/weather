@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -47,10 +48,10 @@ namespace weather_backend.Controllers
 
         [HttpGet]
         [Route("/city/all")]
-        public async Task<string> GetCities()
+        public async Task<IEnumerable<City>> GetCities()
         {
-            _cityList.GetAllCitiesInAustralia();
-            return "nice";
+            IEnumerable<City> allCitiesInAustralia = _cityList.GetAllCitiesInAustralia();
+            return allCitiesInAustralia;
         }
     }
 }

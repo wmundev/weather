@@ -27,6 +27,8 @@ jobs:
         ssh-keyscan "$SSH_URL" >> ~/.ssh/known_hosts
         chmod 600 ~/.ssh/known_hosts
         ssh admin@"$SSH_URL" 'rm -rf /home/admin/weather'
+        chmod 700 ci-scripts/setup_env.sh
+        bash ci-scripts/setup_env.sh
         cd ..
         tar czf - weather | ssh admin@$SSH_URL "cd /home/admin && tar xvzf -"
         cd weather
@@ -37,6 +39,12 @@ jobs:
       env:
         SSH_URL: ${{ secrets.SSH_URL }}
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
+        SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        DB_USER: ${{ secrets.DB_USER }}
+        DB_DATABASE: ${{ secrets.DB_DATABASE }}
       
 #    - name: Restore dependencies
 #      run: |

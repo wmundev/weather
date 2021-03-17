@@ -23,5 +23,13 @@ namespace weather_test
             
             Assert.Equal(-1,result );
         }
+
+        [Fact]
+        public void CalculateTimeDifferenceToMinutesTest()
+        {
+            int result = _timeService.CalculateTimeDifferenceToMinutes(1, 20, 2, 40);
+            
+            Assert.Equal(80, result);
+        }
     }
 }

@@ -9,10 +9,14 @@ namespace weather_backend.Services
             return dateTime1.CompareTo(dateTime2);
         }
 
-        // public int CalculateTimeDifferenceToMinutes(int firstHours, int firstMinutes, int secondHours,
-        //     int secondMinutes)
-        // {
-        //     
-        // }
+        public int CalculateTimeDifferenceToMinutes(int firstHours, int firstMinutes, int secondHours,
+            int secondMinutes)
+        {
+            int firstHoursConvertedToMin = firstHours * 60;
+            int secondHoursConvertedToMin = secondHours * 60;
+
+            int diff = (secondMinutes + secondHoursConvertedToMin) - (firstHoursConvertedToMin + firstMinutes);
+            return diff;
+        }
     }
 }

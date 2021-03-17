@@ -5,11 +5,11 @@ WORKDIR /source
 
 # copy csproj and restore as distinct layers
 #COPY *.sln .
-COPY weather-backend/*.csproj ./aspnetapp/
+COPY /*.csproj ./aspnetapp/
 RUN cd aspnetapp && dotnet restore
 
 # copy everything else and build app
-COPY weather-backend/. ./aspnetapp/
+COPY /. ./aspnetapp/
 WORKDIR /source/aspnetapp
 RUN dotnet publish -c release -o /app --no-restore
 

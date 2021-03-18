@@ -32,6 +32,7 @@ namespace weather_backend
             services.AddTransient<CityList>();
 
             services.AddTransient<ThreadExample>();
+            services.AddTransient<AcademicService>();
             //TODO: doesn't work, will break email sending
             // services.AddTransient<SmtpClient>((serviceProvider) =>
             // {

@@ -1,6 +1,7 @@
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -33,6 +34,9 @@ namespace weather_backend
 
             services.AddTransient<ThreadExample>();
             services.AddTransient<AcademicService>();
+            
+            services.AddTransient<GeolocationService, GeolocationService>();
+            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
             //TODO: doesn't work, will break email sending
             // services.AddTransient<SmtpClient>((serviceProvider) =>
             // {

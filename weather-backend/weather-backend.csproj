@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Cronos" Version="0.7.0" />
     <PackageReference Include="Dapper" Version="2.0.78" />
+    <PackageReference Include="libphonenumber-csharp" Version="8.12.30" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -17,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Assets" />
-    <Folder Include="Factory" />
     <Folder Include="Services\Scheduler\Jobs" />
   </ItemGroup>
 

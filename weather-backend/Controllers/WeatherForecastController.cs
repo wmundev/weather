@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Net.Http;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -48,10 +48,19 @@ namespace weather_backend.Controllers
 
         [HttpGet]
         [Route("/city/all")]
-        public async Task<IEnumerable<City>> GetCities()
+        public async Task<ActionResult<IEnumerable<City>>> GetCities([FromQuery(Name = "num")] int numberOfCities = 100)
         {
-            IEnumerable<City> allCitiesInAustralia = _cityList.GetAllCitiesInAustralia();
-            return allCitiesInAustralia;
+            if (numberOfCities > 500)
+            {
+                return BadRequest(new ProblemDetails
+                {
+                    Type = "too large",
+                    Detail = "size is too large"
+                });
+            }
+
+            IEnumerable<City> allCitiesInAustralia = _cityList.GetAllCitiesInAustralia().Take(numberOfCities);
+            return Ok(allCitiesInAustralia);
         }
     }
 }

@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using weather_backend.Controllers;
+using weather_backend.Extensions;
 using weather_backend.Services;
+using weather_backend.StartupTask;
 
 namespace weather_backend
 {
@@ -24,10 +27,10 @@ namespace weather_backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks();
-            
+
             services.AddControllers();
             services.AddHttpClient();
-            
+
             services.AddTransient<EmailService>();
             services.AddTransient<CurrentWeatherData>();
             services.AddTransient<HttpClient>();
@@ -36,9 +39,11 @@ namespace weather_backend
 
             services.AddTransient<ThreadExample>();
             services.AddTransient<AcademicService>();
-            
+
             services.AddTransient<GeolocationService, GeolocationService>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+            services.AddSingleton<IPhoneService, PhoneService>();
             //TODO: doesn't work, will break email sending
             // services.AddTransient<SmtpClient>((serviceProvider) =>
             // {
@@ -55,12 +60,17 @@ namespace weather_backend
             //         EnableSsl = true
             //     };
             // });
-            
+
             services.AddHostedService<Scheduler>();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"});
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "weather_backend", Version = "v1" });
             });
+
+            //Other registrations
+            services
+                .AddStartupTask<WarmupServicesStartupTask>()
+                .TryAddSingleton(services);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

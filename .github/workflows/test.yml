@@ -16,7 +16,11 @@ jobs:
         with:
           dotnet-version: 6.0.x
           include-prerelease: true
-      - name: Test
+      - name: Unit Tests
         run: |
           cd weather-test
+          dotnet test --no-build --verbosity normal
+      - name: Integration Tests
+        run: |
+          cd Weather.API.IntegrationTests
           dotnet test --no-build --verbosity normal

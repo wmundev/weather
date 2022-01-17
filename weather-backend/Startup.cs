@@ -35,13 +35,13 @@ namespace weather_backend
             services.AddTransient<CurrentWeatherData>();
             services.AddTransient<HttpClient>();
             services.AddTransient<WeatherForecastController>();
-            services.AddTransient<CityList>();
+             services.AddTransient<CityList>();
 
-            services.AddTransient<ThreadExample>();
+             services.AddTransient<ThreadExample>();
             services.AddTransient<AcademicService>();
-
+ 
             services.AddTransient<GeolocationService, GeolocationService>();
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             services.AddSingleton<IPhoneService, PhoneService>();
             //TODO: doesn't work, will break email sending

@@ -35,3 +35,11 @@ To stop the app from running
 ```
 sudo docker-compose down
 ```
+
+## Installing git hooks
+There are git hooks being used in this project. To activate it, run the command in the root of this repository.
+
+```
+git config core.hooksPath .githooks
+```
+

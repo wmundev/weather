@@ -24,11 +24,6 @@ public class PhoneService : IPhoneService
         var countryCode = phoneNumber.CountryCodeSource;
         var possibleNumber = phoneNumberUtil.IsPossibleNumber(phoneNumber);
         var numberType = phoneNumberUtil.GetNumberType(phoneNumber);
-        return new
-        {
-            countryCode = countryCode,
-            possibleNumber = possibleNumber,
-            numberType = numberType
-        };
+        return new {countryCode, possibleNumber, numberType};
     }
 }

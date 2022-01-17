@@ -2,24 +2,23 @@
 using Microsoft.AspNetCore.Mvc;
 using weather_backend.Services;
 
-namespace weather_backend.Controllers
+namespace weather_backend.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class PhoneNumberController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class PhoneNumberController : ControllerBase
+    private readonly IPhoneService _phoneService;
+
+    public PhoneNumberController(IPhoneService phoneService)
     {
-        private readonly IPhoneService _phoneService;
+        _phoneService = phoneService;
+    }
 
-        public PhoneNumberController(IPhoneService phoneService)
-        {
-            this._phoneService = phoneService;
-        }
-
-        [HttpGet]
-        [Route("/phone")]
-        public async Task<ActionResult> ValidatePhoneNumber([FromQuery(Name = "phone")] string phone)
-        {
-            return Ok(_phoneService.ValidatePhoneNumber(phone));
-        }
+    [HttpGet]
+    [Route("/phone")]
+    public async Task<ActionResult> ValidatePhoneNumber([FromQuery(Name = "phone")] string phone)
+    {
+        return Ok(_phoneService.ValidatePhoneNumber(phone));
     }
 }

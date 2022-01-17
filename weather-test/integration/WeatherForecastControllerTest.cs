@@ -9,39 +9,38 @@ using weather_backend.Models;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace weather_test.integration
+namespace weather_test.integration;
+
+public class WeatherForecastControllerTest
 {
-    public class WeatherForecastControllerTest
+    private readonly HttpClient _client;
+    private readonly TestServer _server;
+
+    private readonly ITestOutputHelper _testOutputHelper;
+
+    public WeatherForecastControllerTest(ITestOutputHelper testOutputHelper)
     {
-        private readonly TestServer _server;
-        private readonly HttpClient _client;
+        _testOutputHelper = testOutputHelper;
 
-        private readonly ITestOutputHelper _testOutputHelper;
+        var pathToConfigFile =
+            "C:\\Jetbrains Projects\\RiderProjects\\weather\\weather-backend\\appsettings.json";
+        var config = new ConfigurationBuilder().AddJsonFile(pathToConfigFile).Build();
+        var builder = new WebHostBuilder().UseStartup<Startup>().UseConfiguration(config);
 
-        public WeatherForecastControllerTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-            
-            string pathToConfigFile =
-                "C:\\Jetbrains Projects\\RiderProjects\\weather\\weather-backend\\appsettings.json";
-            var config = new ConfigurationBuilder().AddJsonFile(pathToConfigFile).Build();
-            var builder = new WebHostBuilder().UseStartup<Startup>().UseConfiguration(config);
-            
-            _server = new TestServer(builder);
-            _client = _server.CreateClient();
-        }
+        _server = new TestServer(builder);
+        _client = _server.CreateClient();
+    }
 
-        [Fact]
-        public async Task GetCurrentWeatherDataByCityIdTest()
-        {
-            var response = await _client.GetAsync("/weather");
-            
-            response.EnsureSuccessStatusCode();
+    [Fact]
+    public async Task GetCurrentWeatherDataByCityIdTest()
+    {
+        var response = await _client.GetAsync("/weather");
 
-            string stringResponse = await response.Content.ReadAsStringAsync();
-            WeatherData weatherData = JsonConvert.DeserializeObject<WeatherData>(stringResponse);
-            // _testOutputHelper.WriteLine(await response.Content.ReadAsStringAsync());
-            Assert.Equal("Melbourne", weatherData.name );
-        }
+        response.EnsureSuccessStatusCode();
+
+        var stringResponse = await response.Content.ReadAsStringAsync();
+        var weatherData = JsonConvert.DeserializeObject<WeatherData>(stringResponse);
+        // _testOutputHelper.WriteLine(await response.Content.ReadAsStringAsync());
+        Assert.Equal("Melbourne", weatherData.name);
     }
 }

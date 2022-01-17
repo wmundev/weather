@@ -7,52 +7,46 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using weather_backend.Models;
 
-namespace weather_backend.Services
+namespace weather_backend.Services;
+
+public class CityList
 {
-    public class CityList
+    private readonly ILogger<CityList> _logger;
+
+    public CityList(ILogger<CityList> logger)
     {
-        private readonly ILogger<CityList> _logger;
+        _logger = logger;
+    }
 
-        public CityList(ILogger<CityList> logger)
+    public IEnumerable<City> GetAllCitiesInAustralia()
+    {
+        try
         {
-            _logger = logger;
-        }
-
-        public IEnumerable<City> GetAllCitiesInAustralia()
-        {
-            try
+            using (var streamReader = new StreamReader("Assets/city.list.json"))
             {
-                using (StreamReader streamReader = new StreamReader("Assets/city.list.json"))
+                var allCitiesStringified = streamReader.ReadToEnd();
+
+                var allCities = JsonConvert.DeserializeObject<City[]>(allCitiesStringified);
+
+                var australiaCities = allCities.Where(city => { return city.Country == "AU"; });
+
+                var regex = new Regex("^.*?wantirna.*?$");
+
+                foreach (var city in australiaCities)
                 {
-                    string allCitiesStringified = streamReader.ReadToEnd();
-
-                    City[] allCities = JsonConvert.DeserializeObject<City[]>(allCitiesStringified);
-
-                    IEnumerable<City> australiaCities = allCities.Where((city) => { return city.Country == "AU"; });
-
-                    Regex regex = new Regex("^.*?wantirna.*?$");
-                    
-                    foreach (City city in australiaCities)
-                    {
-                        MatchCollection matchCollection = regex.Matches(city.Name);
-                        if (matchCollection.Count !=  0)
-                        {
-                            _logger.Log(LogLevel.Critical, city.Name);
-
-                        }
-                    }
-
-                    return australiaCities;
+                    var matchCollection = regex.Matches(city.Name);
+                    if (matchCollection.Count != 0) _logger.Log(LogLevel.Critical, city.Name);
                 }
-            }
-            catch (IOException ioException)
-            {
-                Console.WriteLine("The file could not be read");
-                Console.WriteLine(ioException.Message);
-            }
-            return null;
 
+                return australiaCities;
+            }
         }
-        
+        catch (IOException ioException)
+        {
+            Console.WriteLine("The file could not be read");
+            Console.WriteLine(ioException.Message);
+        }
+
+        return null;
     }
 }

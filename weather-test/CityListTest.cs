@@ -6,31 +6,30 @@ using weather_backend.Models;
 using weather_backend.Services;
 using Xunit;
 
-namespace weather_test
+namespace weather_test;
+
+public class CityListTest
 {
-    public class CityListTest
+    private readonly CityList _cityList;
+
+    private readonly Mock<ILogger<CityList>> _mockLogger;
+
+    public CityListTest()
     {
-        private readonly CityList _cityList;
+        _mockLogger = new Mock<ILogger<CityList>>();
 
-        private readonly Mock<ILogger<CityList>> _mockLogger;
+        _cityList = new CityList(_mockLogger.Object);
+    }
 
-        public CityListTest()
-        {
-            _mockLogger = new Mock<ILogger<CityList>>();
+    [Fact]
+    public void GetAllCitiesInAustraliaTest()
+    {
+        var result = _cityList.GetAllCitiesInAustralia();
 
-            _cityList = new CityList(_mockLogger.Object);
-        }
-
-        [Fact]
-        public void GetAllCitiesInAustraliaTest()
-        {
-            var result = _cityList.GetAllCitiesInAustralia();
-
-            var resultSerialised = JsonConvert.SerializeObject(result.First());
-            var expectedSerialised =
-                JsonConvert.SerializeObject(
-                    new City(2057192, "Yunta", "", "AU", new Coordinate(139.550003, -32.583328)));
-            Assert.Equal(resultSerialised, expectedSerialised);
-        }
+        var resultSerialised = JsonConvert.SerializeObject(result.First());
+        var expectedSerialised =
+            JsonConvert.SerializeObject(
+                new City(2057192, "Yunta", "", "AU", new Coordinate(139.550003, -32.583328)));
+        Assert.Equal(resultSerialised, expectedSerialised);
     }
 }

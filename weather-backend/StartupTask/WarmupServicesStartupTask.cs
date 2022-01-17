@@ -5,39 +5,35 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace weather_backend.StartupTask
+namespace weather_backend.StartupTask;
+
+public class WarmupServicesStartupTask : IStartupTask
 {
-    public class WarmupServicesStartupTask : IStartupTask
+    private readonly IServiceProvider _provider;
+    private readonly IServiceCollection _services;
+
+    public WarmupServicesStartupTask(IServiceCollection services, IServiceProvider provider)
     {
-        private readonly IServiceCollection _services;
-        private readonly IServiceProvider _provider;
+        _services = services;
+        _provider = provider;
+    }
 
-        public WarmupServicesStartupTask(IServiceCollection services, IServiceProvider provider)
+    public Task ExecuteAsync(CancellationToken cancellationToken)
+    {
+        using (var scope = _provider.CreateScope())
         {
-            _services = services;
-            _provider = provider;
+            foreach (var singleton in GetServices(_services)) scope.ServiceProvider.GetServices(singleton);
         }
 
-        public Task ExecuteAsync(CancellationToken cancellationToken)
-        {
-            using (var scope = _provider.CreateScope())
-            {
-                foreach (var singleton in GetServices(_services))
-                {
-                    scope.ServiceProvider.GetServices(singleton);
-                }
-            }
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
-
-        static IEnumerable<Type> GetServices(IServiceCollection services)
-        {
-            return services
-                .Where(descriptor => descriptor.ImplementationType != typeof(WarmupServicesStartupTask))
-                .Where(descriptor => descriptor.ServiceType.ContainsGenericParameters == false)
-                .Select(descriptor => descriptor.ServiceType)
-                .Distinct();
-        }
+    private static IEnumerable<Type> GetServices(IServiceCollection services)
+    {
+        return services
+            .Where(descriptor => descriptor.ImplementationType != typeof(WarmupServicesStartupTask))
+            .Where(descriptor => descriptor.ServiceType.ContainsGenericParameters == false)
+            .Select(descriptor => descriptor.ServiceType)
+            .Distinct();
     }
 }

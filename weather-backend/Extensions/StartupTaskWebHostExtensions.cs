@@ -14,10 +14,7 @@ public static class StartupTaskWebHostExtensions
         var startupTasks = webHost.Services.GetServices<IStartupTask>();
 
         // Execute all the tasks
-        foreach (var startupTask in startupTasks)
-        {
-            await startupTask.ExecuteAsync(cancellationToken);
-        }
+        foreach (var startupTask in startupTasks) await startupTask.ExecuteAsync(cancellationToken);
 
         // Start the tasks as normal
         await webHost.RunAsync(cancellationToken);

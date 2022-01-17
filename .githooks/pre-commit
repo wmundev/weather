@@ -24,7 +24,7 @@ echo $filesToFormat
 echo "🏎  - Starting formatting..."
 
 dotnet tool restore
-dotnet jb cleanupcode --include="$filesToFormat" "$repoTopLevel/weather.sln"
+dotnet jb cleanupcode --include="$filesToFormat" "weather.sln"
 
 echo "✅ - Formatting complete. Adding changes..."
 git add $filesToCommit

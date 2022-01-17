@@ -12,90 +12,89 @@ using weather_backend.Extensions;
 using weather_backend.Services;
 using weather_backend.StartupTask;
 
-namespace weather_backend
+namespace weather_backend;
+
+public class Startup
 {
-    public class Startup
+    public Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
+        Configuration = configuration;
+    }
+
+    public IConfiguration Configuration { get; }
+
+    // This method gets called by the runtime. Use this method to add services to the container.
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddHealthChecks();
+
+        services.AddControllers();
+        services.AddHttpClient();
+
+        services.AddTransient<EmailService>();
+        services.AddTransient<CurrentWeatherData>();
+        services.AddTransient<HttpClient>();
+        services.AddTransient<WeatherForecastController>();
+        services.AddTransient<CityList>();
+
+        services.AddTransient<ThreadExample>();
+        services.AddTransient<AcademicService>();
+
+        services.AddTransient<GeolocationService, GeolocationService>();
+        services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+        services.AddSingleton<IPhoneService, PhoneService>();
+        //TODO: doesn't work, will break email sending
+        // services.AddTransient<SmtpClient>((serviceProvider) =>
+        // {
+        //     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+        //     string emailUsername = configuration.GetValue<string>("SMTPUsername");
+        //     string emailPassword = configuration.GetValue<string>("SMTPPassword");
+        //     string emailHost = configuration.GetValue<string>("SMTPHost");
+        //     int emailPort = configuration.GetValue<int>("SMTPPort");
+        //     return new SmtpClient()
+        //     {
+        //         Host = emailHost,
+        //         Port = emailPort,
+        //         Credentials = new NetworkCredential(emailUsername, emailPassword),
+        //         EnableSsl = true
+        //     };
+        // });
+
+        services.AddHostedService<Scheduler>();
+        services.AddSwaggerGen(c =>
         {
-            Configuration = configuration;
+            c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"});
+        });
+
+        //Other registrations
+        services
+            .AddStartupTask<WarmupServicesStartupTask>()
+            .TryAddSingleton(services);
+    }
+
+    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "weather_backend v1"));
         }
 
-        public IConfiguration Configuration { get; }
+        app.UseHttpsRedirection();
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        // app.UseStaticFiles();
+
+        app.UseRouting();
+
+        app.UseAuthorization();
+
+        app.UseEndpoints(endpoints =>
         {
-             services.AddHealthChecks();
-
-             services.AddControllers();
-            services.AddHttpClient();
- 
-            services.AddTransient<EmailService>();
-            services.AddTransient<CurrentWeatherData>();
-            services.AddTransient<HttpClient>();
-            services.AddTransient<WeatherForecastController>();
-             services.AddTransient<CityList>();
-
-             services.AddTransient<ThreadExample>();
-            services.AddTransient<AcademicService>();
- 
-            services.AddTransient<GeolocationService, GeolocationService>();
-             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-
-            services.AddSingleton<IPhoneService, PhoneService>();
-            //TODO: doesn't work, will break email sending
-            // services.AddTransient<SmtpClient>((serviceProvider) =>
-            // {
-            //     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            //     string emailUsername = configuration.GetValue<string>("SMTPUsername");
-            //     string emailPassword = configuration.GetValue<string>("SMTPPassword");
-            //     string emailHost = configuration.GetValue<string>("SMTPHost");
-            //     int emailPort = configuration.GetValue<int>("SMTPPort");
-            //     return new SmtpClient()
-            //     {
-            //         Host = emailHost,
-            //         Port = emailPort,
-            //         Credentials = new NetworkCredential(emailUsername, emailPassword),
-            //         EnableSsl = true
-            //     };
-            // });
-
-            services.AddHostedService<Scheduler>();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "weather_backend", Version = "v1" });
-            });
-
-            //Other registrations
-            services
-                .AddStartupTask<WarmupServicesStartupTask>()
-                .TryAddSingleton(services);
-        }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "weather_backend v1"));
-            }
-
-            app.UseHttpsRedirection();
-
-            // app.UseStaticFiles();
-
-            app.UseRouting();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapHealthChecks("/health");
-            });
-        }
+            endpoints.MapControllers();
+            endpoints.MapHealthChecks("/health");
+        });
     }
 }

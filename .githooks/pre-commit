@@ -14,7 +14,7 @@ filesToCommit=""
 
 for file in $(git diff --name-only --cached --diff-filter=ACMRT)
     do
-        filesToFormat+="${file//weather-backend/.};"
+        filesToFormat+="./"$file";"
         filesToCommit+="./"$file" "
     done
 

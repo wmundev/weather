@@ -28,9 +28,9 @@ namespace weather_backend
         {
              services.AddHealthChecks();
 
-            services.AddControllers();
+             services.AddControllers();
             services.AddHttpClient();
-
+ 
             services.AddTransient<EmailService>();
             services.AddTransient<CurrentWeatherData>();
             services.AddTransient<HttpClient>();

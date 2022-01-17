@@ -8,8 +8,7 @@ namespace Weather.API.IntegrationTests.setup;
 
 #region snippet1
 
-public class CustomWebApplicationFactory<TStartup>
-    : WebApplicationFactory<TStartup> where TStartup : class
+public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

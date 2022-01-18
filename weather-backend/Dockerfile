@@ -5,13 +5,15 @@ WORKDIR /source
 
 # copy csproj and restore as distinct layers
 #COPY *.sln .
-COPY /*.csproj ./aspnetapp/
-RUN cd aspnetapp && dotnet restore
+#COPY /*.csproj ./aspnetapp/
+#WORKDIR /source/aspnetapp
+#RUN dotnet restore
 
 # copy everything else and build app
+WORKDIR /source
 COPY /. ./aspnetapp/
 WORKDIR /source/aspnetapp
-RUN dotnet publish -c release -o /app --no-restore
+RUN dotnet publish -c release -o /app
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0

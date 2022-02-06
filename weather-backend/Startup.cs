@@ -1,4 +1,7 @@
 using System.Net.Http;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
+using Amazon.Extensions.NETCore.Setup;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -9,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using weather_backend.Controllers;
 using weather_backend.Extensions;
+using weather_backend.Repository;
 using weather_backend.Services;
 using weather_backend.StartupTask;
 
@@ -16,9 +20,12 @@ namespace weather_backend;
 
 public class Startup
 {
-    public Startup(IConfiguration configuration)
+    private IWebHostEnvironment _webHostEnvironment;
+
+    public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
     {
         Configuration = configuration;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     public IConfiguration Configuration { get; }
@@ -31,6 +38,28 @@ public class Startup
         services.AddControllers();
         services.AddHttpClient();
 
+        var dynamodbLocalMode = Configuration.GetValue("DynamoDb:LocalMode", false);
+        if (dynamodbLocalMode)
+        {
+            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+            var awsOptions = new AWSOptions
+            {
+                DefaultClientConfig =
+                {
+                    ServiceURL = "http://localhost:8000"
+                }
+            };
+            services.AddAWSService<IAmazonDynamoDB>(awsOptions);
+            services.AddTransient<IDynamoDBContext, DynamoDBContext>();
+        }
+        else
+        {
+            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+            services.AddAWSService<IAmazonDynamoDB>();
+            services.AddTransient<IDynamoDBContext, DynamoDBContext>();
+        }
+
+        services.AddTransient<DynamoDbClient>();
         services.AddTransient<EmailService>();
         services.AddTransient<CurrentWeatherData>();
         services.AddTransient<HttpClient>();
@@ -62,10 +91,7 @@ public class Startup
         // });
 
         services.AddHostedService<Scheduler>();
-        services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"});
-        });
+        services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
 
         //Other registrations
         services

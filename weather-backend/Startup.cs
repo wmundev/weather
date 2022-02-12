@@ -38,6 +38,8 @@ public class Startup
         services.AddControllers();
         services.AddHttpClient();
 
+        services.AddAutoMapper(typeof(Startup));
+
         var dynamodbLocalMode = Configuration.GetValue("DynamoDb:LocalMode", false);
         if (dynamodbLocalMode)
         {

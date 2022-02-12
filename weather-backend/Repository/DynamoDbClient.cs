@@ -17,4 +17,9 @@ public class DynamoDbClient
     {
         return await _amazonDynamoDbClient.LoadAsync<MusicDto>("Dream Theater", "Surrounded");
     }
+
+    public async Task saveRecord(DynamoDbCity obj)
+    {
+        await _amazonDynamoDbClient.SaveAsync(obj);
+    }
 }

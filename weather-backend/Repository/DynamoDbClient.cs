@@ -1,5 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.Model;
+using Amazon.Runtime;
+using Microsoft.Extensions.Logging;
 using weather_backend.Dto;
 
 namespace weather_backend.Repository;
@@ -7,10 +11,12 @@ namespace weather_backend.Repository;
 public class DynamoDbClient
 {
     private readonly IDynamoDBContext _amazonDynamoDbClient;
+    private readonly ILogger<DynamoDbClient> _logger;
 
-    public DynamoDbClient(IDynamoDBContext amazonDynamoDbClient)
+    public DynamoDbClient(IDynamoDBContext amazonDynamoDbClient, ILogger<DynamoDbClient> logger)
     {
         _amazonDynamoDbClient = amazonDynamoDbClient;
+        _logger = logger;
     }
 
     public async Task<MusicDto> getthings()
@@ -18,8 +24,43 @@ public class DynamoDbClient
         return await _amazonDynamoDbClient.LoadAsync<MusicDto>("Dream Theater", "Surrounded");
     }
 
-    public async Task saveRecord(DynamoDbCity obj)
+    public async Task SaveRecord(DynamoDbCity obj)
     {
-        await _amazonDynamoDbClient.SaveAsync(obj);
+        var retry = 0;
+        var maxRetry = 3;
+        while (retry < maxRetry)
+            try
+            {
+                await _amazonDynamoDbClient.SaveAsync(obj);
+                break;
+            }
+            catch (ProvisionedThroughputExceededException throughputExceededException)
+            {
+                _logger.LogError("throughput exceeded, retrying...");
+                _logger.LogError("Error Message:  " + throughputExceededException.Message);
+                retry += 1;
+                Thread.Sleep(1000);
+            }
+            catch (AmazonServiceException ase)
+            {
+                _logger.LogError("Could not complete operation");
+                _logger.LogError("Error Message:  " + ase.Message);
+                _logger.LogError("HTTP Status:    " + ase.StatusCode);
+                _logger.LogError("AWS Error Code: " + ase.ErrorCode);
+                _logger.LogError("Error Type:     " + ase.ErrorType);
+                _logger.LogError("Request ID:     " + ase.RequestId);
+                break;
+            }
+            catch (AmazonClientException ace)
+            {
+                _logger.LogError("Internal error occurred communicating with DynamoDB");
+                _logger.LogError("Error Message:  " + ace.Message);
+                break;
+            }
+    }
+
+    public async Task<DynamoDbCity> GetCity(string name)
+    {
+        return await _amazonDynamoDbClient.LoadAsync<DynamoDbCity>(name);
     }
 }

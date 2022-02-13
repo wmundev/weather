@@ -8,3 +8,10 @@ sed -i "s/{{DB_DATABASE}}/${DB_DATABASE}/g" weather-backend/appsettings.json
 echo $DB_PASSWORD >> weather-backend/POSTGRES_PASSWORD.txt
 echo $DB_USER >> weather-backend/POSTGRES_USER.txt
 echo $DB_DATABASE >> weather-backend/POSTGRES_DB.txt
+# for nginx ssl
+echo VIRTUAL_HOST=$VIRTUAL_HOST >> weather-backend/.env
+echo VIRTUAL_PORT=$PORT >> weather-backend/.env
+echo LETSENCRYPT_HOST=$VIRTUAL_HOST >> weather-backend/.env
+echo LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL >> weather-backend/.env
+# for aspnet core app
+echo ASPNETCORE_HTTP_PORT=$PORT

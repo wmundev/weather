@@ -53,7 +53,7 @@ public class CityList
         var allCities = GetAllCitiesFromJsonFile();
 
         foreach (var city in allCities)
-            await _dynamoDbClient.saveRecord(_mapper.Map<DynamoDbCity>(city));
+            await _dynamoDbClient.SaveRecord(_mapper.Map<DynamoDbCity>(city));
         // System.Threading.Thread.Sleep(1000);
     }
 
@@ -71,5 +71,10 @@ public class CityList
         }
 
         return australiaCities;
+    }
+
+    public async Task<DynamoDbCity> GetCityInfo(string name)
+    {
+        return await _dynamoDbClient.GetCity(name);
     }
 }

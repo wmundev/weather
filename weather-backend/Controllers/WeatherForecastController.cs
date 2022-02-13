@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using weather_backend.Dto;
 using weather_backend.Models;
 using weather_backend.Services;
 
@@ -63,5 +64,13 @@ public class WeatherForecastController : ControllerBase
     {
         await _cityList.PopulateDynamoDbDatabase();
         return Ok(1);
+    }
+
+    [HttpGet]
+    [Route("/city/{name}")]
+    public async Task<ActionResult<DynamoDbCity>> GetCityInformation(string name)
+    {
+        var city = await _cityList.GetCityInfo(name);
+        return Ok(city);
     }
 }

@@ -43,3 +43,15 @@ There are git hooks being used in this project. To activate it, run the command 
 git config core.hooksPath .githooks
 ```
 
+## Installing AWS Profile
+ssh into the server and run
+
+```
+aws --profile default configure set aws_access_key_id "my-20-digit-id"
+```
+
+```
+aws --profile default configure set aws_secret_access_key "my-40-digit-secret-key"
+```
+
+replacing the `"my-20-digit-id"` and `"my-40-digit-secret-key"` with the correct id and password before running the command, it can be found via the terraform stack that created this user in the folder `weather-infra`

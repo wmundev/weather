@@ -87,6 +87,5 @@ services:
       - 3000
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=https://+:443;http://+:80
     volumes:
       - /etc/letsencrypt:/https:ro

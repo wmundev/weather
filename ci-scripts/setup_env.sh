@@ -14,4 +14,4 @@ echo VIRTUAL_PORT=$PORT >> weather-backend/.env
 echo LETSENCRYPT_HOST=$VIRTUAL_HOST >> weather-backend/.env
 echo LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL >> weather-backend/.env
 # for aspnet core app
-echo ASPNETCORE_HTTP_PORT=$PORT
+echo ASPNETCORE_URLS="http://+:${PORT}" >> weather-backend/.env

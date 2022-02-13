@@ -65,3 +65,5 @@ Desktop.ini
 
 *.sln.cache
 packages
+
+**/.terraform

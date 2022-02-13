@@ -56,4 +56,12 @@ public class WeatherForecastController : ControllerBase
         var allCitiesInAustralia = _cityList.GetAllCitiesInAustralia().Take(numberOfCities);
         return Ok(allCitiesInAustralia);
     }
+
+    [HttpGet]
+    [Route("/populate")]
+    public async Task<ActionResult<int>> PopulateDynamoDbDatabase()
+    {
+        await _cityList.PopulateDynamoDbDatabase();
+        return Ok(1);
+    }
 }

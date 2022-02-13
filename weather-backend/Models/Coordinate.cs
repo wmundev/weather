@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Amazon.DynamoDBv2.DataModel;
+using Newtonsoft.Json;
 
 namespace weather_backend.Models;
 
@@ -14,7 +15,11 @@ public class Coordinate
         Latitude = latitude;
     }
 
-    [JsonProperty("lon")] public double Longitude { get; set; }
+    [JsonProperty("lon")]
+    [DynamoDBProperty("lon")]
+    public double Longitude { get; set; }
 
-    [JsonProperty("lat")] public double Latitude { get; set; }
+    [JsonProperty("lat")]
+    [DynamoDBProperty("lat")]
+    public double Latitude { get; set; }
 }

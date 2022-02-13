@@ -22,8 +22,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=https://+:443;http://+:80
 #      - ASPNETCORE_HTTPS_PORT=5000 #doesn't work atm
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/live/dotnet.wilsonmun.live/fullchain.pem
-      - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=/https/live/dotnet.wilsonmun.live/privkey.pem
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/live/dotnet.wilsonmun.me/fullchain.pem
+      - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=/https/live/dotnet.wilsonmun.me/privkey.pem
     volumes:
       - /etc/letsencrypt:/https:ro
     depends_on:

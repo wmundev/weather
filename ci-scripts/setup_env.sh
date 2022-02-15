@@ -15,3 +15,5 @@ echo LETSENCRYPT_HOST=$VIRTUAL_HOST >> weather-backend/.env
 echo LETSENCRYPT_EMAIL=$LETSENCRYPT_EMAIL >> weather-backend/.env
 # for aspnet core app
 echo ASPNETCORE_URLS="http://+:${PORT}" >> weather-backend/.env
+echo AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID >> weather-backend/.env
+echo AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY >> weather-backend/.env

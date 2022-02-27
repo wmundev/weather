@@ -6,7 +6,15 @@ https://github.com/docker/docker-install
 
 https://docs.docker.com/compose/install/
 
-## Instructions for debian
+# Deploying (new)
+Run the command
+```
+dotnet aws deploy
+```
+
+We use this tool to deploy to aws to AWS ECS - https://github.com/aws/aws-dotnet-deploy
+
+## Instructions for debian deploy (deprecated)
 Run the command in a terminal after logging into your server
 
 ```

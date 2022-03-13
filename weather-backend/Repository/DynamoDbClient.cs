@@ -19,9 +19,9 @@ public class DynamoDbClient
         _logger = logger;
     }
 
-    public async Task<MusicDto> getthings()
+    public async Task<MusicDto> getthings(CancellationToken token = default)
     {
-        return await _amazonDynamoDbClient.LoadAsync<MusicDto>("Dream Theater", "Surrounded");
+        return await _amazonDynamoDbClient.LoadAsync<MusicDto>("Dream Theater", "Surrounded", token);
     }
 
     public async Task SaveRecord(DynamoDbCity obj)

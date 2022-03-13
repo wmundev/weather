@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using weather_backend.Controllers;
 using weather_backend.Extensions;
+using weather_backend.Middleware;
 using weather_backend.Repository;
 using weather_backend.Services;
 using weather_backend.StartupTask;
@@ -113,7 +114,9 @@ public class Startup
 
         app.UseHttpsRedirection();
 
-        // app.UseStaticFiles();
+        app.UseStaticFiles();
+
+        app.UseLogMiddleware();
 
         app.UseRouting();
 

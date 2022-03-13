@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using weather_backend.Repository;
 
@@ -20,5 +22,26 @@ public class MusicController : ControllerBase
     public async Task<string> GetIpAddress()
     {
         return (await _client.getthings()).SongTitle;
+    }
+
+    [HttpGet]
+    [Route("music/nice")]
+    public async Task<ActionResult<string>> GetAsyncCancel()
+    {
+        var source = new CancellationTokenSource();
+        var someTask = _client.getthings(source.Token);
+        source.Cancel();
+
+        try
+        {
+            var things = await someTask;
+            return Ok(things.SongTitle);
+        }
+        catch (TaskCanceledException e)
+        {
+            Console.WriteLine(e.Message);
+        }
+
+        return BadRequest(new ProblemDetails {Type = "typeisfailed", Detail = "Failed"});
     }
 }

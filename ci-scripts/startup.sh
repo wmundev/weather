@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 cd /home/admin/weather-backend
 sudo docker-compose build
 sudo docker-compose down

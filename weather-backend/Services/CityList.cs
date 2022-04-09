@@ -27,15 +27,15 @@ public class CityList
         _mapper = mapper;
     }
 
-    private City[] GetAllCitiesFromJsonFile()
+    private IEnumerable<City> GetAllCitiesFromJsonFile()
     {
         try
         {
             using (var streamReader = new StreamReader("Assets/city.list.json"))
             {
-                var allCitiesStringified = streamReader.ReadToEnd();
+                var allCitiesStringify = streamReader.ReadToEnd();
 
-                var allCities = JsonConvert.DeserializeObject<City[]>(allCitiesStringified);
+                var allCities = JsonConvert.DeserializeObject<City[]>(allCitiesStringify);
                 return allCities;
             }
         }
@@ -45,7 +45,7 @@ public class CityList
             Console.WriteLine(ioException.Message);
         }
 
-        return null;
+        return Array.Empty<City>();
     }
 
     public async Task PopulateDynamoDbDatabase()
@@ -64,13 +64,14 @@ public class CityList
 
         var regex = new Regex("^.*?wantirna.*?$");
 
-        foreach (var city in australiaCities)
+        var allCitiesInAustralia = australiaCities.ToList();
+        foreach (var city in allCitiesInAustralia)
         {
             var matchCollection = regex.Matches(city.Name);
             if (matchCollection.Count != 0) _logger.Log(LogLevel.Critical, city.Name);
         }
 
-        return australiaCities;
+        return allCitiesInAustralia;
     }
 
     public async Task<DynamoDbCity> GetCityInfo(string name)

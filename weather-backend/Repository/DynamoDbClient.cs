@@ -8,7 +8,14 @@ using weather_backend.Dto;
 
 namespace weather_backend.Repository;
 
-public class DynamoDbClient
+public interface IDynamoDbClient
+{
+    Task<MusicDto> getthings(CancellationToken token = default);
+    Task SaveRecord(DynamoDbCity obj);
+    Task<DynamoDbCity> GetCity(string name);
+}
+
+public class DynamoDbClient : IDynamoDbClient
 {
     private readonly IDynamoDBContext _amazonDynamoDbClient;
     private readonly ILogger<DynamoDbClient> _logger;

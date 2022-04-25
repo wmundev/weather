@@ -62,7 +62,7 @@ public class Startup
             services.AddTransient<IDynamoDBContext, DynamoDBContext>();
         }
 
-        services.AddTransient<DynamoDbClient>();
+        services.AddTransient<IDynamoDbClient, DynamoDbClient>();
         services.AddTransient<EmailService>();
         services.AddTransient<CurrentWeatherData>();
         services.AddTransient<HttpClient>();

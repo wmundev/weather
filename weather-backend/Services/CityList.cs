@@ -15,12 +15,12 @@ namespace weather_backend.Services;
 
 public class CityList
 {
-    private readonly DynamoDbClient _dynamoDbClient;
+    private readonly IDynamoDbClient _dynamoDbClient;
     private readonly ILogger<CityList> _logger;
     private readonly IMapper _mapper;
 
 
-    public CityList(ILogger<CityList> logger, DynamoDbClient dynamoDbClient, IMapper mapper)
+    public CityList(ILogger<CityList> logger, IDynamoDbClient dynamoDbClient, IMapper mapper)
     {
         _logger = logger;
         _dynamoDbClient = dynamoDbClient;

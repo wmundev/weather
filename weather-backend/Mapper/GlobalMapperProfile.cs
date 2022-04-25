@@ -2,12 +2,13 @@
 using weather_backend.Dto;
 using weather_backend.Models;
 
-namespace weather_backend.Mapper;
-
-public class GlobalMapperProfile : Profile
+namespace weather_backend.Mapper
 {
-    public GlobalMapperProfile()
+    public class GlobalMapperProfile : Profile
     {
-        CreateMap<City, DynamoDbCity>();
+        public GlobalMapperProfile()
+        {
+            CreateMap<City, DynamoDbCity>();
+        }
     }
 }

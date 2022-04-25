@@ -6,3 +6,6 @@ root = true
 [*]
 indent_style = space
 max_line_length = 999999
+
+# IDE0160: Convert to block-scoped namespace
+csharp_style_namespace_declarations = block_scoped:warning

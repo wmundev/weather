@@ -1,8 +1,9 @@
 ﻿using Newtonsoft.Json;
 
-namespace weather_backend.Models;
-
-public class Cloud
+namespace weather_backend.Models
 {
-    [JsonProperty("all")] public int all { get; set; }
+    public class Cloud
+    {
+        [JsonProperty("all")] public int all { get; set; }
+    }
 }

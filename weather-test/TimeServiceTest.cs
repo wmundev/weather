@@ -2,33 +2,34 @@
 using weather_backend.Services;
 using Xunit;
 
-namespace weather_test;
-
-public class TimeServiceTest
+namespace weather_test
 {
-    private readonly TimeService _timeService;
-
-    public TimeServiceTest()
+    public class TimeServiceTest
     {
-        _timeService = new TimeService();
-    }
+        private readonly TimeService _timeService;
 
-    [Fact]
-    public void CompareTimeTest()
-    {
-        var date1 = new DateTime(2020, 12, 20);
-        var date2 = DateTime.Now;
+        public TimeServiceTest()
+        {
+            _timeService = new TimeService();
+        }
 
-        var result = _timeService.CompareTime(date1, date2);
+        [Fact]
+        public void CompareTimeTest()
+        {
+            var date1 = new DateTime(2020, 12, 20);
+            var date2 = DateTime.Now;
 
-        Assert.Equal(-1, result);
-    }
+            var result = _timeService.CompareTime(date1, date2);
 
-    [Fact]
-    public void CalculateTimeDifferenceToMinutesTest()
-    {
-        var result = _timeService.CalculateTimeDifferenceToMinutes(1, 20, 2, 40);
+            Assert.Equal(-1, result);
+        }
 
-        Assert.Equal(80, result);
+        [Fact]
+        public void CalculateTimeDifferenceToMinutesTest()
+        {
+            var result = _timeService.CalculateTimeDifferenceToMinutes(1, 20, 2, 40);
+
+            Assert.Equal(80, result);
+        }
     }
 }

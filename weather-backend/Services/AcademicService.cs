@@ -5,36 +5,37 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using weather_backend.Models;
 
-namespace weather_backend.Services;
-
-public class AcademicService
+namespace weather_backend.Services
 {
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<AcademicService> _logger;
-
-    public AcademicService(IConfiguration configuration, ILogger<AcademicService> logger)
+    public class AcademicService
     {
-        _configuration = configuration;
-        _logger = logger;
-    }
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<AcademicService> _logger;
 
-    public Academic GetAcademicById(int id)
-    {
-        var host = "localhost";
-        var username = _configuration.GetValue<string>("DBUser");
-        var password = _configuration.GetValue<string>("DBPassword");
-        var database = _configuration.GetValue<string>("DBDatabase");
-        var connectionString = $"Host={host};Username={username};Password={password};Database={database}";
-
-        using (var connection = new NpgsqlConnection(connectionString))
+        public AcademicService(IConfiguration configuration, ILogger<AcademicService> logger)
         {
-            var parameters = new {Id = id};
-            var query = "select * from academic where ACNUM = @Id";
-            var result = connection.Query<Academic>(query, parameters);
-            _logger.Log(LogLevel.Warning, result.First().ACNUM.ToString());
-            return result.First();
+            _configuration = configuration;
+            _logger = logger;
         }
 
-        return null;
+        public Academic GetAcademicById(int id)
+        {
+            var host = "localhost";
+            var username = _configuration.GetValue<string>("DBUser");
+            var password = _configuration.GetValue<string>("DBPassword");
+            var database = _configuration.GetValue<string>("DBDatabase");
+            var connectionString = $"Host={host};Username={username};Password={password};Database={database}";
+
+            using (var connection = new NpgsqlConnection(connectionString))
+            {
+                var parameters = new {Id = id};
+                var query = "select * from academic where ACNUM = @Id";
+                var result = connection.Query<Academic>(query, parameters);
+                _logger.Log(LogLevel.Warning, result.First().ACNUM.ToString());
+                return result.First();
+            }
+
+            return null;
+        }
     }
 }

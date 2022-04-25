@@ -4,44 +4,45 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using weather_backend.Repository;
 
-namespace weather_backend.Controllers;
-
-[ApiController]
-[Route("[controller]")]
-public class MusicController : ControllerBase
+namespace weather_backend.Controllers
 {
-    private readonly DynamoDbClient _client;
-
-    public MusicController(DynamoDbClient client)
+    [ApiController]
+    [Route("[controller]")]
+    public class MusicController : ControllerBase
     {
-        _client = client;
-    }
+        private readonly DynamoDbClient _client;
 
-    [HttpGet]
-    [Route("music")]
-    public async Task<string> GetIpAddress()
-    {
-        return (await _client.getthings()).SongTitle;
-    }
-
-    [HttpGet]
-    [Route("music/nice")]
-    public async Task<ActionResult<string>> GetAsyncCancel()
-    {
-        var source = new CancellationTokenSource();
-        var someTask = _client.getthings(source.Token);
-        source.Cancel();
-
-        try
+        public MusicController(DynamoDbClient client)
         {
-            var things = await someTask;
-            return Ok(things.SongTitle);
-        }
-        catch (TaskCanceledException e)
-        {
-            Console.WriteLine(e.Message);
+            _client = client;
         }
 
-        return BadRequest(new ProblemDetails {Type = "typeisfailed", Detail = "Failed"});
+        [HttpGet]
+        [Route("music")]
+        public async Task<string> GetIpAddress()
+        {
+            return (await _client.getthings()).SongTitle;
+        }
+
+        [HttpGet]
+        [Route("music/nice")]
+        public async Task<ActionResult<string>> GetAsyncCancel()
+        {
+            var source = new CancellationTokenSource();
+            var someTask = _client.getthings(source.Token);
+            source.Cancel();
+
+            try
+            {
+                var things = await someTask;
+                return Ok(things.SongTitle);
+            }
+            catch (TaskCanceledException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            return BadRequest(new ProblemDetails {Type = "typeisfailed", Detail = "Failed"});
+        }
     }
 }

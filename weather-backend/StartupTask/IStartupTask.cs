@@ -1,9 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace weather_backend.StartupTask;
-
-public interface IStartupTask
+namespace weather_backend.StartupTask
 {
-    Task ExecuteAsync(CancellationToken cancellationToken = default);
+    public interface IStartupTask
+    {
+        Task ExecuteAsync(CancellationToken cancellationToken = default);
+    }
 }

@@ -1,9 +1,10 @@
-﻿namespace weather_backend.Services;
-
-public class Number
+﻿namespace weather_backend.Services
 {
-    public int Get1Plus1()
+    public class Number
     {
-        return 1 + 1;
+        public int Get1Plus1()
+        {
+            return 1 + 1;
+        }
     }
 }

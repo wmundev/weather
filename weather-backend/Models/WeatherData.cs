@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace weather_backend.Models;
-
-/**
+namespace weather_backend.Models
+{
+    /**
  * * Example
  * * {
  * "coord":{
@@ -48,31 +48,32 @@ namespace weather_backend.Models;
  * "cod":200
  * }
  */
-public class WeatherData
-{
-    [JsonProperty("coord")] public Coordinate coord { get; set; }
+    public class WeatherData
+    {
+        [JsonProperty("coord")] public Coordinate coord { get; set; }
 
-    [JsonProperty("weather")] public Weather[] weather { get; set; }
+        [JsonProperty("weather")] public Weather[] weather { get; set; }
 
-    [JsonProperty("base")] public string BaseInfo { get; set; }
+        [JsonProperty("base")] public string BaseInfo { get; set; }
 
-    [JsonProperty("main")] public MainWeather main { get; set; }
+        [JsonProperty("main")] public MainWeather main { get; set; }
 
-    [JsonProperty("visibility")] public int visibility { get; set; }
+        [JsonProperty("visibility")] public int visibility { get; set; }
 
-    [JsonProperty("wind")] public Wind wind { get; set; }
+        [JsonProperty("wind")] public Wind wind { get; set; }
 
-    [JsonProperty("clouds")] public Cloud clouds { get; set; }
+        [JsonProperty("clouds")] public Cloud clouds { get; set; }
 
-    [JsonProperty("dt")] public int dt { get; set; }
+        [JsonProperty("dt")] public int dt { get; set; }
 
-    [JsonProperty("sys")] public WeatherSystem sys { get; set; }
+        [JsonProperty("sys")] public WeatherSystem sys { get; set; }
 
-    [JsonProperty("timezone")] public int timezone { get; set; }
+        [JsonProperty("timezone")] public int timezone { get; set; }
 
-    [JsonProperty("id")] public int id { get; set; }
+        [JsonProperty("id")] public int id { get; set; }
 
-    [JsonProperty("name")] public string name { get; set; }
+        [JsonProperty("name")] public string name { get; set; }
 
-    [JsonProperty("cod")] public int cod { get; set; }
+        [JsonProperty("cod")] public int cod { get; set; }
+    }
 }

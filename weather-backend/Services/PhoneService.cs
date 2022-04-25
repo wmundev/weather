@@ -1,29 +1,30 @@
 ﻿using PhoneNumbers;
 
-namespace weather_backend.Services;
-
-public interface IPhoneService
+namespace weather_backend.Services
 {
-    dynamic ValidatePhoneNumber(string phone);
-}
-
-public class PhoneService : IPhoneService
-{
-    private readonly PhoneNumberUtil _phoneNumberUtil;
-
-    public PhoneService()
+    public interface IPhoneService
     {
-        _phoneNumberUtil = PhoneNumberUtil.GetInstance();
+        dynamic ValidatePhoneNumber(string phone);
     }
 
-    public dynamic ValidatePhoneNumber(string phone)
+    public class PhoneService : IPhoneService
     {
-        var phoneNumberUtil = _phoneNumberUtil;
-        var phoneNumber = phoneNumberUtil.Parse(phone, "AU");
+        private readonly PhoneNumberUtil _phoneNumberUtil;
 
-        var countryCode = phoneNumber.CountryCodeSource;
-        var possibleNumber = phoneNumberUtil.IsPossibleNumber(phoneNumber);
-        var numberType = phoneNumberUtil.GetNumberType(phoneNumber);
-        return new {countryCode, possibleNumber, numberType};
+        public PhoneService()
+        {
+            _phoneNumberUtil = PhoneNumberUtil.GetInstance();
+        }
+
+        public dynamic ValidatePhoneNumber(string phone)
+        {
+            var phoneNumberUtil = _phoneNumberUtil;
+            var phoneNumber = phoneNumberUtil.Parse(phone, "AU");
+
+            var countryCode = phoneNumber.CountryCodeSource;
+            var possibleNumber = phoneNumberUtil.IsPossibleNumber(phoneNumber);
+            var numberType = phoneNumberUtil.GetNumberType(phoneNumber);
+            return new {countryCode, possibleNumber, numberType};
+        }
     }
 }

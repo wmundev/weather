@@ -4,19 +4,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using weather_backend.StartupTask;
 
-namespace weather_backend.Extensions;
-
-public static class StartupTaskWebHostExtensions
+namespace weather_backend.Extensions
 {
-    public static async Task RunWithTasksAsync(this IHost webHost, CancellationToken cancellationToken = default)
+    public static class StartupTaskWebHostExtensions
     {
-        // Load all tasks from DI
-        var startupTasks = webHost.Services.GetServices<IStartupTask>();
+        public static async Task RunWithTasksAsync(this IHost webHost, CancellationToken cancellationToken = default)
+        {
+            // Load all tasks from DI
+            var startupTasks = webHost.Services.GetServices<IStartupTask>();
 
-        // Execute all the tasks
-        foreach (var startupTask in startupTasks) await startupTask.ExecuteAsync(cancellationToken);
+            // Execute all the tasks
+            foreach (var startupTask in startupTasks) await startupTask.ExecuteAsync(cancellationToken);
 
-        // Start the tasks as normal
-        await webHost.RunAsync(cancellationToken);
+            // Start the tasks as normal
+            await webHost.RunAsync(cancellationToken);
+        }
     }
 }

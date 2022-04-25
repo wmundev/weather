@@ -1,11 +1,12 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
 
-namespace weather_backend.Dto;
-
-[DynamoDBTable("Music")]
-public class MusicDto
+namespace weather_backend.Dto
 {
-    [DynamoDBHashKey] public string Artist { get; set; }
+    [DynamoDBTable("Music")]
+    public class MusicDto
+    {
+        [DynamoDBHashKey] public string Artist { get; set; }
 
-    [DynamoDBRangeKey("SongTitle")] public string SongTitle { get; set; }
+        [DynamoDBRangeKey("SongTitle")] public string SongTitle { get; set; }
+    }
 }

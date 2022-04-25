@@ -1,5 +1,6 @@
-﻿namespace weather_backend.Services;
-
-public class HourlyForecast
+﻿namespace weather_backend.Services
 {
+    public class HourlyForecast
+    {
+    }
 }

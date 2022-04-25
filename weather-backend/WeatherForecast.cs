@@ -1,14 +1,15 @@
 using System;
 
-namespace weather_backend;
-
-public class WeatherForecast
+namespace weather_backend
 {
-    public DateTime Date { get; set; }
+    public class WeatherForecast
+    {
+        public DateTime Date { get; set; }
 
-    public int TemperatureC { get; set; }
+        public int TemperatureC { get; set; }
 
-    public int TemperatureF => 32 + (int) (TemperatureC / 0.5556);
+        public int TemperatureF => 32 + (int) (TemperatureC / 0.5556);
 
-    public string Summary { get; set; }
+        public string Summary { get; set; }
+    }
 }

@@ -4,50 +4,51 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Weather.API.IntegrationTests.setup;
-
-#region snippet1
-
-public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
+namespace Weather.API.IntegrationTests.setup
 {
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    #region snippet1
+
+    public class CustomWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {
-        builder.ConfigureServices(services =>
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            // var descriptor = services.SingleOrDefault(
-            //     d => d.ServiceType ==
-            //          typeof(DbContextOptions<ApplicationDbContext>));
-            //
-            // services.Remove(descriptor);
-
-            // services.AddDbContext<ApplicationDbContext>(options =>
-            // {
-            // options.UseInMemoryDatabase("InMemoryDbForTesting");
-            // });
-
-            var sp = services.BuildServiceProvider();
-
-            using (var scope = sp.CreateScope())
+            builder.ConfigureServices(services =>
             {
-                var scopedServices = scope.ServiceProvider;
-                // var db = scopedServices.GetRequiredService<ApplicationDbContext>();
-                var logger = scopedServices
-                    .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+                // var descriptor = services.SingleOrDefault(
+                //     d => d.ServiceType ==
+                //          typeof(DbContextOptions<ApplicationDbContext>));
+                //
+                // services.Remove(descriptor);
 
-                // db.Database.EnsureCreated();
+                // services.AddDbContext<ApplicationDbContext>(options =>
+                // {
+                // options.UseInMemoryDatabase("InMemoryDbForTesting");
+                // });
 
-                try
+                var sp = services.BuildServiceProvider();
+
+                using (var scope = sp.CreateScope())
                 {
-                    // Utilities.InitializeDbForTests(db);
+                    var scopedServices = scope.ServiceProvider;
+                    // var db = scopedServices.GetRequiredService<ApplicationDbContext>();
+                    var logger = scopedServices
+                        .GetRequiredService<ILogger<CustomWebApplicationFactory<TStartup>>>();
+
+                    // db.Database.EnsureCreated();
+
+                    try
+                    {
+                        // Utilities.InitializeDbForTests(db);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, "An error occurred seeding the " +
+                                            "database with test messages. Error: {Message}", ex.Message);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    logger.LogError(ex, "An error occurred seeding the " +
-                                        "database with test messages. Error: {Message}", ex.Message);
-                }
-            }
-        });
+            });
+        }
     }
-}
 
-#endregion
+    #endregion
+}

@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Threading;
 
-namespace weather_backend.Services;
-
-public class ThreadExample
+namespace weather_backend.Services
 {
-    private bool isCompleted;
-
-    public void CreateNewThread()
+    public class ThreadExample
     {
-        var newThread = new Thread(ForLoopThread);
-        newThread.Start();
-        newThread.Name = "new thread";
+        private bool isCompleted;
 
-        Thread.CurrentThread.Name = "main thread";
-        ForLoopThread();
-    }
-
-    private void ForLoopThread()
-    {
-        if (!isCompleted)
+        public void CreateNewThread()
         {
-            Console.WriteLine("hello world");
-            isCompleted = true;
+            var newThread = new Thread(ForLoopThread);
+            newThread.Start();
+            newThread.Name = "new thread";
+
+            Thread.CurrentThread.Name = "main thread";
+            ForLoopThread();
+        }
+
+        private void ForLoopThread()
+        {
+            if (!isCompleted)
+            {
+                Console.WriteLine("hello world");
+                isCompleted = true;
+            }
         }
     }
 }

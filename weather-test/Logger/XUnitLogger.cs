@@ -7,101 +7,102 @@ using Xunit.Abstractions;
  * Taken from https://www.meziantou.net/how-to-get-asp-net-core-logs-in-the-output-of-xunit-tests.htm
  * This is to allow logger to output logging information when running unit tests
  */
-namespace weather_test.Logger;
-
-internal class XUnitLogger : ILogger
+namespace weather_test.Logger
 {
-    private readonly string _categoryName;
-    private readonly LoggerExternalScopeProvider _scopeProvider;
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider,
-        string categoryName)
+    internal class XUnitLogger : ILogger
     {
-        _testOutputHelper = testOutputHelper;
-        _scopeProvider = scopeProvider;
-        _categoryName = categoryName;
-    }
+        private readonly string _categoryName;
+        private readonly LoggerExternalScopeProvider _scopeProvider;
+        private readonly ITestOutputHelper _testOutputHelper;
 
-    public bool IsEnabled(LogLevel logLevel)
-    {
-        return logLevel != LogLevel.None;
-    }
-
-    public IDisposable BeginScope<TState>(TState state)
-    {
-        return _scopeProvider.Push(state);
-    }
-
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
-        Func<TState, Exception, string> formatter)
-    {
-        var sb = new StringBuilder();
-        sb.Append(GetLogLevelString(logLevel))
-            .Append(" [").Append(_categoryName).Append("] ")
-            .Append(formatter(state, exception));
-
-        if (exception != null) sb.Append('\n').Append(exception);
-
-        // Append scopes
-        _scopeProvider.ForEachScope((scope, state) =>
+        public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider,
+            string categoryName)
         {
-            state.Append("\n => ");
-            state.Append(scope);
-        }, sb);
+            _testOutputHelper = testOutputHelper;
+            _scopeProvider = scopeProvider;
+            _categoryName = categoryName;
+        }
 
-        _testOutputHelper.WriteLine(sb.ToString());
-    }
-
-    public static ILogger CreateLogger(ITestOutputHelper testOutputHelper)
-    {
-        return new XUnitLogger(testOutputHelper, new LoggerExternalScopeProvider(), "");
-    }
-
-    public static ILogger<T> CreateLogger<T>(ITestOutputHelper testOutputHelper)
-    {
-        return new XUnitLogger<T>(testOutputHelper, new LoggerExternalScopeProvider());
-    }
-
-    private static string GetLogLevelString(LogLevel logLevel)
-    {
-        return logLevel switch
+        public bool IsEnabled(LogLevel logLevel)
         {
-            LogLevel.Trace => "trce",
-            LogLevel.Debug => "dbug",
-            LogLevel.Information => "info",
-            LogLevel.Warning => "warn",
-            LogLevel.Error => "fail",
-            LogLevel.Critical => "crit",
-            _ => throw new ArgumentOutOfRangeException(nameof(logLevel))
-        };
+            return logLevel != LogLevel.None;
+        }
+
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            return _scopeProvider.Push(state);
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
+            Func<TState, Exception, string> formatter)
+        {
+            var sb = new StringBuilder();
+            sb.Append(GetLogLevelString(logLevel))
+                .Append(" [").Append(_categoryName).Append("] ")
+                .Append(formatter(state, exception));
+
+            if (exception != null) sb.Append('\n').Append(exception);
+
+            // Append scopes
+            _scopeProvider.ForEachScope((scope, state) =>
+            {
+                state.Append("\n => ");
+                state.Append(scope);
+            }, sb);
+
+            _testOutputHelper.WriteLine(sb.ToString());
+        }
+
+        public static ILogger CreateLogger(ITestOutputHelper testOutputHelper)
+        {
+            return new XUnitLogger(testOutputHelper, new LoggerExternalScopeProvider(), "");
+        }
+
+        public static ILogger<T> CreateLogger<T>(ITestOutputHelper testOutputHelper)
+        {
+            return new XUnitLogger<T>(testOutputHelper, new LoggerExternalScopeProvider());
+        }
+
+        private static string GetLogLevelString(LogLevel logLevel)
+        {
+            return logLevel switch
+            {
+                LogLevel.Trace => "trce",
+                LogLevel.Debug => "dbug",
+                LogLevel.Information => "info",
+                LogLevel.Warning => "warn",
+                LogLevel.Error => "fail",
+                LogLevel.Critical => "crit",
+                _ => throw new ArgumentOutOfRangeException(nameof(logLevel))
+            };
+        }
     }
-}
 
-internal sealed class XUnitLogger<T> : XUnitLogger, ILogger<T>
-{
-    public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider)
-        : base(testOutputHelper, scopeProvider, typeof(T).FullName)
+    internal sealed class XUnitLogger<T> : XUnitLogger, ILogger<T>
     {
-    }
-}
-
-internal sealed class XUnitLoggerProvider : ILoggerProvider
-{
-    private readonly LoggerExternalScopeProvider _scopeProvider = new();
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public XUnitLoggerProvider(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
+        public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider)
+            : base(testOutputHelper, scopeProvider, typeof(T).FullName)
+        {
+        }
     }
 
-    public ILogger CreateLogger(string categoryName)
+    internal sealed class XUnitLoggerProvider : ILoggerProvider
     {
-        return new XUnitLogger(_testOutputHelper, _scopeProvider, categoryName);
-    }
+        private readonly LoggerExternalScopeProvider _scopeProvider = new();
+        private readonly ITestOutputHelper _testOutputHelper;
 
-    public void Dispose()
-    {
+        public XUnitLoggerProvider(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
+        public ILogger CreateLogger(string categoryName)
+        {
+            return new XUnitLogger(_testOutputHelper, _scopeProvider, categoryName);
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }

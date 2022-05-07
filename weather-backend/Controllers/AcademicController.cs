@@ -6,7 +6,7 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AcademicController
+    public class AcademicController : ControllerBase
     {
         private readonly AcademicService _academicService;
 
@@ -17,9 +17,9 @@ namespace weather_backend.Controllers
 
         [HttpGet]
         [Route("/academic")]
-        public Academic GetAcademicById(int id)
+        public ActionResult<Academic> GetAcademicById(int id)
         {
-            return _academicService.GetAcademicById(id);
+            return Ok(_academicService.GetAcademicById(id));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,14 @@ namespace weather_backend.Middleware
             var headers = context.Request.Headers;
             // headers are case insensitive
             var correlationId = headers["CorrelationID"];
-            _logger.LogInformation(correlationId);
+            if (!string.IsNullOrEmpty(correlationId))
+            {
+                var strings = new StringBuilder();
+                strings.Append("Correlation: ");
+                strings.Append(correlationId);
+                _logger.LogInformation(strings.ToString());
+            }
+
             await _next(context);
         }
     }

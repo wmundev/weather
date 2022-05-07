@@ -1,0 +1,27 @@
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using weather_backend.Services;
+
+namespace weather_backend.Controllers
+{
+    [ApiController]
+    [Route("[controller]")]
+    public class KafkaController : ControllerBase
+    {
+        private readonly IKafkaProducer _kafkaProducer;
+
+        public KafkaController(IKafkaProducer kafkaProducer)
+        {
+            _kafkaProducer = kafkaProducer;
+        }
+
+        [HttpGet]
+        [Route("/niceone")]
+        public async Task<ActionResult> GetKafka([FromQuery] string message)
+        {
+            Task.Factory.StartNew(() => _kafkaProducer.ProduceMessage("weblog", message));
+
+            return Ok();
+        }
+    }
+}

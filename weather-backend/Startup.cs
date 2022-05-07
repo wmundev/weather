@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using weather_backend.Controllers;
 using weather_backend.Extensions;
+using weather_backend.HostedService;
 using weather_backend.Middleware;
 using weather_backend.Repository;
 using weather_backend.Services;
@@ -93,7 +94,9 @@ namespace weather_backend
             //     };
             // });
 
+            services.AddSingleton<IKafkaProducer, KafkaProducer>();
             services.AddHostedService<Scheduler>();
+            services.AddHostedService<KafkaHostedService>();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
 
             //Other registrations

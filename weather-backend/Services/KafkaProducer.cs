@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using Confluent.Kafka;
+using Microsoft.Extensions.Configuration;
 
 namespace weather_backend.Services
 {
@@ -11,13 +12,17 @@ namespace weather_backend.Services
 
     public class KafkaProducer : IKafkaProducer
     {
+        private readonly IConfiguration _configuration;
         private readonly IProducer<Null, string> _producerBuilder;
 
-        public KafkaProducer()
+        public KafkaProducer(IConfiguration configuration)
         {
+            _configuration = configuration;
+            var server = _configuration.GetValue<string>("Kafka:ServerAddress");
+
             var config = new ProducerConfig
             {
-                BootstrapServers = "18.233.153.1:9093",
+                BootstrapServers = server,
                 ClientId = Dns.GetHostName()
             };
             _producerBuilder = new ProducerBuilder<Null, string>(config).Build();

@@ -2,12 +2,20 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Confluent.Kafka;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace weather_backend.HostedService
 {
     public class KafkaHostedService : BackgroundService
     {
+        private readonly IConfiguration _configuration;
+
+        public KafkaHostedService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await Task.Yield();
@@ -16,9 +24,11 @@ namespace weather_backend.HostedService
 
         private async Task BackgroundJob(CancellationToken stoppingToken)
         {
+            var server = _configuration.GetValue<string>("Kafka:ServerAddress");
+
             var config = new ConsumerConfig
             {
-                BootstrapServers = "18.233.153.1:9093",
+                BootstrapServers = server,
                 GroupId = "foo",
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };

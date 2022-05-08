@@ -40,8 +40,8 @@ namespace weather_backend.HostedService
                 while (!cancelled)
                 {
                     var consumeResult = consumer.Consume(stoppingToken);
-                    Console.WriteLine("nice" + consumeResult.Message.Key);
-                    Console.WriteLine("nice" + consumeResult.Message.Value);
+                    // Console.WriteLine("nice" + consumeResult.Message.Key);
+                    Console.WriteLine($"Message received: {consumeResult.Message.Value}");
                 }
 
                 consumer.Close();

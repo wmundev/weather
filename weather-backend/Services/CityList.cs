@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using weather_backend.Dto;
@@ -18,13 +19,15 @@ namespace weather_backend.Services
         private readonly IDynamoDbClient _dynamoDbClient;
         private readonly ILogger<CityList> _logger;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _memoryCache;
 
 
-        public CityList(ILogger<CityList> logger, IDynamoDbClient dynamoDbClient, IMapper mapper)
+        public CityList(ILogger<CityList> logger, IDynamoDbClient dynamoDbClient, IMapper mapper, IMemoryCache memoryCache)
         {
             _logger = logger;
             _dynamoDbClient = dynamoDbClient;
             _mapper = mapper;
+            _memoryCache = memoryCache;
         }
 
         private IEnumerable<City> GetAllCitiesFromJsonFile()
@@ -76,7 +79,22 @@ namespace weather_backend.Services
 
         public async Task<DynamoDbCity> GetCityInfo(string name)
         {
-            return await _dynamoDbClient.GetCity(name);
+            if (!_memoryCache.TryGetValue(name, out DynamoDbCity cachedCity))
+            {
+                Console.WriteLine("fetching from db");
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromSeconds(60))
+                    .SetAbsoluteExpiration(TimeSpan.FromSeconds(120));
+
+                var result = await _dynamoDbClient.GetCity(name);
+
+                cachedCity = result;
+
+                _memoryCache.Set(name, result, cacheEntryOptions);
+            }
+
+            return cachedCity;
         }
     }
 }

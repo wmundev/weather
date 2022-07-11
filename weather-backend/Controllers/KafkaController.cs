@@ -17,9 +17,9 @@ namespace weather_backend.Controllers
 
         [HttpGet]
         [Route("/niceone")]
-        public async Task<ActionResult> GetKafka([FromQuery] string message)
+        public async Task<ActionResult> GetKafka([FromQuery] string message, [FromQuery] string topic)
         {
-            Task.Factory.StartNew(() => _kafkaProducer.ProduceMessage("weblog", message));
+            Task.Factory.StartNew(() => _kafkaProducer.ProduceMessage(topic, message));
 
             return Ok();
         }

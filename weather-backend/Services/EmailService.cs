@@ -4,20 +4,23 @@ using System.Net;
 using System.Net.Mail;
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using weather_backend.Models;
 
 namespace weather_backend.Services
 {
     public class EmailService
     {
         private readonly IConfiguration _configuration;
+        private readonly ISecretService _secretService;
         private readonly SmtpClient _smtpClient;
 
-        public EmailService(IConfiguration configuration)
+        public EmailService(IConfiguration configuration, ISecretService secretService)
         {
             _configuration = configuration;
+            _secretService = secretService;
 
-            var emailUsername = configuration.GetValue<string>("SMTPUsername");
-            var emailPassword = configuration.GetValue<string>("SMTPPassword");
+            var emailUsername = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))?.Result;
+            var emailPassword = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword))?.Result;
             var emailHost = configuration.GetValue<string>("SMTPHost");
             var emailPort = configuration.GetValue<int>("SMTPPort");
 
@@ -47,7 +50,7 @@ namespace weather_backend.Services
 
         public void SendEmail(string subject, string body, string receiver)
         {
-            var senderEmailAddress = new MailAddress(_configuration.GetValue<string>("SMTPUsername"));
+            var senderEmailAddress = new MailAddress(_secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))?.Result);
             var toEmailAddress = new MailAddress(receiver);
 
             var mailMessage = new MailMessage(senderEmailAddress, toEmailAddress);

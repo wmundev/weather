@@ -2,6 +2,7 @@ using System.Net.Http;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Extensions.NETCore.Setup;
+using Amazon.SimpleSystemsManagement;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -12,7 +13,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using weather_backend.Controllers;
 using weather_backend.Extensions;
-using weather_backend.HostedService;
 using weather_backend.Middleware;
 using weather_backend.Repository;
 using weather_backend.Services;
@@ -64,6 +64,8 @@ namespace weather_backend
                 services.AddTransient<IDynamoDBContext, DynamoDBContext>();
             }
 
+            services.AddAWSService<IAmazonSimpleSystemsManagement>();
+
             services.AddTransient<IDynamoDbClient, DynamoDbClient>();
             services.AddTransient<EmailService>();
             services.AddTransient<CurrentWeatherData>();
@@ -78,6 +80,11 @@ namespace weather_backend
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             services.AddSingleton<IPhoneService, PhoneService>();
+            services.AddSingleton<DelegateService>();
+
+            services.AddSingleton<SecretMemoryCache>();
+            services.AddSingleton<ISecretService, SecretService>();
+
             //TODO: doesn't work, will break email sending
             // services.AddTransient<SmtpClient>((serviceProvider) =>
             // {
@@ -97,7 +104,7 @@ namespace weather_backend
 
             services.AddSingleton<IKafkaProducer, KafkaProducer>();
             services.AddHostedService<Scheduler>();
-            services.AddHostedService<KafkaHostedService>();
+            // services.AddHostedService<KafkaHostedService>();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
 
             //Other registrations

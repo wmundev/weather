@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using weather_backend.Models;
 
 namespace weather_backend.Services
@@ -15,10 +15,12 @@ namespace weather_backend.Services
         private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
         private readonly ILogger<CurrentWeatherData> _logger;
+        private readonly ISecretService _secretService;
 
-        public CurrentWeatherData(IConfiguration configuration, HttpClient httpClient, ILogger<CurrentWeatherData> logger)
+        public CurrentWeatherData(IConfiguration configuration, HttpClient httpClient, ILogger<CurrentWeatherData> logger, ISecretService secretService)
         {
             _logger = logger;
+            _secretService = secretService;
             _configuration = configuration;
             _httpClient = httpClient;
         }
@@ -29,7 +31,7 @@ namespace weather_backend.Services
          */
         public async Task<WeatherData> GetCurrentWeatherDataByCityId(double cityId)
         {
-            var apiKey = _configuration.GetValue<string>("OpenWeatherApiKey");
+            var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
 
             var uriBuilder = new UriBuilder(BaseUrl);
             var queryCollection = HttpUtility.ParseQueryString(uriBuilder.Query);
@@ -45,7 +47,7 @@ namespace weather_backend.Services
             var response = await _httpClient.SendAsync(httpRequestMessage);
             var stringResponse = await response.Content.ReadAsStringAsync();
 
-            var weatherData = JsonConvert.DeserializeObject<WeatherData>(stringResponse);
+            var weatherData = JsonSerializer.Deserialize<WeatherData>(stringResponse);
             return weatherData;
         }
     }

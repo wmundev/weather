@@ -20,15 +20,17 @@ namespace weather_backend.Controllers
         private readonly CurrentWeatherData _currentWeatherData;
         private readonly EmailService _emailService;
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ISecretService _secretService;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration,
-            CurrentWeatherData currentWeatherData, EmailService emailService, CityList cityList)
+            CurrentWeatherData currentWeatherData, EmailService emailService, CityList cityList, ISecretService secretService)
         {
             _logger = logger;
             _configuration = configuration;
             _currentWeatherData = currentWeatherData;
             _emailService = emailService;
             _cityList = cityList;
+            _secretService = secretService;
         }
 
         [HttpGet]
@@ -43,7 +45,7 @@ namespace weather_backend.Controllers
 
             _emailService.SendEmail($"{weatherData.name} Current Weather",
                 $"Current Temperature: {weatherData.main.temp}, Humidity: {weatherData.main.humidity}",
-                _configuration.GetValue<string>("SMTPUsername"));
+                await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername)));
             return weatherData;
         }
 

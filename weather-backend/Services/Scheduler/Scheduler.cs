@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using weather_backend.Models;
 
 namespace weather_backend.Services
 {
@@ -11,16 +12,18 @@ namespace weather_backend.Services
         private readonly IConfiguration _configuration;
         private readonly CurrentWeatherData _currentWeatherData;
         private readonly EmailService _emailService;
+        private readonly ISecretService _secretService;
         private ILogger<Scheduler> _logger;
 
         public Scheduler(EmailService emailService, CurrentWeatherData currentWeatherData, ILogger<Scheduler> logger,
-            IConfiguration configuration) :
+            IConfiguration configuration, ISecretService secretService) :
             base("0 22 * * *", TimeZoneInfo.Utc)
         {
             _emailService = emailService;
             _currentWeatherData = currentWeatherData;
             _logger = logger;
             _configuration = configuration;
+            _secretService = secretService;
         }
 
         public override async Task DoWork(CancellationToken cancellationToken)
@@ -31,7 +34,7 @@ namespace weather_backend.Services
 
             _emailService.SendEmail($"{weatherData.name} Current Weather",
                 $"Current Temperature: {weatherData.main.temp}, Humidity: {weatherData.main.humidity}",
-                _configuration.GetValue<string>("SMTPUsername"));
+                await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername)));
             // return Task.CompletedTask;
         }
 

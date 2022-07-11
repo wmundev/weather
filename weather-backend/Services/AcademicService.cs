@@ -1,8 +1,5 @@
-﻿using System.Linq;
-using Dapper;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Npgsql;
 using weather_backend.Models;
 
 namespace weather_backend.Services
@@ -20,21 +17,22 @@ namespace weather_backend.Services
 
         public Academic GetAcademicById(int id)
         {
-            var host = "localhost";
-            var username = _configuration.GetValue<string>("DBUser");
-            var password = _configuration.GetValue<string>("DBPassword");
-            var database = _configuration.GetValue<string>("DBDatabase");
-            var connectionString = $"Host={host};Username={username};Password={password};Database={database}";
-
-            using (var connection = new NpgsqlConnection(connectionString))
-            {
-                var parameters = new {Id = id};
-                var query = "select * from academic where ACNUM = @Id";
-                var result = connection.Query<Academic>(query, parameters);
-                _logger.Log(LogLevel.Warning, result.First().ACNUM.ToString());
-                return result.First();
-            }
-
+            // var host = "localhost";
+            // var username = _configuration.GetValue<string>("DBUser");
+            // var password = _configuration.GetValue<string>("DBPassword");
+            // var database = _configuration.GetValue<string>("DBDatabase");
+            // var connectionString = $"Host={host};Username={username};Password={password};Database={database}";
+            //
+            // using (var connection = new NpgsqlConnection(connectionString))
+            // {
+            //     var parameters = new {Id = id};
+            //     var query = "select * from academic where ACNUM = @Id";
+            //     var result = connection.Query<Academic>(query, parameters);
+            //     _logger.Log(LogLevel.Warning, result.First().ACNUM.ToString());
+            //     return result.First();
+            // }
+            //
+            // return null;
             return null;
         }
     }

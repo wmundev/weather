@@ -67,3 +67,5 @@ Desktop.ini
 packages
 
 **/.terraform
+
+weather-infra/secret-variables.tfvars

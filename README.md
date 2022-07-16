@@ -9,7 +9,8 @@ https://docs.docker.com/compose/install/
 # Deploying (new)
 Run the command
 ```
-dotnet aws deploy
+cd .\weather-backend
+dotnet aws deploy --deployment-project ../weather-backend.Deployment
 ```
 
 We use this tool to deploy to aws to AWS ECS - https://github.com/aws/aws-dotnet-deploy

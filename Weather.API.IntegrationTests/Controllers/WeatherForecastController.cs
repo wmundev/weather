@@ -1,17 +1,17 @@
 ﻿using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Weather.API.IntegrationTests.setup;
 using weather_backend;
 using weather_backend.Models;
 using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class WeatherForecastController : IClassFixture<WebApplicationFactory<Startup>>
+    public class WeatherForecastController : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
-        private readonly WebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Startup> _factory;
 
-        public WeatherForecastController(WebApplicationFactory<Startup> factory)
+        public WeatherForecastController(CustomWebApplicationFactory<Startup> factory)
         {
             _factory = factory;
         }

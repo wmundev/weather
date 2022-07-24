@@ -52,6 +52,19 @@ namespace weather_backend.Deployment
             //         Console.WriteLine("Customizing Beanstalk Environment");
             //     }
             // }
+            
+            // if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.BeanstalkEnvironment)))
+            // {
+            //     if (evnt.Props is CfnEnvironmentProps props)
+            //     {
+            //         var optionSettingsArray = props.OptionSettings as IEnumerable<object>;
+            //         optionSettingsArray.ToList().Add(new CfnEnvironment.OptionSettingProperty
+            //         {
+            //             OptionName = "ConfigDocument",
+            //             Value = _configuration.SolutionStackName
+            //         });
+            //     }
+            // }
 
             if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.AppIAMRole)))
             {

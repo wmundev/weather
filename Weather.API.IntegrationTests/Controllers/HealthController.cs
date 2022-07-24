@@ -24,7 +24,7 @@ namespace Weather.API.IntegrationTests.Controllers
             // Assert
             response.EnsureSuccessStatusCode(); // Status Code 200-299
             Assert.Equal("text/plain",
-                response.Content.Headers.ContentType.ToString());
+                response.Content.Headers.ContentType?.ToString());
             Assert.Equal("Healthy",
                 await response.Content.ReadAsStringAsync());
         }

@@ -23,5 +23,5 @@ jobs:
           dotnet test
       - name: Run Integration Tests
         run: |
-          cd Weather.API.IntegrationTests
-          dotnet test
+          dotnet restore
+          dotnet test Weather.API.IntegrationTests/Weather.API.IntegrationTests.csproj

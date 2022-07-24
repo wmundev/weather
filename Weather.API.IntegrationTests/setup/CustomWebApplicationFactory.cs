@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace Weather.API.IntegrationTests.setup
@@ -24,6 +25,8 @@ namespace Weather.API.IntegrationTests.setup
                 // {
                 // options.UseInMemoryDatabase("InMemoryDbForTesting");
                 // });
+
+                services.AddSingleton<IHostLifetime, NoopHostLifetime>();
 
                 var sp = services.BuildServiceProvider();
 

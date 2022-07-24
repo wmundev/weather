@@ -17,11 +17,37 @@ jobs:
         with:
           dotnet-version: 6.0.x
           include-prerelease: true
-      - name: Run Unit Tests
-        run: |
-          cd weather-test
-          dotnet test
-      - name: Run Integration Tests
-        run: |
-          dotnet restore
-          dotnet test Weather.API.IntegrationTests/Weather.API.IntegrationTests.csproj
+
+      - name: Restore Dependencies
+        run: dotnet restore weather.sln
+
+      - name: Build
+        run: dotnet build weather.sln --configuration Release --no-restore
+
+      - name: Test
+#        TODO
+#        run: dotnet test weather.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+        run: dotnet test weather-test/weather-test.csproj --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage --filter FullyQualifiedName\!~IntegrationTests
+
+      - name: Copy Coverage To Predictable Location
+        run: cp coverage/**/coverage.cobertura.xml coverage.cobertura.xml
+
+      - name: Code Coverage Summary Report
+        uses: irongut/CodeCoverageSummary@v1.2.0
+        with:
+          filename: coverage.cobertura.xml
+          badge: true
+          fail_below_min: true
+          format: markdown
+          hide_branch_rate: false
+          hide_complexity: true
+          indicators: true
+          output: both
+          thresholds: '60 80'
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          recreate: true
+          path: code-coverage-results.md

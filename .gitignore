@@ -72,3 +72,7 @@ weather-infra/secret-variables.tfvars
 
 # cdk
 weather-backend.Deployment/cdk.out
+
+
+# code coverage report folder
+/coverage

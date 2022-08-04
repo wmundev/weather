@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
+using weather_backend.Dto;
 
 namespace weather_backend.Controllers
 {
@@ -8,6 +11,13 @@ namespace weather_backend.Controllers
     [Route("feature")]
     public class NewFeatureController : ControllerBase
     {
+        private readonly IConnectionMultiplexer _redis;
+
+        public NewFeatureController(IConnectionMultiplexer redis)
+        {
+            _redis = redis;
+        }
+
         [Route("pattern")]
         public async Task<ActionResult> Pattern()
         {
@@ -22,6 +32,37 @@ namespace weather_backend.Controllers
         public async Task<ActionResult> GeneratePassword()
         {
             return Ok();
+        }
+
+        [Route("redis")]
+        [HttpPost]
+        public async Task<ActionResult> RedisSaveTest([FromBody] RedisSaveTestDto value)
+        {
+            var db = _redis.GetDatabase();
+            var foo = await db.StringSetAsync("foo", value.Value);
+            return Ok(foo.ToString());
+            // var pong = await db.PingAsync();
+            // return Ok();
+        }
+
+        [Route("redis")]
+        [HttpGet]
+        public async Task<ActionResult> RedisGetTest()
+        {
+            var watch = Stopwatch.StartNew();
+
+            var db = _redis.GetDatabase();
+            var foo = await db.StringGetAsync("foo");
+
+            watch.Stop();
+            var elapsedMs = watch.ElapsedMilliseconds;
+            return Ok(new
+            {
+                result = foo.ToString(),
+                time = elapsedMs
+            });
+            // var pong = await db.PingAsync();
+            // return Ok();
         }
     }
 }

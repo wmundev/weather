@@ -19,11 +19,11 @@ namespace weather_backend.Services
         {
             _configuration = configuration;
             var server = _configuration.GetValue<string>("Kafka:ServerAddress");
-
             var config = new ProducerConfig
             {
                 BootstrapServers = server,
-                ClientId = Dns.GetHostName()
+                ClientId = Dns.GetHostName(),
+                MessageSendMaxRetries = 10
             };
             _producerBuilder = new ProducerBuilder<Null, string>(config).Build();
         }

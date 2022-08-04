@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
@@ -11,8 +12,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using weather_backend.Controllers;
 using weather_backend.Extensions;
+using weather_backend.HostedService;
 using weather_backend.Middleware;
 using weather_backend.Repository;
 using weather_backend.Services;
@@ -64,6 +67,39 @@ namespace weather_backend
                 services.AddTransient<IDynamoDBContext, DynamoDBContext>();
             }
 
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != Environments.Development)
+                try
+                {
+                    var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions
+                    {
+                        EndPoints = {"redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379"},
+                        ConnectRetry = 5
+                    });
+                    services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+                }
+                catch (RedisConnectionException e)
+                {
+                    // we add redis as optional and not fail if cannot connect
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
+            else
+                try
+                {
+                    var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions
+                    {
+                        EndPoints = {"redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379"},
+                        ConnectRetry = 5
+                    });
+                    services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+                }
+                catch (RedisConnectionException e)
+                {
+                    // we add redis as optional and not fail if cannot connect
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
+
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
 
             services.AddTransient<IDynamoDbClient, DynamoDbClient>();
@@ -101,10 +137,9 @@ namespace weather_backend
             //         EnableSsl = true
             //     };
             // });
-
             services.AddSingleton<IKafkaProducer, KafkaProducer>();
             services.AddHostedService<Scheduler>();
-            // services.AddHostedService<KafkaHostedService>();
+            services.AddHostedService<KafkaHostedService>();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
 
             //Other registrations

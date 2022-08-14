@@ -120,6 +120,13 @@ namespace weather_backend
 
             services.AddSingleton<SecretMemoryCache>();
             services.AddSingleton<ISecretService, SecretService>();
+            
+            services.AddHostedService<QueuedHostedService>();
+            services.AddSingleton<IBackgroundTaskQueue>(_ =>
+            {
+                var queueCapacity = 100;
+                return new DefaultBackgroundTaskQueue(queueCapacity);
+            });
 
             //TODO: doesn't work, will break email sending
             // services.AddTransient<SmtpClient>((serviceProvider) =>

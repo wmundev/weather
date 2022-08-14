@@ -8,13 +8,16 @@ namespace weather_backend.HostedService
 {
     public sealed class QueuedHostedService : BackgroundService
     {
-        private readonly IBackgroundTaskQueue _taskQueue;
         private readonly ILogger<QueuedHostedService> _logger;
+        private readonly IBackgroundTaskQueue _taskQueue;
+        private int count;
 
         public QueuedHostedService(
             IBackgroundTaskQueue taskQueue,
-            ILogger<QueuedHostedService> logger) =>
+            ILogger<QueuedHostedService> logger)
+        {
             (_taskQueue, _logger) = (taskQueue, logger);
+        }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -29,30 +32,35 @@ namespace weather_backend.HostedService
         private async Task ProcessTaskQueueAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
-            {
                 try
                 {
-                    Func<CancellationToken, ValueTask>? workItem =
+                    var workItem =
                         await _taskQueue.DequeueAsync(stoppingToken);
 
                     Console.WriteLine("dequeue");
                     await workItem(stoppingToken);
+                    count += 1;
+                    Console.WriteLine(count);
                 }
                 catch (OperationCanceledException)
                 {
                     // Prevent throwing if stoppingToken was signaled
+                    Console.WriteLine("huh");
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error occurred executing task work item.");
                 }
-            }
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation(
                 $"{nameof(QueuedHostedService)} is stopping.");
+
+            await _taskQueue.CompletionAsync();
+
+            Console.WriteLine("all queue items flushed");
 
             await base.StopAsync(stoppingToken);
         }

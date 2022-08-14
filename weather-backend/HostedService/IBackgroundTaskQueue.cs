@@ -11,5 +11,7 @@ namespace weather_backend.HostedService
 
         ValueTask<Func<CancellationToken, ValueTask>> DequeueAsync(
             CancellationToken cancellationToken);
+
+        Task CompletionAsync();
     }
 }

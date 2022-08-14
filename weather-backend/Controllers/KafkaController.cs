@@ -11,8 +11,8 @@ namespace weather_backend.Controllers
     [Route("[controller]")]
     public class KafkaController : ControllerBase
     {
+        private readonly IBackgroundTaskQueue _backgroundTaskQueue;
         private readonly IKafkaProducer _kafkaProducer;
-        private readonly IBackgroundTaskQueue   _backgroundTaskQueue;
 
         public KafkaController(IKafkaProducer kafkaProducer, IBackgroundTaskQueue backgroundTaskQueue)
         {
@@ -27,17 +27,17 @@ namespace weather_backend.Controllers
             // Task.Factory.StartNew(() => _kafkaProducer.ProduceMessage(topic, message));
             await _backgroundTaskQueue.QueueBackgroundWorkItemAsync(async token =>
             {
-                await BuildWorkItemAsync(token, message, topic);
+                // await BuildWorkItemAsync(token, message, topic);
                 Console.WriteLine("haha");
+                Thread.Sleep(1000);
             });
 
             return Ok();
         }
 
-        private async ValueTask BuildWorkItemAsync(CancellationToken token,string message, string topic)
+        private async ValueTask BuildWorkItemAsync(CancellationToken token, string message, string topic)
         {
             await _kafkaProducer.ProduceMessage(topic, message);
-
         }
     }
 }

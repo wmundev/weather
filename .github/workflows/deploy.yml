@@ -29,4 +29,5 @@ jobs:
 
       - name: Execute Deployment
         working-directory: ./ZipCodeWebApi
-        run: dotnet aws deploy --silent --apply ../deployment-settings.json
+        run: |
+          dotnet aws deploy --silent --project-path "weather-backend/weather-backend.csproj" --apply "../weather-backend.Deployment/appsettings.json"

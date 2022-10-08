@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -17,20 +18,20 @@ namespace weather_backend.Controllers
     {
         private readonly CityList _cityList;
         private readonly IConfiguration _configuration;
-        private readonly CurrentWeatherData _currentWeatherData;
+        private readonly ICurrentWeatherData _currentWeatherData;
         private readonly EmailService _emailService;
         private readonly ILogger<WeatherForecastController> _logger;
         private readonly ISecretService _secretService;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration,
-            CurrentWeatherData currentWeatherData, EmailService emailService, CityList cityList, ISecretService secretService)
+            ICurrentWeatherData currentWeatherData, EmailService emailService, CityList cityList, ISecretService secretService)
         {
-            _logger = logger;
-            _configuration = configuration;
-            _currentWeatherData = currentWeatherData;
-            _emailService = emailService;
-            _cityList = cityList;
-            _secretService = secretService;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _currentWeatherData = currentWeatherData ?? throw new ArgumentNullException(nameof(currentWeatherData));
+            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _cityList = cityList ?? throw new ArgumentNullException(nameof(cityList));
+            _secretService = secretService ?? throw new ArgumentNullException(nameof(secretService));
         }
 
         [HttpGet]

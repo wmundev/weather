@@ -16,8 +16,8 @@ namespace weather_backend.Controllers
 
         public KafkaController(IKafkaProducer kafkaProducer, IBackgroundTaskQueue backgroundTaskQueue)
         {
-            _kafkaProducer = kafkaProducer;
-            _backgroundTaskQueue = backgroundTaskQueue;
+            _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(kafkaProducer));
+            _backgroundTaskQueue = backgroundTaskQueue ?? throw new ArgumentNullException(nameof(backgroundTaskQueue));
         }
 
         [HttpGet]

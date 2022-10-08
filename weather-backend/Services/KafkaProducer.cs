@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Confluent.Kafka;
 using Microsoft.Extensions.Configuration;
@@ -17,7 +18,7 @@ namespace weather_backend.Services
 
         public KafkaProducer(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             var server = _configuration.GetValue<string>("Kafka:ServerAddress");
             var config = new ProducerConfig
             {

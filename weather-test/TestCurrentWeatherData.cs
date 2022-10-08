@@ -15,7 +15,7 @@ namespace weather_test
         private readonly Mock<HttpMessageHandler> _mockHttpMessageHandler = new();
         private readonly Mock<ISecretService> _mockSecretService;
         private readonly ITestOutputHelper _testOutputHelper;
-        private readonly CurrentWeatherData _underTest;
+        private readonly ICurrentWeatherData _underTest;
 
         public TestCurrentWeatherData(ITestOutputHelper testOutputHelper)
         {
@@ -28,7 +28,7 @@ namespace weather_test
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var logger = XUnitLogger.CreateLogger<CurrentWeatherData>(_testOutputHelper);
+            var logger = XUnitLogger.CreateLogger<ICurrentWeatherData>(_testOutputHelper);
 
             _mockSecretService = new Mock<ISecretService>();
             _underTest = new CurrentWeatherData(configuration, new HttpClient(_mockHttpMessageHandler.Object), logger, _mockSecretService.Object);

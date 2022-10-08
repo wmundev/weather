@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Extensions.NETCore.Setup;
@@ -43,6 +42,8 @@ namespace weather_backend
 
             services.AddControllers();
             services.AddHttpClient();
+            services.AddHttpClient<IGeolocationService, GeolocationService>("geolocation");
+            services.AddHttpClient<ICurrentWeatherData, CurrentWeatherData>("openweathermap");
 
             services.AddAutoMapper(typeof(Startup));
 
@@ -102,17 +103,14 @@ namespace weather_backend
 
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
 
-            services.AddTransient<IDynamoDbClient, DynamoDbClient>();
+            services.AddSingleton<IDynamoDbClient, DynamoDbClient>();
             services.AddTransient<EmailService>();
-            services.AddTransient<CurrentWeatherData>();
-            services.AddTransient<HttpClient>();
             services.AddTransient<WeatherForecastController>();
             services.AddTransient<CityList>();
 
             services.AddTransient<ThreadExample>();
             services.AddTransient<AcademicService>();
 
-            services.AddTransient<GeolocationService, GeolocationService>();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
             services.AddSingleton<IPhoneService, PhoneService>();
@@ -120,7 +118,7 @@ namespace weather_backend
 
             services.AddSingleton<SecretMemoryCache>();
             services.AddSingleton<ISecretService, SecretService>();
-            
+
             services.AddHostedService<QueuedHostedService>();
             services.AddSingleton<IBackgroundTaskQueue>(_ =>
             {

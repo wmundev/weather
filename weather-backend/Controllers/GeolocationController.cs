@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using weather_backend.Services;
 
@@ -8,11 +9,11 @@ namespace weather_backend.Controllers
     [Route("[controller]")]
     public class GeolocationController : ControllerBase
     {
-        private readonly GeolocationService _geolocationService;
+        private readonly IGeolocationService _geolocationService;
 
-        public GeolocationController(GeolocationService geolocationService)
+        public GeolocationController(IGeolocationService geolocationService)
         {
-            _geolocationService = geolocationService;
+            _geolocationService = geolocationService ?? throw new ArgumentNullException(nameof(geolocationService));
         }
 
         [HttpGet]

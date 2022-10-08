@@ -10,12 +10,12 @@ namespace weather_backend.Services
     public class Scheduler : CronJobService
     {
         private readonly IConfiguration _configuration;
-        private readonly CurrentWeatherData _currentWeatherData;
+        private readonly ICurrentWeatherData _currentWeatherData;
         private readonly EmailService _emailService;
         private readonly ISecretService _secretService;
         private ILogger<Scheduler> _logger;
 
-        public Scheduler(EmailService emailService, CurrentWeatherData currentWeatherData, ILogger<Scheduler> logger,
+        public Scheduler(EmailService emailService, ICurrentWeatherData currentWeatherData, ILogger<Scheduler> logger,
             IConfiguration configuration, ISecretService secretService) :
             base("0 22 * * *", TimeZoneInfo.Utc)
         {

@@ -9,7 +9,7 @@ using weather_backend.Models;
 
 namespace weather_backend.Services
 {
-    public class CurrentWeatherData
+    public class CurrentWeatherData : ICurrentWeatherData
     {
         private const string BaseUrl = "https://api.openweathermap.org/data/2.5/weather";
         private readonly IConfiguration _configuration;
@@ -19,10 +19,10 @@ namespace weather_backend.Services
 
         public CurrentWeatherData(IConfiguration configuration, HttpClient httpClient, ILogger<CurrentWeatherData> logger, ISecretService secretService)
         {
-            _logger = logger;
-            _secretService = secretService;
-            _configuration = configuration;
-            _httpClient = httpClient;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _secretService = secretService ?? throw new ArgumentNullException(nameof(secretService));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         /**

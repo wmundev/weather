@@ -15,7 +15,7 @@ namespace weather_test
         private readonly Mock<HttpMessageHandler> _mockHttpMessageHandler = new();
         private readonly Mock<ISecretService> _mockSecretService;
         private readonly ITestOutputHelper _testOutputHelper;
-        private readonly CurrentWeatherData _underTest;
+        private readonly ICurrentWeatherData _underTest;
 
         public TestCurrentWeatherData(ITestOutputHelper testOutputHelper)
         {

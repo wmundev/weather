@@ -13,7 +13,7 @@ namespace weather_backend.HostedService
 
         public KafkaHostedService(IConfiguration configuration)
         {
-            _configuration = configuration;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

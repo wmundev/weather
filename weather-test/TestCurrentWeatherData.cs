@@ -28,7 +28,7 @@ namespace weather_test
                 .AddInMemoryCollection(inMemorySettings)
                 .Build();
 
-            var logger = XUnitLogger.CreateLogger<ICurrentWeatherData>(_testOutputHelper);
+            var logger = XUnitLogger.CreateLogger<CurrentWeatherData>(_testOutputHelper);
 
             _mockSecretService = new Mock<ISecretService>();
             _underTest = new CurrentWeatherData(configuration, new HttpClient(_mockHttpMessageHandler.Object), logger, _mockSecretService.Object);

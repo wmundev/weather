@@ -76,3 +76,5 @@ weather-backend.Deployment/cdk.out
 
 # code coverage report folder
 /coverage
+
+/.vs

@@ -146,6 +146,7 @@ namespace weather_backend
             services.AddHostedService<Scheduler>();
             services.AddHostedService<KafkaHostedService>();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
+            services.AddSingleton<IEncryptionService, EncryptionService>();
 
             //Other registrations
             services

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using weather_backend.Dto;
 using weather_backend.Models;
 using weather_backend.Repository;
@@ -34,13 +33,12 @@ namespace weather_backend.Services
         {
             try
             {
-                using (var streamReader = new StreamReader("Assets/city.list.json"))
-                {
-                    var allCitiesStringify = streamReader.ReadToEnd();
+                const string path = "./Assets/city.list.json";
+                using var streamReader = new StreamReader(path);
+                var allCitiesStringify = streamReader.ReadToEnd();
 
-                    var allCities = JsonConvert.DeserializeObject<City[]>(allCitiesStringify);
-                    return allCities;
-                }
+                var allCities = System.Text.Json.JsonSerializer.Deserialize<City[]>(allCitiesStringify);
+                return allCities ?? Array.Empty<City>();
             }
             catch (IOException ioException)
             {
@@ -62,19 +60,17 @@ namespace weather_backend.Services
 
         public IEnumerable<City> GetAllCitiesInAustralia()
         {
+            const string AUSTRALIA_COUNTRY_CODE = "AU";
             var allCities = GetAllCitiesFromJsonFile();
-            var australiaCities = allCities.Where(city => { return city.Country == "AU"; });
+            var australiaCities = allCities.Where(city => city.Country == AUSTRALIA_COUNTRY_CODE);
+            return australiaCities;
+        }
 
-            var regex = new Regex("^.*?wantirna.*?$");
+        public IEnumerable<City> FilterCitiesByCityName(IEnumerable<City> cities, string cityName)
+        {
+            var regex = new Regex($"^.*?{cityName}.*?$");
 
-            var allCitiesInAustralia = australiaCities.ToList();
-            foreach (var city in allCitiesInAustralia)
-            {
-                var matchCollection = regex.Matches(city.Name);
-                if (matchCollection.Count != 0) _logger.Log(LogLevel.Critical, city.Name);
-            }
-
-            return allCitiesInAustralia;
+            return cities.Where(city => regex.IsMatch(city.Name));
         }
 
         public async Task<DynamoDbCity> GetCityInfo(string name)

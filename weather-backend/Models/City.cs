@@ -1,26 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace weather_backend.Models
 {
     public class City
     {
-        public City()
-        {
-        }
-
-        public City(double id, string name, string state, string country, Coordinate coordinate)
-        {
-            Id = id;
-            Name = name;
-            State = state;
-            Country = country;
-            Coordinate = coordinate;
-        }
-
-        [JsonProperty("id")] public double Id { get; set; }
-        [JsonProperty("name")] public string Name { get; set; }
-        [JsonProperty("state")] public string State { get; set; }
-        [JsonProperty("country")] public string Country { get; set; }
-        [JsonProperty("coord")] public Coordinate Coordinate { get; set; }
+        [JsonPropertyName("id")] public double Id { get; init; }
+        [JsonPropertyName("name")] public string Name { get; init; }
+        [JsonPropertyName("state")] public string State { get; init; }
+        [JsonPropertyName("country")] public string Country { get; init; }
+        [JsonPropertyName("coord")] public Coordinate Coordinate { get; init; }
     }
 }

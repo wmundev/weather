@@ -1,26 +1,16 @@
-﻿using Amazon.DynamoDBv2.DataModel;
-using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
+using Amazon.DynamoDBv2.DataModel;
 
 namespace weather_backend.Models
 {
     public class Coordinate
     {
-        public Coordinate()
-        {
-        }
-
-        public Coordinate(double longitude, double latitude)
-        {
-            Longitude = longitude;
-            Latitude = latitude;
-        }
-
-        [JsonProperty("lon")]
+        [JsonPropertyName("lon")]
         [DynamoDBProperty("lon")]
-        public double Longitude { get; set; }
+        public double Longitude { get; init; }
 
-        [JsonProperty("lat")]
+        [JsonPropertyName("lat")]
         [DynamoDBProperty("lat")]
-        public double Latitude { get; set; }
+        public double Latitude { get; init; }
     }
 }

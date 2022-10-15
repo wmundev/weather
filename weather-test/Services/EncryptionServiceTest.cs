@@ -16,7 +16,7 @@ namespace weather_test.Services
         [Fact]
         public void EncryptDecryptTest()
         {
-            var text = Encoding.ASCII.GetBytes("Got more soul than a sock with a hole");
+            var text = Encoding.UTF8.GetBytes("Got more soul than a sock with a hole");
 
             var (ciphertext, nonce, key) = _encryptionService.Encrypt(text);
             var decrypted = _encryptionService.Decrypt(ciphertext, nonce, key);

@@ -1,11 +1,15 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using System.Text.Json;
+using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
+using weather_backend.Models;
 using weather_backend.Repository;
 using weather_backend.Services;
+using Xunit;
 
-namespace weather_test
+namespace weather_test.Services
 {
     public class CityListTest
     {
@@ -26,17 +30,24 @@ namespace weather_test
             _cityList = new CityList(_mockLogger.Object, _dynamoDbClient.Object, _mapper.Object, _mockMemoryCache.Object);
         }
 
-        //FIXME
-        // [Fact]
-        // public void GetAllCitiesInAustraliaTest()
-        // {
-        //     var result = _cityList.GetAllCitiesInAustralia();
-        //
-        //     var resultSerialised = JsonConvert.SerializeObject(result.First());
-        //     var expectedSerialised =
-        //         JsonConvert.SerializeObject(
-        //             new City(2057192, "Yunta", "", "AU", new Coordinate(139.550003, -32.583328)));
-        //     Assert.Equal(resultSerialised, expectedSerialised);
-        // }
+
+        [Fact]
+        public void GetAllCitiesInAustraliaTest()
+        {
+            var result = _cityList.GetAllCitiesInAustralia();
+
+            var resultSerialised = JsonSerializer.Serialize(result.First());
+            var expectedSerialised =
+                JsonSerializer.Serialize(
+                    new City
+                    {
+                        Id = 2057192,
+                        Name = "Yunta",
+                        State = "",
+                        Country = "AU",
+                        Coordinate = new Coordinate { Latitude = -32.583328, Longitude = 139.550003 }
+                    });
+            Assert.Equal(resultSerialised, expectedSerialised);
+        }
     }
 }

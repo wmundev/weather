@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -19,39 +18,22 @@ namespace weather_backend.Services
         private readonly ILogger<CityList> _logger;
         private readonly IMapper _mapper;
         private readonly IMemoryCache _memoryCache;
+        private readonly ICityRepository _cityRepository;
 
 
-        public CityList(ILogger<CityList> logger, IDynamoDbClient dynamoDbClient, IMapper mapper, IMemoryCache memoryCache)
+        public CityList(ILogger<CityList> logger, IDynamoDbClient dynamoDbClient, IMapper mapper, IMemoryCache memoryCache, ICityRepository cityRepository)
         {
-            _logger = logger;
-            _dynamoDbClient = dynamoDbClient;
-            _mapper = mapper;
-            _memoryCache = memoryCache;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _dynamoDbClient = dynamoDbClient ?? throw new ArgumentNullException(nameof(dynamoDbClient));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+            _cityRepository = cityRepository ?? throw new ArgumentNullException(nameof(cityRepository));
         }
 
-        private IEnumerable<City> GetAllCitiesFromJsonFile()
-        {
-            try
-            {
-                const string path = "./Assets/city.list.json";
-                using var streamReader = new StreamReader(path);
-                var allCitiesStringify = streamReader.ReadToEnd();
-
-                var allCities = System.Text.Json.JsonSerializer.Deserialize<City[]>(allCitiesStringify);
-                return allCities ?? Array.Empty<City>();
-            }
-            catch (IOException ioException)
-            {
-                Console.WriteLine("The file could not be read");
-                Console.WriteLine(ioException.Message);
-            }
-
-            return Array.Empty<City>();
-        }
 
         public async Task PopulateDynamoDbDatabase()
         {
-            var allCities = GetAllCitiesFromJsonFile();
+            var allCities = _cityRepository.GetAllCitiesFromJsonFile();
 
             foreach (var city in allCities)
                 await _dynamoDbClient.SaveRecord(_mapper.Map<DynamoDbCity>(city));
@@ -61,7 +43,7 @@ namespace weather_backend.Services
         public IEnumerable<City> GetAllCitiesInAustralia()
         {
             const string AUSTRALIA_COUNTRY_CODE = "AU";
-            var allCities = GetAllCitiesFromJsonFile();
+            var allCities = _cityRepository.GetAllCitiesFromJsonFile();
             var australiaCities = allCities.Where(city => city.Country == AUSTRALIA_COUNTRY_CODE);
             return australiaCities;
         }

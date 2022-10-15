@@ -51,13 +51,7 @@ namespace weather_backend
             if (dynamodbLocalMode)
             {
                 services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-                var awsOptions = new AWSOptions
-                {
-                    DefaultClientConfig =
-                    {
-                        ServiceURL = "http://localhost:8000"
-                    }
-                };
+                var awsOptions = new AWSOptions { DefaultClientConfig = { ServiceURL = "http://localhost:8000" } };
                 services.AddAWSService<IAmazonDynamoDB>(awsOptions);
                 services.AddTransient<IDynamoDBContext, DynamoDBContext>();
             }
@@ -71,11 +65,7 @@ namespace weather_backend
             if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != Environments.Development)
                 try
                 {
-                    var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions
-                    {
-                        EndPoints = {"redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379"},
-                        ConnectRetry = 5
-                    });
+                    var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions { EndPoints = { "redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379" }, ConnectRetry = 5 });
                     services.AddSingleton<IConnectionMultiplexer>(multiplexer);
                 }
                 catch (RedisConnectionException e)
@@ -87,11 +77,7 @@ namespace weather_backend
             else
                 try
                 {
-                    var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions
-                    {
-                        EndPoints = {"redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379"},
-                        ConnectRetry = 5
-                    });
+                    var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions { EndPoints = { "redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379" }, ConnectRetry = 5 });
                     services.AddSingleton<IConnectionMultiplexer>(multiplexer);
                 }
                 catch (RedisConnectionException e)
@@ -104,6 +90,7 @@ namespace weather_backend
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
 
             services.AddSingleton<IDynamoDbClient, DynamoDbClient>();
+            services.AddSingleton<ICityRepository, CityRepository>();
             services.AddTransient<EmailService>();
             services.AddTransient<WeatherForecastController>();
             services.AddTransient<CityList>();
@@ -145,7 +132,7 @@ namespace weather_backend
             services.AddSingleton<IKafkaProducer, KafkaProducer>();
             services.AddHostedService<Scheduler>();
             services.AddHostedService<KafkaHostedService>();
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
+            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "weather_backend", Version = "v1" }); });
             services.AddSingleton<IEncryptionService, EncryptionService>();
 
             //Other registrations

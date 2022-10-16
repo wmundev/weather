@@ -3,6 +3,7 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Extensions.NETCore.Setup;
 using Amazon.SimpleSystemsManagement;
+using Amazon.Translate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -88,6 +89,8 @@ namespace weather_backend
                 }
 
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
+            services.AddAWSService<IAmazonTranslate>();
+            services.AddSingleton<ILanguageTranslatorService, LanguageTranslatorService>();
 
             services.AddSingleton<IDynamoDbClient, DynamoDbClient>();
             services.AddSingleton<ICityRepository, CityRepository>();
@@ -105,7 +108,6 @@ namespace weather_backend
 
             services.AddSingleton<SecretMemoryCache>();
             services.AddSingleton<ISecretService, SecretService>();
-
             services.AddHostedService<QueuedHostedService>();
             services.AddSingleton<IBackgroundTaskQueue>(_ =>
             {

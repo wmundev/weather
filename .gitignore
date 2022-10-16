@@ -78,3 +78,6 @@ weather-backend.Deployment/cdk.out
 /coverage
 
 /.vs
+
+# generated language files
+weather-backend/Assets/Generated

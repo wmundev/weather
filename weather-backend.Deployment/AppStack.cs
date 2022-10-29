@@ -1,8 +1,10 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using Amazon.CDK;
 using Amazon.CDK.AWS.ElasticBeanstalk;
 using Amazon.CDK.AWS.IAM;
@@ -58,13 +60,46 @@ namespace weather_backend.Deployment
             {
                 if (evnt.Props is CfnEnvironmentProps props)
                 {
-                    var optionSettingsArray = props.OptionSettings as IEnumerable<object>;
-                    optionSettingsArray.ToList().Add(new CfnEnvironment.OptionSettingProperty
-                    {
-                        Namespace = "aws:autoscaling:launchconfiguration",
-                        OptionName = "RootVolumeType",
-                        Value = "gp3"
-                    });
+                    // var optionSettingsArray = props.OptionSettings as CfnEnvironment.OptionSettingProperty[];
+                    // var optionList = optionSettingsArray.ToList(); 
+                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
+                    // {
+                    //     Namespace = "aws:autoscaling:launchconfiguration",
+                    //     OptionName = "RootVolumeType",
+                    //     ResourceName = null,
+                    //     Value = "gp3"
+                    // });
+                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
+                    // {
+                    //     Namespace = "aws:autoscaling:launchconfiguration",
+                    //     OptionName = "RootVolumeIOPS",
+                    //     ResourceName = null,
+                    //     Value = "3000"
+                    // });
+                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
+                    // {
+                    //     Namespace = "aws:autoscaling:launchconfiguration",
+                    //     OptionName = "RootVolumeThroughput",
+                    //     ResourceName = null,
+                    //     Value = "125"
+                    // });
+                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
+                    // {
+                    //     Namespace = "aws:autoscaling:launchconfiguration",
+                    //     OptionName = "RootVolumeSize",
+                    //     ResourceName = null,
+                    //     Value = "10"
+                    // });
+                    // props.OptionSettings = optionList;
+
+                    // throw new Exception(JsonSerializer.Serialize(props.OptionSettings));
+
+                    // optionSettingsArray.ToList().Add(new CfnEnvironment.OptionSettingProperty
+                    // {
+                    // Namespace = "aws:ec2:instances",
+                    // OptionName = "EnableSpot",
+                    // Value = "false"
+                    // });
                 }
             }
 

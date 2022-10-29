@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Amazon.CDK;
+using Amazon.CDK.AWS.ElasticBeanstalk;
 using Amazon.CDK.AWS.IAM;
 using AWS.Deploy.Recipes.CDK.Common;
 using Constructs;
@@ -53,18 +54,19 @@ namespace weather_backend.Deployment
             //     }
             // }
             
-            // if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.BeanstalkEnvironment)))
-            // {
-            //     if (evnt.Props is CfnEnvironmentProps props)
-            //     {
-            //         var optionSettingsArray = props.OptionSettings as IEnumerable<object>;
-            //         optionSettingsArray.ToList().Add(new CfnEnvironment.OptionSettingProperty
-            //         {
-            //             OptionName = "ConfigDocument",
-            //             Value = _configuration.SolutionStackName
-            //         });
-            //     }
-            // }
+            if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.BeanstalkEnvironment)))
+            {
+                if (evnt.Props is CfnEnvironmentProps props)
+                {
+                    var optionSettingsArray = props.OptionSettings as IEnumerable<object>;
+                    optionSettingsArray.ToList().Add(new CfnEnvironment.OptionSettingProperty
+                    {
+                        Namespace = "aws:autoscaling:launchconfiguration",
+                        OptionName = "RootVolumeType",
+                        Value = "gp3"
+                    });
+                }
+            }
 
             if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.AppIAMRole)))
             {

@@ -60,6 +60,8 @@ namespace weather_backend.Deployment
             {
                 if (evnt.Props is CfnEnvironmentProps props)
                 {
+                    // See https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html#command-options-general-autoscalingasg
+                    
                     // var optionSettingsArray = props.OptionSettings as CfnEnvironment.OptionSettingProperty[];
                     // var optionList = optionSettingsArray.ToList(); 
                     // optionList.Add(new CfnEnvironment.OptionSettingProperty

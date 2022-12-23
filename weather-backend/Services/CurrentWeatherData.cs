@@ -48,7 +48,7 @@ namespace weather_backend.Services
             var stringResponse = await response.Content.ReadAsStringAsync();
 
             var weatherData = JsonSerializer.Deserialize<WeatherData>(stringResponse);
-            return weatherData;
+            return weatherData!;
         }
     }
 }

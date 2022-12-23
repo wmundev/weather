@@ -2,8 +2,8 @@
 {
     public class AllSecrets
     {
-        public string OpenWeatherApiKey { get; set; }
-        public string SMTPUsername { get; set; }
-        public string SMTPPassword { get; set; }
+        public required string OpenWeatherApiKey { get; set; }
+        public required string SMTPUsername { get; set; }
+        public required string SMTPPassword { get; set; }
     }
 }

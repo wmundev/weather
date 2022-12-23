@@ -2,6 +2,6 @@
 {
     public class RedisSaveTestDto
     {
-        public string Value { get; set; }
+        public required string Value { get; init; }
     }
 }

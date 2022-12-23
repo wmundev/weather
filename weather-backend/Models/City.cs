@@ -4,10 +4,10 @@ namespace weather_backend.Models
 {
     public class City
     {
-        [JsonPropertyName("id")] public double Id { get; init; }
-        [JsonPropertyName("name")] public string Name { get; init; }
-        [JsonPropertyName("state")] public string State { get; init; }
-        [JsonPropertyName("country")] public string Country { get; init; }
-        [JsonPropertyName("coord")] public Coordinate Coordinate { get; init; }
+        [JsonPropertyName("id")] public required double Id { get; init; }
+        [JsonPropertyName("name")] public required string Name { get; init; }
+        [JsonPropertyName("state")] public required string State { get; init; }
+        [JsonPropertyName("country")] public required string Country { get; init; }
+        [JsonPropertyName("coord")] public required Coordinate Coordinate { get; init; }
     }
 }

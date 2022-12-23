@@ -24,21 +24,14 @@ namespace weather_backend.Services
             var emailHost = configuration.GetValue<string>("SMTPHost");
             var emailPort = configuration.GetValue<int>("SMTPPort");
 
-
-            _smtpClient = new SmtpClient
-            {
-                Host = emailHost,
-                Port = emailPort,
-                Credentials = new NetworkCredential(emailUsername, emailPassword),
-                EnableSsl = true
-            };
+            _smtpClient = new SmtpClient { Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true };
             _smtpClient.SendCompleted += SendCompletedCallback;
         }
 
         private void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
         {
             // Get the unique identifier for this asynchronous operation.
-            var token = (string) e.UserState;
+            var token = (string)e.UserState;
 
             if (e.Cancelled) Console.WriteLine("[{0}] Send canceled.", token);
 
@@ -50,10 +43,16 @@ namespace weather_backend.Services
 
         public void SendEmail(string subject, string body, string receiver)
         {
-            var senderEmailAddress = new MailAddress(_secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))?.Result);
+            var senderEmailAddress = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername)).Result;
+            if (senderEmailAddress is null)
+            {
+                throw new Exception("Sender email in secret is null");
+            }
+
+            var senderEmailAddressMailAddress = new MailAddress(senderEmailAddress);
             var toEmailAddress = new MailAddress(receiver);
 
-            var mailMessage = new MailMessage(senderEmailAddress, toEmailAddress);
+            var mailMessage = new MailMessage(senderEmailAddressMailAddress, toEmailAddress);
             mailMessage.Subject = subject;
             mailMessage.Body = body;
 

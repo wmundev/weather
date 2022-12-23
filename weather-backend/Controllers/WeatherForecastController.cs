@@ -44,9 +44,15 @@ namespace weather_backend.Controllers
             double cityId = 7839805;
             var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(cityId);
 
+            var receiverEmail = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
+            if (receiverEmail is null)
+            {
+                throw new Exception("Receiver email in secret is null");
+            }
+
             _emailService.SendEmail($"{weatherData.name} Current Weather",
                 $"Current Temperature: {weatherData.main.temp}, Humidity: {weatherData.main.humidity}",
-                await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername)));
+                receiverEmail);
             return weatherData;
         }
 
@@ -55,7 +61,7 @@ namespace weather_backend.Controllers
         public async Task<ActionResult<IEnumerable<City>>> GetCities([FromQuery(Name = "num")] int numberOfCities = 100)
         {
             if (numberOfCities > 500)
-                return BadRequest(new ProblemDetails {Type = "too large", Detail = "size is too large"});
+                return BadRequest(new ProblemDetails { Type = "too large", Detail = "size is too large" });
 
             var allCitiesInAustralia = _cityList.GetAllCitiesInAustralia().Take(numberOfCities);
             return Ok(allCitiesInAustralia);

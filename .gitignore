@@ -81,3 +81,5 @@ weather-backend.Deployment/cdk.out
 
 # generated language files
 weather-backend/Assets/Generated
+
+out

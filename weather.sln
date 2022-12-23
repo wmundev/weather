@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "weather-test", "weather-tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weather.API.IntegrationTests", "Weather.API.IntegrationTests\Weather.API.IntegrationTests.csproj", "{1F8D2532-8F4D-4CA6-BF55-38DD117481EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weather.CLI", "Weather.CLI\Weather.CLI.csproj", "{80463ADC-8FF5-4289-A20C-9E343B8E971F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{1F8D2532-8F4D-4CA6-BF55-38DD117481EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F8D2532-8F4D-4CA6-BF55-38DD117481EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F8D2532-8F4D-4CA6-BF55-38DD117481EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80463ADC-8FF5-4289-A20C-9E343B8E971F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80463ADC-8FF5-4289-A20C-9E343B8E971F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80463ADC-8FF5-4289-A20C-9E343B8E971F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80463ADC-8FF5-4289-A20C-9E343B8E971F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -8,10 +8,6 @@ namespace weather_backend.Dto
     [DynamoDBTable("weather")]
     public class DynamoDbCity
     {
-        public DynamoDbCity()
-        {
-        }
-
         public DynamoDbCity(double id, string name, string state, string country, Coordinate coordinate)
         {
             Id = Convert.ToString(id, CultureInfo.InvariantCulture);
@@ -22,16 +18,16 @@ namespace weather_backend.Dto
         }
 
 
-        [DynamoDBProperty("id")] public string Id { get; set; }
+        [DynamoDBProperty("id")] public required string Id { get; set; }
 
         [DynamoDBHashKey]
         [DynamoDBProperty("name")]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
-        [DynamoDBProperty("state")] public string State { get; set; }
+        [DynamoDBProperty("state")] public required string State { get; set; }
 
-        [DynamoDBProperty("country")] public string Country { get; set; }
+        [DynamoDBProperty("country")] public required string Country { get; set; }
 
-        [DynamoDBProperty("coord")] public Coordinate Coordinate { get; set; }
+        [DynamoDBProperty("coord")] public required Coordinate Coordinate { get; set; }
     }
 }

@@ -5,8 +5,8 @@ namespace weather_backend.Dto
     [DynamoDBTable("Music")]
     public class MusicDto
     {
-        [DynamoDBHashKey] public string Artist { get; set; }
+        [DynamoDBHashKey] public required string Artist { get; set; }
 
-        [DynamoDBRangeKey("SongTitle")] public string SongTitle { get; set; }
+        [DynamoDBRangeKey("SongTitle")] public required string SongTitle { get; set; }
     }
 }

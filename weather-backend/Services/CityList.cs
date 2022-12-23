@@ -57,7 +57,7 @@ namespace weather_backend.Services
 
         public async Task<DynamoDbCity> GetCityInfo(string name)
         {
-            if (!_memoryCache.TryGetValue(name, out DynamoDbCity cachedCity))
+            if (!_memoryCache.TryGetValue(name, out DynamoDbCity? cachedCity) || cachedCity is null)
             {
                 Console.WriteLine("fetching from db");
 

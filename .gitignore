@@ -83,3 +83,5 @@ weather-backend.Deployment/cdk.out
 weather-backend/Assets/Generated
 
 out
+
+**/node_modules

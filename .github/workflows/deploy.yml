@@ -29,4 +29,4 @@ jobs:
 
       - name: Execute Deployment
         run: |
-          dotnet aws deploy --silent --project-path "weather-backend/weather-backend.csproj" --apply "../weather-backend.Deployment/appsettings.json"
+          dotnet aws deploy --silent --project-path "weather-backend/weather-backend.csproj" --deployment-project "../weather-backend.Deployment" --application-name "weather-backend"

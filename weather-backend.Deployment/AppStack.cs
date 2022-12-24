@@ -1,10 +1,8 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using Amazon.CDK;
 using Amazon.CDK.AWS.ElasticBeanstalk;
 using Amazon.CDK.AWS.IAM;
@@ -46,7 +44,7 @@ namespace weather_backend.Deployment
         /// <param name="evnt"></param>
         private void CustomizeCDKProps(CustomizePropsEventArgs<Recipe> evnt)
         {
-            // Example of how to customize the Beanstalk Environment.
+           // Example of how to customize the Beanstalk Environment.
             // 
             // if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.BeanstalkEnvironment)))
             // {
@@ -55,13 +53,13 @@ namespace weather_backend.Deployment
             //         Console.WriteLine("Customizing Beanstalk Environment");
             //     }
             // }
-            
+
             if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.BeanstalkEnvironment)))
             {
                 if (evnt.Props is CfnEnvironmentProps props)
                 {
                     // See https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html#command-options-general-autoscalingasg
-                    
+
                     // var optionSettingsArray = props.OptionSettings as CfnEnvironment.OptionSettingProperty[];
                     // var optionList = optionSettingsArray.ToList(); 
                     // optionList.Add(new CfnEnvironment.OptionSettingProperty
@@ -109,30 +107,22 @@ namespace weather_backend.Deployment
             {
                 if (evnt.Props is RoleProps props)
                 {
-                    props.ManagedPolicies = props.ManagedPolicies.Concat(
-                        new[]
-                        {
-                            ManagedPolicy.FromAwsManagedPolicyName("AmazonDynamoDBReadOnlyAccess")
-                        }
-                    ).ToArray();
+                    var managedPolicies = props.ManagedPolicies;
+                    if (managedPolicies is null)
+                    {
+                        props.ManagedPolicies =
+                            new[] { ManagedPolicy.FromAwsManagedPolicyName("AmazonDynamoDBReadOnlyAccess") };
+                    }
+                    else
+                    {
+                        props.ManagedPolicies = managedPolicies.Concat(
+                            new[] { ManagedPolicy.FromAwsManagedPolicyName("AmazonDynamoDBReadOnlyAccess") }
+                        ).ToArray();
+                    }
+
 
                     const string parameterStoreInlinePolicyName = "weather-backend-app-parameter-store";
-                    var parameterStoreInlinePolicy = new PolicyDocument(new PolicyDocumentProps
-                    {
-                        Statements = new[]
-                        {
-                            new PolicyStatement(new PolicyStatementProps
-                            {
-                                Actions = new[] { "ssm:DescribeParameters"},
-                                Resources = new[] { "*" }
-                            }),
-                            new PolicyStatement(new PolicyStatementProps
-                            {
-                                Actions = new[] { "ssm:GetParameter" },
-                                Resources = new[] { "arn:aws:ssm:us-east-1:775267081896:parameter/weather_secrets" }
-                            })
-                        }
-                    });
+                    var parameterStoreInlinePolicy = new PolicyDocument(new PolicyDocumentProps { Statements = new[] { new PolicyStatement(new PolicyStatementProps { Actions = new[] { "ssm:DescribeParameters" }, Resources = new[] { "*" } }), new PolicyStatement(new PolicyStatementProps { Actions = new[] { "ssm:GetParameter" }, Resources = new[] { "arn:aws:ssm:us-east-1:775267081896:parameter/weather_secrets" } }) } });
 
                     if (props.InlinePolicies != null)
                     {

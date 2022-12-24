@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <RollForward>Major</RollForward>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
     <AWSProjectType>DeploymentProject</AWSProjectType>
-    <!-- The value "1.0.3+48ef3bc4ee" is replaced by the project template system. -->
-    <RecipeCDKCommonVersion>1.0.3+48ef3bc4ee</RecipeCDKCommonVersion>
+    <!-- The value "1.8.8+205d8d903e" is replaced by the project template system. -->
+    <RecipeCDKCommonVersion>1.8.8+205d8d903e</RecipeCDKCommonVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,23 +25,23 @@
 
   <ItemGroup>
     <!-- CDK Construct Library dependencies -->
-    <PackageReference Include="Amazon.CDK.Lib" Version="2.13.0" />
+    <PackageReference Include="Amazon.CDK.Lib" Version="2.43.1" />
 
-    <PackageReference Include="AWSSDK.ElasticBeanstalk" Version="3.7.0.61" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.7" />
+    <PackageReference Include="AWSSDK.ElasticBeanstalk" Version="3.7.100.14" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
 
     <!-- jsii Roslyn analyzers (un-comment to obtain compile-time checks for missing required props
     <PackageReference Include="Amazon.Jsii.Analyzers" Version="*" PrivateAssets="all" />
     -->
   </ItemGroup>
 
-  <!--If the project template is being compiled it self the "1.0.3+48ef3bc4ee" token won't have been replaced. To make sure the project can still compile use a project reference. -->
+  <!--If the project template is being compiled it self the "1.8.8+205d8d903e" token won't have been replaced. To make sure the project can still compile use a project reference. -->
   <ItemGroup Condition=" '$(RecipeCDKCommonVersion.ToUpper())' == 'AWSDEPLOYRECIPESCDKCOMMONVERSION' ">
     <ProjectReference Include="..\..\..\AWS.Deploy.Recipes.CDK.Common\AWS.Deploy.Recipes.CDK.Common.csproj" />
   </ItemGroup>
-  <!-- The project has run through the project template engine and "1.0.3+48ef3bc4ee" has been replaced with valid version number so a PackageReference is used. -->
+  <!-- The project has run through the project template engine and "1.8.8+205d8d903e" has been replaced with valid version number so a PackageReference is used. -->
   <ItemGroup Condition=" '$(RecipeCDKCommonVersion.ToUpper())' != 'AWSDEPLOYRECIPESCDKCOMMONVERSION' ">
-    <PackageReference Include="AWS.Deploy.Recipes.CDK.Common" Version="1.0.3+48ef3bc4ee" />
+    <PackageReference Include="AWS.Deploy.Recipes.CDK.Common" Version="1.8.8+205d8d903e" />
   </ItemGroup>
 
 </Project>

@@ -63,30 +63,31 @@ namespace weather_backend
                 services.AddTransient<IDynamoDBContext, DynamoDBContext>();
             }
 
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != Environments.Development)
-                try
-                {
-                    var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions { EndPoints = { "redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379" }, ConnectRetry = 5 });
-                    services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-                }
-                catch (RedisConnectionException e)
-                {
-                    // we add redis as optional and not fail if cannot connect
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine(e.StackTrace);
-                }
-            else
-                try
-                {
-                    var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions { EndPoints = { "redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379" }, ConnectRetry = 5 });
-                    services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-                }
-                catch (RedisConnectionException e)
-                {
-                    // we add redis as optional and not fail if cannot connect
-                    Console.WriteLine(e.Message);
-                    Console.WriteLine(e.StackTrace);
-                }
+            //TODO add back redis if needed
+            // if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != Environments.Development)
+            //     try
+            //     {
+            //         var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions { EndPoints = { "redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379" }, ConnectRetry = 5 });
+            //         services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+            //     }
+            //     catch (RedisConnectionException e)
+            //     {
+            //         // we add redis as optional and not fail if cannot connect
+            //         Console.WriteLine(e.Message);
+            //         Console.WriteLine(e.StackTrace);
+            //     }
+            // else
+            //     try
+            //     {
+            //         var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions { EndPoints = { "redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379" }, ConnectRetry = 5 });
+            //         services.AddSingleton<IConnectionMultiplexer>(multiplexer);
+            //     }
+            //     catch (RedisConnectionException e)
+            //     {
+            //         // we add redis as optional and not fail if cannot connect
+            //         Console.WriteLine(e.Message);
+            //         Console.WriteLine(e.StackTrace);
+            //     }
 
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
             services.AddAWSService<IAmazonTranslate>();

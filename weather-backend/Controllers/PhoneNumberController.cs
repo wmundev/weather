@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using weather_backend.Services;
 
 namespace weather_backend.Controllers
@@ -17,7 +16,7 @@ namespace weather_backend.Controllers
 
         [HttpGet]
         [Route("/phone")]
-        public async Task<ActionResult> ValidatePhoneNumber([FromQuery(Name = "phone")] string phone)
+        public IActionResult ValidatePhoneNumber([FromQuery(Name = "phone")] string phone)
         {
             return Ok(_phoneService.ValidatePhoneNumber(phone));
         }

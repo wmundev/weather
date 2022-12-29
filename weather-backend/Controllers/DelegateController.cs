@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using weather_backend.Services;
 
@@ -18,7 +17,7 @@ namespace weather_backend.Controllers
 
         [HttpGet]
         [Route("test")]
-        public async Task<ActionResult> TestDelegate()
+        public IActionResult TestDelegate()
         {
             _delegateService.SortThings((i, i1) => { Console.WriteLine(i + i1); });
             return Ok();

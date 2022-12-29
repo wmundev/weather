@@ -22,16 +22,13 @@ namespace weather_backend.HostedService
             await BackgroundJob(stoppingToken);
         }
 
+#pragma warning disable CS1998
         private async Task BackgroundJob(CancellationToken stoppingToken)
+#pragma warning restore CS1998
         {
             var server = _configuration.GetValue<string>("Kafka:ServerAddress");
 
-            var config = new ConsumerConfig
-            {
-                BootstrapServers = server,
-                GroupId = "foo",
-                AutoOffsetReset = AutoOffsetReset.Earliest
-            };
+            var config = new ConsumerConfig { BootstrapServers = server, GroupId = "foo", AutoOffsetReset = AutoOffsetReset.Earliest };
 
             using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
             {

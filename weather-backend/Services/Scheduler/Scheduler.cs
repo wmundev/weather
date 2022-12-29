@@ -31,10 +31,15 @@ namespace weather_backend.Services
             //melbourne cityid: 7839805
             double cityId = 7839805;
             var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(cityId);
+            var receiverEmail = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
+            if (receiverEmail is null)
+            {
+                throw new Exception("Receiver email in secret is null");
+            }
 
             _emailService.SendEmail($"{weatherData.name} Current Weather",
                 $"Current Temperature: {weatherData.main.temp}, Humidity: {weatherData.main.humidity}",
-                await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername)));
+                receiverEmail);
             // return Task.CompletedTask;
         }
 

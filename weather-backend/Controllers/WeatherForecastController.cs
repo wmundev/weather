@@ -58,7 +58,7 @@ namespace weather_backend.Controllers
 
         [HttpGet]
         [Route("/city/all")]
-        public async Task<ActionResult<IEnumerable<City>>> GetCities([FromQuery(Name = "num")] int numberOfCities = 100)
+        public ActionResult<IEnumerable<City>> GetCities([FromQuery(Name = "num")] int numberOfCities = 100)
         {
             if (numberOfCities > 500)
                 return BadRequest(new ProblemDetails { Type = "too large", Detail = "size is too large" });

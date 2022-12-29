@@ -20,6 +20,7 @@ namespace weather_backend.Controllers
         [Route("generate")]
         public async Task GenerateLanguageFile()
         {
+            await Task.CompletedTask;
             // uncomment to use translation
             // await _languageTranslatorService.GenerateLanguageFileAsync();
         }

@@ -27,7 +27,7 @@ namespace weather_backend.Controllers
             // Task.Factory.StartNew(() => _kafkaProducer.ProduceMessage(topic, message));
             await _backgroundTaskQueue.QueueBackgroundWorkItemAsync(async token =>
             {
-                // await BuildWorkItemAsync(token, message, topic);
+                await BuildWorkItemAsync(token, message, topic);
                 Console.WriteLine("haha");
                 Thread.Sleep(1000);
             });

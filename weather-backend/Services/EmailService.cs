@@ -21,7 +21,7 @@ namespace weather_backend.Services
 
             var emailUsername = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))?.Result;
             var emailPassword = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword))?.Result;
-            var emailHost = configuration.GetValue<string>("SMTPHost");
+            var emailHost = configuration.GetValue<string>("SMTPHost") ?? throw new NullReferenceException("Email host is null");
             var emailPort = configuration.GetValue<int>("SMTPPort");
 
             _smtpClient = new SmtpClient { Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true };
@@ -31,7 +31,7 @@ namespace weather_backend.Services
         private void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
         {
             // Get the unique identifier for this asynchronous operation.
-            var token = (string)e.UserState;
+            var token = e.UserState as string;
 
             if (e.Cancelled) Console.WriteLine("[{0}] Send canceled.", token);
 

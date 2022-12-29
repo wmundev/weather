@@ -19,24 +19,24 @@ namespace weather_backend.Controllers
         }
 
         [Route("pattern")]
-        public async Task<ActionResult> Pattern()
+        public IActionResult Pattern()
         {
             var greeting = "nice one";
 
-            if (greeting is string thisisgreeting) Console.WriteLine(thisisgreeting);
+            if (greeting is { } thisisgreeting) Console.WriteLine(thisisgreeting);
 
             return Ok();
         }
 
         [Route("password")]
-        public async Task<ActionResult> GeneratePassword()
+        public IActionResult GeneratePassword()
         {
             return Ok();
         }
 
         [Route("redis")]
         [HttpPost]
-        public async Task<ActionResult> RedisSaveTest([FromBody] RedisSaveTestDto value)
+        public async Task<IActionResult> RedisSaveTest([FromBody] RedisSaveTestDto value)
         {
             var db = _redis.GetDatabase();
             var foo = await db.StringSetAsync("foo", value.Value);
@@ -47,7 +47,7 @@ namespace weather_backend.Controllers
 
         [Route("redis")]
         [HttpGet]
-        public async Task<ActionResult> RedisGetTest()
+        public async Task<IActionResult> RedisGetTest()
         {
             var watch = Stopwatch.StartNew();
 
@@ -56,11 +56,7 @@ namespace weather_backend.Controllers
 
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
-            return Ok(new
-            {
-                result = foo.ToString(),
-                time = elapsedMs
-            });
+            return Ok(new { result = foo.ToString(), time = elapsedMs });
             // var pong = await db.PingAsync();
             // return Ok();
         }

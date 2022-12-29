@@ -11,7 +11,7 @@ namespace weather_backend.Services
     {
         private readonly CronExpression _expression;
         private readonly TimeZoneInfo _timeZoneInfo;
-        private Timer _timer;
+        private Timer? _timer;
 
         protected CronJobService(string cronExpression, TimeZoneInfo timeZoneInfo)
         {

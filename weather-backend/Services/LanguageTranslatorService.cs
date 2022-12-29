@@ -65,7 +65,9 @@ namespace weather_backend.Services
             const string directoryPrefixToGenerateFilesIn = "Assets/Generated";
             using StreamReader streamReader = new(filepath);
             string json = await streamReader.ReadToEndAsync();
+#pragma warning disable CS8600
             dynamic anonObject = JsonConvert.DeserializeObject<ExpandoObject>(json, new ExpandoObjectConverter());
+#pragma warning restore CS8600
             if (anonObject == null)
             {
                 throw new Exception();

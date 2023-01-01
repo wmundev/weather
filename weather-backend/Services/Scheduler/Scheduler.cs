@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using weather_backend.Models;
 
-namespace weather_backend.Services
+namespace weather_backend.Services.Scheduler
 {
     public class Scheduler : CronJobService
     {
@@ -17,7 +17,7 @@ namespace weather_backend.Services
 
         public Scheduler(EmailService emailService, ICurrentWeatherData currentWeatherData, ILogger<Scheduler> logger,
             IConfiguration configuration, ISecretService secretService) :
-            base("0 22 * * *", TimeZoneInfo.Utc)
+            base(Constants.CRON_EXPRESSION_SCHEDULE_JOB, TimeZoneInfo.Utc)
         {
             _emailService = emailService;
             _currentWeatherData = currentWeatherData;
@@ -28,6 +28,7 @@ namespace weather_backend.Services
 
         public override async Task DoWork(CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Executing schedule");
             //melbourne cityid: 7839805
             double cityId = 7839805;
             var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(cityId);

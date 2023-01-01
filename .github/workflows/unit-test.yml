@@ -1,4 +1,4 @@
-﻿name: .NET
+﻿name: "unit-tests"
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  unitTest:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

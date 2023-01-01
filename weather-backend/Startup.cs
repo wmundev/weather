@@ -1,4 +1,3 @@
-using System;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Extensions.NETCore.Setup;
@@ -12,13 +11,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using StackExchange.Redis;
-using weather_backend.Controllers;
 using weather_backend.Extensions;
 using weather_backend.HostedService;
 using weather_backend.Middleware;
 using weather_backend.Repository;
 using weather_backend.Services;
+using weather_backend.Services.Scheduler;
 using weather_backend.StartupTask;
 
 namespace weather_backend
@@ -153,7 +151,10 @@ namespace weather_backend
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "weather_backend v1"));
             }
 
-            app.UseHttpsRedirection();
+            if (!env.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
 
             app.UseStaticFiles();
 

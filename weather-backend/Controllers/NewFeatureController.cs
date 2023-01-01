@@ -19,6 +19,7 @@ namespace weather_backend.Controllers
         }
 
         [Route("pattern")]
+        [HttpGet]
         public IActionResult Pattern()
         {
             var greeting = "nice one";
@@ -29,6 +30,7 @@ namespace weather_backend.Controllers
         }
 
         [Route("password")]
+        [HttpGet]
         public IActionResult GeneratePassword()
         {
             return Ok();

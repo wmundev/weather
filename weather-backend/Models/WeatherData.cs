@@ -50,30 +50,30 @@ namespace weather_backend.Models
      */
     public class WeatherData
     {
-        [JsonProperty("coord")] public required Coordinate coord { get; set; }
+        [JsonProperty("coord")] public Coordinate coord { get; set; }
 
-        [JsonProperty("weather")] public required Weather[] weather { get; set; }
+        [JsonProperty("weather")] public Weather[] weather { get; set; }
 
-        [JsonProperty("base")] public required string BaseInfo { get; set; }
+        [JsonProperty("base")] public string BaseInfo { get; set; }
 
-        [JsonProperty("main")] public required MainWeather main { get; set; }
+        [JsonProperty("main")] public MainWeather main { get; set; }
 
-        [JsonProperty("visibility")] public required int visibility { get; set; }
+        [JsonProperty("visibility")] public int visibility { get; set; }
 
-        [JsonProperty("wind")] public required Wind wind { get; set; }
+        [JsonProperty("wind")] public Wind wind { get; set; }
 
-        [JsonProperty("clouds")] public required Cloud clouds { get; set; }
+        [JsonProperty("clouds")] public Cloud clouds { get; set; }
 
-        [JsonProperty("dt")] public required int dt { get; set; }
+        [JsonProperty("dt")] public int dt { get; set; }
 
-        [JsonProperty("sys")] public required WeatherSystem sys { get; set; }
+        [JsonProperty("sys")] public WeatherSystem sys { get; set; }
 
-        [JsonProperty("timezone")] public required int timezone { get; set; }
+        [JsonProperty("timezone")] public int timezone { get; set; }
 
-        [JsonProperty("id")] public required int id { get; set; }
+        [JsonProperty("id")] public int id { get; set; }
 
-        [JsonProperty("name")] public required string name { get; set; }
+        [JsonProperty("name")] public string name { get; set; }
 
-        [JsonProperty("cod")] public required int cod { get; set; }
+        [JsonProperty("cod")] public int cod { get; set; }
     }
 }

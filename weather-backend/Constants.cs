@@ -6,6 +6,8 @@ namespace weather_backend
     {
         public const string SECRETS_KEY = "weather_secrets";
 
+        public const string CRON_EXPRESSION_SCHEDULE_JOB = "0 22 * * *";
+
         /**
          * See https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
          */

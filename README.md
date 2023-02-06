@@ -6,6 +6,12 @@ https://github.com/docker/docker-install
 
 https://docs.docker.com/compose/install/
 
+# Create a new deployment project for aws dotnet deploy
+
+```
+cd weather-backend && dotnet aws deployment-project generate
+```
+
 # Deploying (new)
 Run the command
 ```

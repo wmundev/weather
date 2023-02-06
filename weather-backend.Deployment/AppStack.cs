@@ -44,7 +44,7 @@ namespace weather_backend.Deployment
         /// <param name="evnt"></param>
         private void CustomizeCDKProps(CustomizePropsEventArgs<Recipe> evnt)
         {
-           // Example of how to customize the Beanstalk Environment.
+            // Example of how to customize the Beanstalk Environment.
             // 
             // if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.BeanstalkEnvironment)))
             // {

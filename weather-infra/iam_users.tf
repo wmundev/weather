@@ -1,4 +1,4 @@
-﻿resource "aws_iam_user" "app_iam_user" {
+resource "aws_iam_user" "app_iam_user" {
   name = "weather_iam_user"
   path = "/system/"
 }

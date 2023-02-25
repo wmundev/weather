@@ -1,4 +1,4 @@
-﻿#resource "aws_iam_role" "weather_app_role" {
+#resource "aws_iam_role" "weather_app_role" {
 #  name = "weather_app_role"
 #
 #  # Terraform's "jsonencode" function converts a

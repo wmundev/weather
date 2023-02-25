@@ -1,4 +1,4 @@
-﻿# Installing this application on a server
+# Installing this application on a server
 # Prerequisities
 Install docker and docker-compose
 

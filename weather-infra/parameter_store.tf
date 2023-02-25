@@ -1,4 +1,4 @@
-﻿resource "aws_ssm_parameter" "app_secret" {
+resource "aws_ssm_parameter" "app_secret" {
   name        = "weather_secrets"
   description = "Secrets for the weather app in json"
   type        = "SecureString"

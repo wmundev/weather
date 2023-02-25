@@ -1,4 +1,4 @@
-﻿resource "aws_dynamodb_table" "basic_dynamodb_table" {
+resource "aws_dynamodb_table" "basic_dynamodb_table" {
   name           = "weather"
   billing_mode   = var.environment == "test" ? "PAY_PER_REQUEST" : "PROVISIONED"
   read_capacity  = var.environment == "test" ? 0 : 1

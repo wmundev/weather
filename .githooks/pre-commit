@@ -29,6 +29,11 @@ dotnet jb cleanupcode --include="$filesToFormat" "weather.sln"
 echo "✅ - Formatting complete. Adding changes..."
 git add $filesToCommit
 
-echo "💅 - Files committed. You're free to push your beautiful code now." 
+# Generate OpenAPI docs
+(
+  cd $(git rev-parse --show-toplevel)/scripts
+  ./generate-openapi-docs.sh
+  git add api.yaml
+)
 
 exit 0

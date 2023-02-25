@@ -1,0 +1,519 @@
+openapi: 3.0.1
+info:
+  title: weather_backend
+  version: v1
+paths:
+  /academic:
+    get:
+      tags:
+        - Academic
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Academic'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Academic'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/Academic'
+  /delegate/test:
+    get:
+      tags:
+        - Delegate
+      responses:
+        '200':
+          description: Success
+  /api/Encryption/encrypt:
+    get:
+      tags:
+        - Encryption
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  /Geolocation/ipaddress:
+    get:
+      tags:
+        - Geolocation
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  /Geolocation/location:
+    get:
+      tags:
+        - Geolocation
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  /niceone:
+    get:
+      tags:
+        - Kafka
+      parameters:
+        - name: message
+          in: query
+          schema:
+            type: string
+        - name: topic
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+  /api/LanguageTranslator/generate:
+    post:
+      tags:
+        - LanguageTranslator
+      responses:
+        '200':
+          description: Success
+  /Music/music:
+    get:
+      tags:
+        - Music
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  /Music/music/nice:
+    get:
+      tags:
+        - Music
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  /feature/pattern:
+    get:
+      tags:
+        - NewFeature
+      responses:
+        '200':
+          description: Success
+  /feature/password:
+    get:
+      tags:
+        - NewFeature
+      responses:
+        '200':
+          description: Success
+  /feature/redis:
+    post:
+      tags:
+        - NewFeature
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RedisSaveTestDto'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RedisSaveTestDto'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RedisSaveTestDto'
+      responses:
+        '200':
+          description: Success
+    get:
+      tags:
+        - NewFeature
+      responses:
+        '200':
+          description: Success
+  /phone:
+    get:
+      tags:
+        - PhoneNumber
+      parameters:
+        - name: phone
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+  /api/PrimeNumber:
+    get:
+      tags:
+        - PrimeNumber
+      parameters:
+        - name: number
+          in: query
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Success
+  /weather:
+    get:
+      tags:
+        - WeatherForecast
+      responses:
+        '201':
+          description: Created
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /city/all:
+    get:
+      tags:
+        - WeatherForecast
+      parameters:
+        - name: num
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 100
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+  /populate:
+    get:
+      tags:
+        - WeatherForecast
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: integer
+                format: int32
+            application/json:
+              schema:
+                type: integer
+                format: int32
+            text/json:
+              schema:
+                type: integer
+                format: int32
+  '/city/{name}':
+    get:
+      tags:
+        - WeatherForecast
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/DynamoDbCity'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DynamoDbCity'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/DynamoDbCity'
+components:
+  schemas:
+    Academic:
+      type: object
+      properties:
+        acnum:
+          type: integer
+          format: int32
+        deptnum:
+          type: integer
+          format: int32
+        famname:
+          type: string
+          nullable: true
+        givename:
+          type: string
+          nullable: true
+        initials:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+      additionalProperties: false
+    City:
+      type: object
+      properties:
+        id:
+          type: number
+          format: double
+        name:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        coord:
+          $ref: '#/components/schemas/Coordinate'
+      additionalProperties: false
+    Cloud:
+      type: object
+      properties:
+        all:
+          type: integer
+          format: int32
+      additionalProperties: false
+    Coordinate:
+      type: object
+      properties:
+        lon:
+          type: number
+          format: double
+        lat:
+          type: number
+          format: double
+      additionalProperties: false
+    DynamoDbCity:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        coordinate:
+          $ref: '#/components/schemas/Coordinate'
+      additionalProperties: false
+    MainWeather:
+      type: object
+      properties:
+        temp:
+          type: number
+          format: double
+        feels_like:
+          type: number
+          format: double
+        temp_min:
+          type: number
+          format: double
+        temp_max:
+          type: number
+          format: double
+        pressure:
+          type: integer
+          format: int32
+        humidity:
+          type: integer
+          format: int32
+      additionalProperties: false
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          nullable: true
+      additionalProperties: { }
+    RedisSaveTestDto:
+      type: object
+      properties:
+        value:
+          type: string
+          nullable: true
+      additionalProperties: false
+    Weather:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        main:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+      additionalProperties: false
+    WeatherData:
+      type: object
+      properties:
+        coord:
+          $ref: '#/components/schemas/Coordinate'
+        weather:
+          type: array
+          items:
+            $ref: '#/components/schemas/Weather'
+          nullable: true
+        baseInfo:
+          type: string
+          nullable: true
+        main:
+          $ref: '#/components/schemas/MainWeather'
+        visibility:
+          type: integer
+          format: int32
+        wind:
+          $ref: '#/components/schemas/Wind'
+        clouds:
+          $ref: '#/components/schemas/Cloud'
+        dt:
+          type: integer
+          format: int32
+        sys:
+          $ref: '#/components/schemas/WeatherSystem'
+        timezone:
+          type: integer
+          format: int32
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+          nullable: true
+        cod:
+          type: integer
+          format: int32
+      additionalProperties: false
+    WeatherSystem:
+      type: object
+      properties:
+        type:
+          type: integer
+          format: int32
+        id:
+          type: integer
+          format: int32
+        country:
+          type: string
+          nullable: true
+        sunrise:
+          type: integer
+          format: int32
+        sunset:
+          type: integer
+          format: int32
+      additionalProperties: false
+    Wind:
+      type: object
+      properties:
+        speed:
+          type: number
+          format: double
+        deg:
+          type: integer
+          format: int32
+      additionalProperties: false

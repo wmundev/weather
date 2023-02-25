@@ -33,7 +33,7 @@ git add $filesToCommit
 (
   cd $(git rev-parse --show-toplevel)/scripts
   ./generate-openapi-docs.sh
-  git add api.yaml
+  git add ../api.yaml
 )
 
 exit 0

@@ -204,6 +204,13 @@ paths:
       responses:
         '200':
           description: Success
+  /api/PrimeNumber/haha:
+    get:
+      tags:
+        - PrimeNumber
+      responses:
+        '200':
+          description: Success
   /weather:
     get:
       tags:

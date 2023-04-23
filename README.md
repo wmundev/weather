@@ -16,7 +16,7 @@ cd weather-backend && dotnet aws deployment-project generate
 Run the command
 ```
 cd .\weather-backend
-dotnet aws deploy --deployment-project ../weather-backend.Deployment
+dotnet aws deploy --project-path "weather-backend/weather-backend.csproj" --deployment-project "../weather-backend.Deployment" --application-name "weather-backend"
 ```
 
 We use this tool to deploy to aws to AWS ECS - https://github.com/aws/aws-dotnet-deploy

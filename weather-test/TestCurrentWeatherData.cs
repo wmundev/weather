@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
-using Moq;
+using NSubstitute;
 using weather_backend.Services;
 using weather_test.Logger;
 using Xunit.Abstractions;
@@ -10,12 +10,9 @@ namespace weather_test
 {
     public class TestCurrentWeatherData
     {
-        private readonly Mock<IConfiguration> _configuration = new();
-
-        private readonly Mock<HttpMessageHandler> _mockHttpMessageHandler = new();
-        private readonly Mock<ISecretService> _mockSecretService;
+        private readonly HttpMessageHandler _mockHttpMessageHandler = Substitute.For<HttpMessageHandler>();
+        private readonly ISecretService _mockSecretService;
         private readonly ITestOutputHelper _testOutputHelper;
-        private readonly ICurrentWeatherData _underTest;
 
         public TestCurrentWeatherData(ITestOutputHelper testOutputHelper)
         {
@@ -30,8 +27,8 @@ namespace weather_test
 
             var logger = XUnitLogger.CreateLogger<CurrentWeatherData>(_testOutputHelper);
 
-            _mockSecretService = new Mock<ISecretService>();
-            _underTest = new CurrentWeatherData(configuration, new HttpClient(_mockHttpMessageHandler.Object), logger, _mockSecretService.Object);
+            _mockSecretService = Substitute.For<ISecretService>();
+            new CurrentWeatherData(configuration, new HttpClient(_mockHttpMessageHandler), logger, _mockSecretService);
         }
 
         // FIXME

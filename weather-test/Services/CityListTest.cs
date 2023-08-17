@@ -4,7 +4,7 @@ using System.Text.Json;
 using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Moq;
+using NSubstitute;
 using weather_backend.Models;
 using weather_backend.Repository;
 using weather_backend.Services;
@@ -15,29 +15,29 @@ namespace weather_test.Services
     public class CityListTest
     {
         private readonly CityList _cityList;
-        private readonly Mock<IDynamoDbClient> _dynamoDbClient;
-        private readonly Mock<IMapper> _mapper;
+        private readonly IDynamoDbClient _dynamoDbClient;
+        private readonly IMapper _mapper;
 
-        private readonly Mock<ILogger<CityList>> _mockLogger;
-        private readonly Mock<IMemoryCache> _mockMemoryCache;
-        private readonly Mock<ICityRepository> _mockCityRepository;
+        private readonly ILogger<CityList> _mockLogger;
+        private readonly IMemoryCache _mockMemoryCache;
+        private readonly ICityRepository _mockCityRepository;
 
         public CityListTest()
         {
-            _mockLogger = new Mock<ILogger<CityList>>();
-            _dynamoDbClient = new Mock<IDynamoDbClient>();
-            _mapper = new Mock<IMapper>();
-            _mockMemoryCache = new Mock<IMemoryCache>();
-            _mockCityRepository = new Mock<ICityRepository>();
+            _mockLogger = Substitute.For<ILogger<CityList>>();
+            _dynamoDbClient =  Substitute.For< IDynamoDbClient>();
+            _mapper = Substitute.For< IMapper>();
+            _mockMemoryCache = Substitute.For<  IMemoryCache>();
+            _mockCityRepository = Substitute.For<  ICityRepository>();
 
-            _cityList = new CityList(_mockLogger.Object, _dynamoDbClient.Object, _mapper.Object, _mockMemoryCache.Object, _mockCityRepository.Object);
+            _cityList = new CityList(_mockLogger, _dynamoDbClient, _mapper, _mockMemoryCache, _mockCityRepository);
         }
 
 
         [Fact]
         public void GetAllCitiesInAustraliaTest()
         {
-            _mockCityRepository.Setup(s => s.GetAllCitiesFromJsonFile()).Returns(new List<City>
+            _mockCityRepository.GetAllCitiesFromJsonFile().Returns(new List<City>
             {
                 new()
                 {

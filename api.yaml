@@ -50,6 +50,28 @@ paths:
             text/json:
               schema:
                 type: string
+  /api/v1/word/capitalize-first-word:
+    get:
+      tags:
+        - EnglishWord
+      parameters:
+        - name: input
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
   /Geolocation/ipaddress:
     get:
       tags:
@@ -211,6 +233,67 @@ paths:
       responses:
         '200':
           description: Success
+  /api/stringbase64/decodebase64:
+    get:
+      tags:
+        - StringBase64
+      parameters:
+        - name: stringToDecode
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  /api/stringbase64/encodebase64:
+    get:
+      tags:
+        - StringBase64
+      parameters:
+        - name: stringToEncode
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  /api/struc/nice:
+    get:
+      tags:
+        - StrucTest
+      responses:
+        '200':
+          description: Success
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
   /weather:
     get:
       tags:

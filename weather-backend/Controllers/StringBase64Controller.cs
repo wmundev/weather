@@ -1,5 +1,4 @@
 using System;
-using System.Buffers.Text;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +6,7 @@ namespace weather_backend.Controllers
 {
     [Route("api/stringbase64")]
     [ApiController]
-    public sealed class StringBase64Controller: ControllerBase
+    public sealed class StringBase64Controller : ControllerBase
     {
         [HttpGet]
         [Route("decodebase64")]
@@ -17,7 +16,7 @@ namespace weather_backend.Controllers
             string decodedString = Encoding.UTF8.GetString(bytes);
             return Ok(decodedString);
         }
-        
+
         [HttpGet]
         [Route("encodebase64")]
         public ActionResult<string> Encode([FromQuery] string stringToEncode)

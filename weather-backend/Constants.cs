@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Text.Json;
 
 namespace weather_backend
 {
@@ -7,6 +8,8 @@ namespace weather_backend
         public const string SECRETS_KEY = "weather_secrets";
 
         public const string CRON_EXPRESSION_SCHEDULE_JOB = "0 22 * * *";
+
+        public static JsonSerializerOptions DefaultJsonOptions => new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true };
 
         /**
          * See https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html

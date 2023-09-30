@@ -16,13 +16,13 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.0.x
-          include-prerelease: true
+          dotnet-quality: 'ga'
 
-#      - name: Restore Dependencies
-#        run: dotnet restore weather.sln
-#
-#      - name: Build
-#        run: dotnet build weather.sln --configuration Release --no-restore
+      - name: Restore Dependencies
+        run: dotnet restore weather.sln
+
+      - name: Build
+        run: dotnet build weather.sln --configuration Release --no-restore
 
       - name: Test
 #        TODO

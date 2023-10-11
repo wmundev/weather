@@ -12,7 +12,7 @@
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.101.38" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.7" />
     <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.103.19" />
-    <PackageReference Include="AWSSDK.Translate" Version="3.7.200.6" />
+    <PackageReference Include="AWSSDK.Translate" Version="3.7.200.53" />
     <PackageReference Include="Confluent.Kafka" Version="2.2.0" />
     <PackageReference Include="Cronos" Version="0.7.1" />
     <PackageReference Include="Dapper" Version="2.1.4" />

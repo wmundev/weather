@@ -1,4 +1,4 @@
-namespace Weather.CLI.Services
+namespace Weather.CLI.Services.DynamicProgramming
 {
     public sealed class LongestIncreasingSubsequenceProblem
     {

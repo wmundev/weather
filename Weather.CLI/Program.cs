@@ -2,6 +2,7 @@
 
 using Weather.CLI.Model;
 using Weather.CLI.Services;
+using Weather.CLI.Services.DynamicProgramming;
 
 Console.WriteLine("Hello, World!");
 

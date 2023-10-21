@@ -9,11 +9,8 @@ namespace Weather.CLI.Services.DynamicProgramming
          * Generalize the relationship
          * Implement by solving subproblems in order
          */
-        public int SolveSolution()
+        public static int SolveSolution(int[] problem)
         {
-            const int answer = 4;
-            int[] problem = { 5, 2, 8, 6, 3, 6, 9, 5 };
-
             var result = 1;
 
             for (int i = 0; i < problem.Length; i++)
@@ -34,10 +31,6 @@ namespace Weather.CLI.Services.DynamicProgramming
                 result = Math.Max(maxSubsequence, result);
                 Console.WriteLine($"i: {i} nice result {result}");
             }
-
-
-            Console.WriteLine("Result is " + result);
-            if (answer != result) throw new Exception("Wrong answer");
 
             return result;
         }

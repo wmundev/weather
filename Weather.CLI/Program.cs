@@ -2,7 +2,6 @@
 
 using Weather.CLI.Model;
 using Weather.CLI.Services;
-using Weather.CLI.Services.DynamicProgramming;
 
 Console.WriteLine("Hello, World!");
 
@@ -31,5 +30,3 @@ Console.WriteLine(animal);
 
 var simpleService = new SimpleService();
 await simpleService.DoThings();
-
-new LongestIncreasingSubsequenceProblem().SolveSolution();

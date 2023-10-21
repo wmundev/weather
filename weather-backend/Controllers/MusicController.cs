@@ -10,11 +10,11 @@ namespace weather_backend.Controllers
     [Route("[controller]")]
     public class MusicController : ControllerBase
     {
-        private readonly DynamoDbClient _client;
+        private readonly IDynamoDbClient _client;
 
-        public MusicController(DynamoDbClient client)
+        public MusicController(IDynamoDbClient client)
         {
-            _client = client;
+            _client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
         [HttpGet]
@@ -42,7 +42,7 @@ namespace weather_backend.Controllers
                 Console.WriteLine(e.Message);
             }
 
-            return BadRequest(new ProblemDetails {Type = "typeisfailed", Detail = "Failed"});
+            return BadRequest(new ProblemDetails { Type = "typeisfailed", Detail = "Failed" });
         }
     }
 }

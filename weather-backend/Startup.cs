@@ -1,6 +1,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Extensions.NETCore.Setup;
+using Amazon.SecurityToken;
 using Amazon.SimpleSystemsManagement;
 using Amazon.Translate;
 using Microsoft.AspNetCore.Builder;
@@ -38,6 +39,8 @@ namespace weather_backend
         {
             services.AddMemoryCache();
             services.AddHealthChecks();
+            services.AddSingleton<AmazonCredentialsCachingService>();
+            services.AddAWSService<IAmazonSecurityTokenService>();
 
             services.AddControllers();
             services.AddHttpClient();
@@ -57,8 +60,8 @@ namespace weather_backend
             else
             {
                 services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-                services.AddAWSService<IAmazonDynamoDB>();
-                services.AddTransient<IDynamoDBContext, DynamoDBContext>();
+                // services.AddAWSService<IAmazonDynamoDB>();
+                // services.AddTransient<IDynamoDBContext, DynamoDBContext>();
             }
 
             //TODO add back redis if needed

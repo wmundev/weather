@@ -61,11 +61,7 @@ namespace weather_backend.Services
 
         private async Task<GetParameterResponse> FetchSecretFromParameterStore(string secretKey)
         {
-            var getParameterRequest = new GetParameterRequest
-            {
-                Name = secretKey,
-                WithDecryption = true
-            };
+            var getParameterRequest = new GetParameterRequest { Name = secretKey, WithDecryption = true };
             var secret = await _ssmClient.GetParameterAsync(getParameterRequest);
             return secret;
         }

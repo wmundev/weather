@@ -30,3 +30,5 @@ Console.WriteLine(animal);
 
 var simpleService = new SimpleService();
 await simpleService.DoThings();
+
+new LongestIncreasingSubsequenceProblem().SolveSolution();

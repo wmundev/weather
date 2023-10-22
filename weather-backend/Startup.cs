@@ -60,7 +60,15 @@ namespace weather_backend
             else
             {
                 services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-                // services.AddAWSService<IAmazonDynamoDB>();
+                services.AddSingleton<IDynamoDBContext>(provider =>
+                {
+                    var awsOptions = new AWSOptions();
+                    awsOptions.Credentials = provider.GetRequiredService<AmazonCredentialsCachingService>();
+
+                    var dynamodbClient = awsOptions.CreateServiceClient<IAmazonDynamoDB>();
+                    DynamoDBContext context = new DynamoDBContext(dynamodbClient);
+                    return context;
+                });
                 // services.AddTransient<IDynamoDBContext, DynamoDBContext>();
             }
 

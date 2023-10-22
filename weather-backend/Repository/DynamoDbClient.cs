@@ -1,13 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
-using Amazon.Extensions.NETCore.Setup;
 using Amazon.Runtime;
 using Microsoft.Extensions.Logging;
 using weather_backend.Dto;
-using weather_backend.Services;
 
 namespace weather_backend.Repository
 {
@@ -16,6 +13,7 @@ namespace weather_backend.Repository
         Task<MusicDto> getthings(CancellationToken token = default);
         Task SaveRecord(DynamoDbCity obj);
         Task<DynamoDbCity> GetCity(string name);
+        Task<EmailCodeEntity> LoadEmailCode();
     }
 
     public class DynamoDbClient : IDynamoDbClient
@@ -23,16 +21,15 @@ namespace weather_backend.Repository
         private readonly IDynamoDBContext _amazonDynamoDbClient;
         private readonly ILogger<DynamoDbClient> _logger;
 
-        public DynamoDbClient(ILogger<DynamoDbClient> logger, AmazonCredentialsCachingService amazonCredentialsCachingService)
+        public DynamoDbClient(ILogger<DynamoDbClient> logger, IDynamoDBContext amazonDynamoDbClient)
         {
-            var awsOptions = new AWSOptions();
-            awsOptions.Credentials = amazonCredentialsCachingService;
-
-            var dynamodbClient = awsOptions.CreateServiceClient<IAmazonDynamoDB>();
-            DynamoDBContext context = new DynamoDBContext(dynamodbClient);
-            _amazonDynamoDbClient = context;
-
             _logger = logger;
+            _amazonDynamoDbClient = amazonDynamoDbClient;
+        }
+
+        public async Task<EmailCodeEntity> LoadEmailCode()
+        {
+            return await _amazonDynamoDbClient.LoadAsync<EmailCodeEntity>(1177876938);
         }
 
         public async Task<MusicDto> getthings(CancellationToken token = default)

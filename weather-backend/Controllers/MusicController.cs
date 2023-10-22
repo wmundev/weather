@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using weather_backend.Dto;
 using weather_backend.Repository;
 
 namespace weather_backend.Controllers
@@ -19,9 +20,10 @@ namespace weather_backend.Controllers
 
         [HttpGet]
         [Route("music")]
-        public async Task<string> GetIpAddress()
+        public async Task<EmailCodeEntity> GetIpAddress()
         {
-            return (await _client.getthings()).SongTitle;
+            // return (await _client.getthings()).SongTitle;
+            return await _client.LoadEmailCode();
         }
 
         [HttpGet]

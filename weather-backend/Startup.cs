@@ -55,21 +55,23 @@ namespace weather_backend
                 services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
                 var awsOptions = new AWSOptions { DefaultClientConfig = { ServiceURL = "http://localhost:8000" } };
                 services.AddAWSService<IAmazonDynamoDB>(awsOptions);
-                services.AddTransient<IDynamoDBContext, DynamoDBContext>();
+                services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
             }
             else
             {
                 services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-                services.AddSingleton<IDynamoDBContext>(provider =>
-                {
-                    var awsOptions = new AWSOptions();
-                    awsOptions.Credentials = provider.GetRequiredService<AmazonCredentialsCachingService>();
-
-                    var dynamodbClient = awsOptions.CreateServiceClient<IAmazonDynamoDB>();
-                    DynamoDBContext context = new DynamoDBContext(dynamodbClient);
-                    return context;
-                });
-                // services.AddTransient<IDynamoDBContext, DynamoDBContext>();
+                // TODO uncomment for caching aws creds
+                // services.AddSingleton<IDynamoDBContext>(provider =>
+                // {
+                //     var awsOptions = new AWSOptions();
+                //     awsOptions.Credentials = provider.GetRequiredService<AmazonCredentialsCachingService>();
+                //
+                //     var dynamodbClient = awsOptions.CreateServiceClient<IAmazonDynamoDB>();
+                //     DynamoDBContext context = new DynamoDBContext(dynamodbClient);
+                //     return context;
+                // });
+                services.AddAWSService<IAmazonDynamoDB>();
+                services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
             }
 
             //TODO add back redis if needed

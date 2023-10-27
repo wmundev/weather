@@ -39,7 +39,7 @@ namespace weather_backend
         {
             services.AddMemoryCache();
             services.AddHealthChecks();
-            services.AddSingleton<AmazonCredentialsCachingService>();
+
             services.AddAWSService<IAmazonSecurityTokenService>();
 
             services.AddControllers();
@@ -60,6 +60,8 @@ namespace weather_backend
             else
             {
                 services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+                // TODO uncomment for caching aws creds
+                // services.AddSingleton<AmazonCredentialsCachingService>();
                 // TODO uncomment for caching aws creds
                 // services.AddSingleton<IDynamoDBContext>(provider =>
                 // {

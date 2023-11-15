@@ -21,8 +21,6 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 7.0.x
-          dotnet-quality: 'ga'
-
+          dotnet-version: 8.x
       - name: Run tests
         run: dotnet test Weather.API.IntegrationTests/Weather.API.IntegrationTests.csproj --configuration Release

@@ -11,12 +11,12 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 2
+    open-pull-requests-limit: 5
   - package-ecosystem: "nuget"
     directory: "/weather-backend"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 2
+    open-pull-requests-limit: 5
     groups:
       weather_backend_minor_patch_updates:
         update-types:
@@ -28,7 +28,7 @@ updates:
   - package-ecosystem: "nuget"
     directory: "/weather-test"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 2
     groups:
       weather_test_minor_patch_updates:
@@ -41,7 +41,7 @@ updates:
   - package-ecosystem: "nuget"
     directory: "/Weather.API.IntegrationTests"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 2
     groups:
       weather_api_integrationtests_minor_patch_updates:
@@ -54,7 +54,7 @@ updates:
   - package-ecosystem: "nuget"
     directory: "/Weather.CLI.UnitTests"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 2
     groups:
       weather_cli_unittests_minor_patch_updates:
@@ -68,7 +68,7 @@ updates:
     directory: "/Weather.CLI"
     schedule:
       interval: "weekly"
-    open-pull-requests-limit: 2
+    open-pull-requests-limit: 5
     groups:
       weather_cli_minor_patch_updates:
         update-types:

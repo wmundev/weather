@@ -139,13 +139,13 @@ paths:
           content:
             text/plain:
               schema:
-                type: string
+                $ref: '#/components/schemas/EmailCodeEntity'
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/EmailCodeEntity'
             text/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/EmailCodeEntity'
   /Music/music/nice:
     get:
       tags:
@@ -472,6 +472,19 @@ components:
           nullable: true
         coordinate:
           $ref: '#/components/schemas/Coordinate'
+      additionalProperties: false
+    EmailCodeEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        code:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
       additionalProperties: false
     MainWeather:
       type: object

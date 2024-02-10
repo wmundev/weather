@@ -9,30 +9,32 @@ namespace Weather.CLI.Services.DynamicProgramming
          * Generalize the relationship
          * Implement by solving subproblems in order
          */
-        public static int SolveSolution(int[] problem)
+        public static int SolveSolution(int[] nums)
         {
-            var result = 1;
-
-            for (int i = 0; i < problem.Length; i++)
+            if (nums.Length == 0)
             {
-                int maxSubsequence = 1;
-                for (int j = 0; j < i; j++)
-                {
-                    int newLengthOfSubsequence = 1;
-                    if (problem[j] < problem[i])
-                    {
-                        newLengthOfSubsequence++;
-                    }
-
-                    maxSubsequence = Math.Max(maxSubsequence, newLengthOfSubsequence);
-                }
-
-                Console.WriteLine("maxSubsequence " + maxSubsequence);
-                result = Math.Max(maxSubsequence, result);
-                Console.WriteLine($"i: {i} nice result {result}");
+                return 0;
             }
 
-            return result;
+            int[] dp = new int[nums.Length];
+            dp[0] = 1;
+            int maxans = 1;
+            for (int i = 1; i < dp.Length; i++)
+            {
+                int maxval = 0;
+                for (int j = 0; j < i; j++)
+                {
+                    if (nums[i] > nums[j])
+                    {
+                        maxval = Math.Max(maxval, dp[j]);
+                    }
+                }
+
+                dp[i] = maxval + 1;
+                maxans = Math.Max(maxans, dp[i]);
+            }
+
+            return maxans;
         }
     }
 }

@@ -4,14 +4,14 @@ namespace Weather.CLI.UnitTests.Services.DynamicProgramming
 {
     public sealed class LongestIncreasingSubsequenceProblemTest
     {
-        [Fact]
-        public void SolveSolution()
+        [Theory]
+        [InlineData(new int[] {5, 2, 8, 6, 3, 6, 9, 5}, 4)]
+        [InlineData(new int[] {3, 2, 6, 4, 5, 1}, 3)]
+        public void SolveSolution(int[] problem, int expectedResult)
         {
-            int[] problem = { 5, 2, 8, 6, 3, 6, 9, 5 };
-
             var result = LongestIncreasingSubsequenceProblem.SolveSolution(problem);
 
-            Assert.Equal(4, result);
+            Assert.Equal(expectedResult, result);
         }
     }
 }

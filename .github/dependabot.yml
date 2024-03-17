@@ -18,49 +18,45 @@ updates:
       interval: "weekly"
     open-pull-requests-limit: 5
     groups:
-      weather_backend_minor_patch_updates:
+      weather_backend_minor_updates:
         update-types:
         - "minor"
-        - "patch"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+        update-types: ["version-update:semver-major", "version-update:semver-patch"]
   - package-ecosystem: "nuget"
     directory: "/weather-test"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 2
     groups:
-      weather_test_minor_patch_updates:
+      weather_test_minor_updates:
         update-types:
         - "minor"
-        - "patch"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+        update-types: ["version-update:semver-major", "version-update:semver-patch"]
   - package-ecosystem: "nuget"
     directory: "/Weather.CLI.UnitTests"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 2
     groups:
-      weather_cli_unittests_minor_patch_updates:
+      weather_cli_unittests_minor_updates:
         update-types:
         - "minor"
-        - "patch"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+        update-types: ["version-update:semver-major", "version-update:semver-patch"]
   - package-ecosystem: "nuget"
     directory: "/Weather.CLI"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
     groups:
-      weather_cli_minor_patch_updates:
+      weather_cli_minor_updates:
         update-types:
         - "minor"
-        - "patch"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+        update-types: ["version-update:semver-major", "version-update:semver-patch"]

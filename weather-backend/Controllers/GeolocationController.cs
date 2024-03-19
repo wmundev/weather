@@ -6,7 +6,7 @@ using weather_backend.Services;
 namespace weather_backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("geolocation")]
     public class GeolocationController : ControllerBase
     {
         private readonly IGeolocationService _geolocationService;
@@ -18,14 +18,14 @@ namespace weather_backend.Controllers
 
         [HttpGet]
         [Route("ipaddress")]
-        public async Task<string> GetIpAddress()
+        public async Task<ActionResult<string>> GetIpAddress()
         {
             return await _geolocationService.GetIpAddress();
         }
 
         [HttpGet]
         [Route("location")]
-        public async Task<string> GetLocation()
+        public async Task<ActionResult<string>> GetLocation()
         {
             return await _geolocationService.GetLocation();
         }

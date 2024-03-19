@@ -72,7 +72,7 @@ paths:
             text/json:
               schema:
                 type: string
-  /Geolocation/ipaddress:
+  /geolocation/ipaddress:
     get:
       tags:
         - Geolocation
@@ -89,7 +89,7 @@ paths:
             text/json:
               schema:
                 type: string
-  /Geolocation/location:
+  /geolocation/location:
     get:
       tags:
         - Geolocation

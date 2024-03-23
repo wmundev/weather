@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.AspNetCore.Mvc;
@@ -7,16 +6,16 @@ using Microsoft.AspNetCore.Mvc;
 namespace weather_backend.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/prime-number")]
     public class PrimeNumberController : ControllerBase
     {
-
         [HttpGet]
+        [ProducesResponseType(typeof(string), 200)]
         public IActionResult Get([FromQuery(Name = "number")] int number)
         {
-            if (number < 2)
+            if (number == 1)
             {
-                return BadRequest("Number must be greater than 1");
+                return Ok("false");
             }
 
             var isPrime = true;
@@ -31,7 +30,7 @@ namespace weather_backend.Controllers
 
             return Ok(isPrime);
         }
-        
+
         [HttpGet("haha")]
         public IActionResult FastestIteratingOverList()
         {
@@ -47,9 +46,8 @@ namespace weather_backend.Controllers
                     max = item;
                 }
             }
-            
+
             return Ok(max);
         }
-
     }
 }

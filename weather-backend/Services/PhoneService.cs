@@ -1,10 +1,11 @@
 ﻿using PhoneNumbers;
+using weather_backend.Models.PhoneService;
 
 namespace weather_backend.Services
 {
     public interface IPhoneService
     {
-        dynamic ValidatePhoneNumber(string phone);
+        ValidatePhoneNumberModel ValidatePhoneNumber(string phone);
     }
 
     public class PhoneService : IPhoneService
@@ -16,7 +17,7 @@ namespace weather_backend.Services
             _phoneNumberUtil = PhoneNumberUtil.GetInstance();
         }
 
-        public dynamic ValidatePhoneNumber(string phone)
+        public ValidatePhoneNumberModel ValidatePhoneNumber(string phone)
         {
             var phoneNumberUtil = _phoneNumberUtil;
             var phoneNumber = phoneNumberUtil.Parse(phone, "AU");
@@ -24,7 +25,7 @@ namespace weather_backend.Services
             var countryCode = phoneNumber.CountryCodeSource;
             var possibleNumber = phoneNumberUtil.IsPossibleNumber(phoneNumber);
             var numberType = phoneNumberUtil.GetNumberType(phoneNumber);
-            return new {countryCode, possibleNumber, numberType};
+            return new ValidatePhoneNumberModel {CountryCode = countryCode, PossibleNumber = possibleNumber, NumberType = numberType};
         }
     }
 }

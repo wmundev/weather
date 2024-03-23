@@ -201,7 +201,7 @@ paths:
       responses:
         '200':
           description: Success
-  /phone:
+  /phone-number/phone:
     get:
       tags:
         - PhoneNumber
@@ -213,7 +213,29 @@ paths:
       responses:
         '200':
           description: Success
-  /api/PrimeNumber:
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ValidatePhoneNumberModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidatePhoneNumberModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ValidatePhoneNumberModel'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  /api/prime-number:
     get:
       tags:
         - PrimeNumber
@@ -226,7 +248,17 @@ paths:
       responses:
         '200':
           description: Success
-  /api/PrimeNumber/haha:
+          content:
+            text/plain:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: string
+            text/json:
+              schema:
+                type: string
+  /api/prime-number/haha:
     get:
       tags:
         - PrimeNumber
@@ -455,6 +487,15 @@ components:
           type: number
           format: double
       additionalProperties: false
+    CountryCodeSource:
+      enum:
+        - 0
+        - 1
+        - 5
+        - 10
+        - 20
+      type: integer
+      format: int32
     DynamoDbCity:
       type: object
       properties:
@@ -508,6 +549,22 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    PhoneNumberType:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - 10
+        - 11
+      type: integer
+      format: int32
     ProblemDetails:
       type: object
       properties:
@@ -534,6 +591,16 @@ components:
         value:
           type: string
           nullable: true
+      additionalProperties: false
+    ValidatePhoneNumberModel:
+      type: object
+      properties:
+        countryCode:
+          $ref: '#/components/schemas/CountryCodeSource'
+        possibleNumber:
+          type: boolean
+        numberType:
+          $ref: '#/components/schemas/PhoneNumberType'
       additionalProperties: false
     Weather:
       type: object

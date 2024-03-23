@@ -9,7 +9,9 @@ namespace weather_backend
 
         public const string CRON_EXPRESSION_SCHEDULE_JOB = "0 22 * * *";
 
-        public static JsonSerializerOptions DefaultJsonOptions => new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true };
+        public static JsonSerializerOptions DefaultJsonOptions => new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true};
+
+        public static JsonSerializerOptions CamelCaseJsonOptions => new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
 
         /**
          * See https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html

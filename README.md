@@ -1,3 +1,6 @@
+# Test coverage
+[![codecov](https://codecov.io/gh/wmundev/weather/graph/badge.svg?token=X3KS5IXEHD)](https://codecov.io/gh/wmundev/weather)
+
 # Installing this application on a server
 # Prerequisities
 Install docker and docker-compose

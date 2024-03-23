@@ -1,11 +1,13 @@
-name: "integration-tests"
+name: "tests"
 
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  integrationTest:
+  runTests:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -21,11 +23,7 @@ jobs:
         with:
           dotnet-version: 8.x
       - name: Run tests
-        run: dotnet test Weather.API.IntegrationTests/Weather.API.IntegrationTests.csproj --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
-
-      - name: Copy Coverage To Predictable Location
-        run: cp coverage/**/coverage.cobertura.xml coverage.cobertura.xml
-
+        run: dotnet test --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
         with:

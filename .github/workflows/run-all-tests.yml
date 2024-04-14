@@ -1,13 +1,11 @@
-name: "tests"
+name: "run-all-tests"
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
-  runTests:
+  all-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

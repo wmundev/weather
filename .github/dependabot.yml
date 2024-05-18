@@ -10,20 +10,21 @@ updates:
     # Workflow files stored in the default location of `.github/workflows`. (You don't need to specify `/.github/workflows` for `directory`. You can use `directory: "/"`.)
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 5
   - package-ecosystem: "nuget"
     directory: "/weather-backend"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 5
     groups:
       weather_backend_minor_updates:
         update-types:
-        - "minor"
+          - "minor"
+          - "patch"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major", "version-update:semver-patch"]
+        update-types: [ "version-update:semver-major" ]
   - package-ecosystem: "nuget"
     directory: "/weather-test"
     schedule:
@@ -32,10 +33,11 @@ updates:
     groups:
       weather_test_minor_updates:
         update-types:
-        - "minor"
+          - "minor"
+          - "patch"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major", "version-update:semver-patch"]
+        update-types: [ "version-update:semver-major" ]
   - package-ecosystem: "nuget"
     directory: "/Weather.CLI.UnitTests"
     schedule:
@@ -44,19 +46,21 @@ updates:
     groups:
       weather_cli_unittests_minor_updates:
         update-types:
-        - "minor"
+          - "minor"
+          - "patch"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major", "version-update:semver-patch"]
+        update-types: [ "version-update:semver-major" ]
   - package-ecosystem: "nuget"
     directory: "/Weather.CLI"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     open-pull-requests-limit: 5
     groups:
       weather_cli_minor_updates:
         update-types:
-        - "minor"
+          - "minor"
+          - "patch"
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major", "version-update:semver-patch"]
+        update-types: [ "version-update:semver-major" ]

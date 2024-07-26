@@ -2,7 +2,7 @@ namespace Weather.CLI.Services
 {
     public class SimpleService
     {
-        public async Task DoThings()
+        public async Task<int> DoThings()
         {
             Func<Task<int>> func = async () =>
             {
@@ -18,11 +18,14 @@ namespace Weather.CLI.Services
                 return 'c';
             };
 
-            await SafeExecutor<int>(func);
+            var result1 = await SafeExecutor(func);
+            var result2 = await SafeExecutor(func2);
+
+            return result1 + (int)result2;
         }
 
 
-        private Task<T> SafeExecutor<T>(Func<Task<T>> func)
+        public Task<T> SafeExecutor<T>(Func<Task<T>> func)
         {
             try
             {

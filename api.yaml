@@ -15,7 +15,7 @@ paths:
             format: int32
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -32,14 +32,14 @@ paths:
         - Delegate
       responses:
         '200':
-          description: Success
+          description: OK
   /api/Encryption/encrypt:
     get:
       tags:
         - Encryption
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -61,7 +61,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -78,7 +78,7 @@ paths:
         - Geolocation
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -95,7 +95,7 @@ paths:
         - Geolocation
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -112,7 +112,7 @@ paths:
         - HelloWorld
       responses:
         '200':
-          description: Success
+          description: OK
   /niceone:
     get:
       tags:
@@ -128,21 +128,21 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: OK
   /api/LanguageTranslator/generate:
     post:
       tags:
         - LanguageTranslator
       responses:
         '200':
-          description: Success
+          description: OK
   /Music/music:
     get:
       tags:
         - Music
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -159,7 +159,7 @@ paths:
         - Music
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -176,14 +176,14 @@ paths:
         - NewFeature
       responses:
         '200':
-          description: Success
+          description: OK
   /feature/password:
     get:
       tags:
         - NewFeature
       responses:
         '200':
-          description: Success
+          description: OK
   /feature/redis:
     post:
       tags:
@@ -201,13 +201,13 @@ paths:
               $ref: '#/components/schemas/RedisSaveTestDto'
       responses:
         '200':
-          description: Success
+          description: OK
     get:
       tags:
         - NewFeature
       responses:
         '200':
-          description: Success
+          description: OK
   /phone-number/phone:
     get:
       tags:
@@ -219,7 +219,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -254,7 +254,7 @@ paths:
             format: int32
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -271,7 +271,7 @@ paths:
         - PrimeNumber
       responses:
         '200':
-          description: Success
+          description: OK
   /api/stringbase64/decodebase64:
     get:
       tags:
@@ -283,7 +283,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -305,7 +305,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -322,7 +322,7 @@ paths:
         - StrucTest
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -375,7 +375,7 @@ paths:
             default: 100
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -398,7 +398,7 @@ paths:
         - WeatherForecast
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -424,7 +424,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             text/plain:
               schema:
@@ -438,6 +438,13 @@ paths:
 components:
   schemas:
     Academic:
+      required:
+        - acnum
+        - deptnum
+        - famname
+        - givename
+        - initials
+        - title
       type: object
       properties:
         acnum:
@@ -460,6 +467,12 @@ components:
           nullable: true
       additionalProperties: false
     City:
+      required:
+        - coord
+        - country
+        - id
+        - name
+        - state
       type: object
       properties:
         id:
@@ -504,6 +517,12 @@ components:
       type: integer
       format: int32
     DynamoDbCity:
+      required:
+        - coordinate
+        - country
+        - id
+        - name
+        - state
       type: object
       properties:
         id:
@@ -593,6 +612,8 @@ components:
           nullable: true
       additionalProperties: { }
     RedisSaveTestDto:
+      required:
+        - value
       type: object
       properties:
         value:
@@ -610,6 +631,11 @@ components:
           $ref: '#/components/schemas/PhoneNumberType'
       additionalProperties: false
     Weather:
+      required:
+        - description
+        - icon
+        - id
+        - main
       type: object
       properties:
         id:
@@ -666,6 +692,12 @@ components:
           format: int32
       additionalProperties: false
     WeatherSystem:
+      required:
+        - country
+        - id
+        - sunrise
+        - sunset
+        - type
       type: object
       properties:
         type:

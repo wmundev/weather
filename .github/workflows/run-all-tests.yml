@@ -20,6 +20,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.x
+      - name: Setup env
+        env:
+          CONFIG_CAT_SDK_KEY_PROD: ${{ secrets.CONFIG_CAT_SDK_KEY_PROD }}
+        run: |
+          bash ci-scripts/setup_env.sh
       - name: Run tests
         run: dotnet test --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
       - name: Upload coverage reports to Codecov

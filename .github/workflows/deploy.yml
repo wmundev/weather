@@ -43,7 +43,6 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           CONFIG_CAT_SDK_KEY_PROD: ${{ secrets.CONFIG_CAT_SDK_KEY_PROD }}
         run: |
-          chmod 700 ci-scripts/setup_env.sh
           bash ci-scripts/setup_env.sh
           dotnet aws deploy --silent --project-path "weather-backend/weather-backend.csproj" --deployment-project "../weather-backend.Deployment" --application-name "weather-backend"
         

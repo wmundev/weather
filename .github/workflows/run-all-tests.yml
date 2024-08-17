@@ -22,7 +22,7 @@ jobs:
           dotnet-version: 8.x
       - name: Setup env
         env:
-          CONFIG_CAT_SDK_KEY_PROD: ${{ secrets.CONFIG_CAT_SDK_KEY_PROD }}
+          CONFIG_CAT_SDK_KEY_PROD: ${{ secrets.CONFIG_CAT_SDK_KEY_UAT }}
         run: |
           bash ci-scripts/setup_env.sh
       - name: Run tests

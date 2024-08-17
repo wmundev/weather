@@ -28,21 +28,7 @@ jobs:
 
       - name: Execute Deployment
         env:
-          SSH_URL: ${{ secrets.SSH_URL }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          OPEN_WEATHER_API_KEY: ${{ secrets.OPEN_WEATHER_API_KEY }}
-          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_DATABASE: ${{ secrets.DB_DATABASE }}
-          PORT: ${{ secrets.PORT }}
-          VIRTUAL_HOST: ${{ secrets.VIRTUAL_HOST }}
-          LETSENCRYPT_EMAIL: ${{ secrets.LETSENCRYPT_EMAIL }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           CONFIG_CAT_SDK_KEY_PROD: ${{ secrets.CONFIG_CAT_SDK_KEY_PROD }}
         run: |
           bash ci-scripts/setup_env.sh
           dotnet aws deploy --silent --project-path "weather-backend/weather-backend.csproj" --deployment-project "../weather-backend.Deployment" --application-name "weather-backend"
-        

@@ -3,30 +3,38 @@
 using Weather.CLI.Model;
 using Weather.CLI.Services;
 
-Console.WriteLine("Hello, World!");
-
-string? haha = "wow";
-
-if (haha is not null)
-{
-    Console.WriteLine(haha);
-}
-
-
-int nice()
-{
-    return 1;
-}
-
-var niceFunc = nice;
-
-Console.WriteLine(niceFunc());
-
-var personTest = new Person("test");
-
-var animal = personTest with { firstName = "fafa" };
-
-Console.WriteLine(animal);
+// Console.WriteLine("Hello, World!");
+//
+// string? haha = "wow";
+//
+// if (haha is not null)
+// {
+//     Console.WriteLine(haha);
+// }
+//
+//
+// int nice()
+// {
+//     return 1;
+// }
+//
+// var niceFunc = nice;
+//
+// Console.WriteLine(niceFunc());
+//
+// var personTest = new Person("test");
+//
+// var animal = personTest with { firstName = "fafa" };
+//
+// Console.WriteLine(animal);
+//
+// var simpleService = new SimpleService();
+// await simpleService.DoThings();
 
 var simpleService = new SimpleService();
-await simpleService.DoThings();
+
+for (int i = 0; i < 1000000; i++)
+{
+    simpleService.DoThings();
+    Console.WriteLine("nice");
+}

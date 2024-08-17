@@ -8,26 +8,26 @@
 # To enable this hook, rename this file to "pre-commit".
 
 # Format code
-repoTopLevel=`git rev-parse --show-toplevel`
-filesToFormat=""
-filesToCommit=""
+#repoTopLevel=`git rev-parse --show-toplevel`
+#filesToFormat=""
+#filesToCommit=""
 
-for file in $(git diff --name-only --cached --diff-filter=ACMRT)
-    do
-        filesToFormat+="./"$file";"
-        filesToCommit+="./"$file" "
-    done
+#for file in $(git diff --name-only --cached --diff-filter=ACMRT)
+#    do
+#        filesToFormat+="./"$file";"
+#        filesToCommit+="./"$file" "
+#    done
 
-echo "🗂  - Files to be formatted:"
-echo $filesToFormat
+#echo "🗂  - Files to be formatted:"
+#echo $filesToFormat
 
-echo "🏎  - Starting formatting..."
+#echo "🏎  - Starting formatting..."
 
-dotnet tool restore
-dotnet jb cleanupcode --include="$filesToFormat" "weather.sln"
+#dotnet tool restore
+#dotnet jb cleanupcode --include="$filesToFormat" "weather.sln"
 
-echo "✅ - Formatting complete. Adding changes..."
-git add $filesToCommit
+#echo "✅ - Formatting complete. Adding changes..."
+#git add $filesToCommit
 
 # Generate OpenAPI docs
 (

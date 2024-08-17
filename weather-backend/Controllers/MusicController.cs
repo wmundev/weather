@@ -8,7 +8,7 @@ using weather_backend.Repository;
 namespace weather_backend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/music")]
     public class MusicController : ControllerBase
     {
         private readonly IDynamoDbClient _client;
@@ -19,20 +19,12 @@ namespace weather_backend.Controllers
         }
 
         [HttpGet]
-        [Route("music")]
-        public async Task<EmailCodeEntity> GetIpAddress()
-        {
-            // return (await _client.getthings()).SongTitle;
-            return await _client.LoadEmailCode();
-        }
-
-        [HttpGet]
-        [Route("music/nice")]
+        [Route("song-title")]
         public async Task<ActionResult<string>> GetAsyncCancel()
         {
             var source = new CancellationTokenSource();
             var someTask = _client.getthings(source.Token);
-            source.Cancel();
+            await source.CancelAsync();
 
             try
             {
@@ -44,7 +36,7 @@ namespace weather_backend.Controllers
                 Console.WriteLine(e.Message);
             }
 
-            return BadRequest(new ProblemDetails { Type = "typeisfailed", Detail = "Failed" });
+            return BadRequest(new ProblemDetails {Type = "typeisfailed", Detail = "Failed"});
         }
     }
 }

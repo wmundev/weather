@@ -9,8 +9,8 @@ set -e
 #sed -i "s/{{DB_USER}}/${DB_USER}/g" weather-backend/appsettings.json
 #sed -i "s/{{DB_DATABASE}}/${DB_DATABASE}/g" weather-backend/appsettings.json
 
-sed -i "s/{{REPLACE_ME_CONFIG_CAT_SDK_KEY}}/${CONFIG_CAT_SDK_KEY_PROD}/g" weather-backend/appsettings.Development.json
-sed -i "s/{{REPLACE_ME_CONFIG_CAT_SDK_KEY}}/${CONFIG_CAT_SDK_KEY_PROD}/g" weather-backend/appsettings.Production.json
+sed -i "s|{{REPLACE_ME_CONFIG_CAT_SDK_KEY}}|${CONFIG_CAT_SDK_KEY_PROD}|g" weather-backend/appsettings.Development.json
+sed -i "s|{{REPLACE_ME_CONFIG_CAT_SDK_KEY}}|${CONFIG_CAT_SDK_KEY_PROD}|g" weather-backend/appsettings.Production.json
 
 # for docker compose config
 #echo "$DB_PASSWORD" >> weather-backend/POSTGRES_PASSWORD.txt

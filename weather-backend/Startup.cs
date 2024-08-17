@@ -1,9 +1,11 @@
+using System;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Extensions.NETCore.Setup;
 using Amazon.SecurityToken;
 using Amazon.SimpleSystemsManagement;
 using Amazon.Translate;
+using ConfigCat.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using weather_backend.Adapters;
 using weather_backend.Extensions;
 using weather_backend.HostedService;
 using weather_backend.Middleware;
@@ -48,6 +51,23 @@ namespace weather_backend
             services.AddHttpClient<ICurrentWeatherData, CurrentWeatherData>("openweathermap");
 
             services.AddAutoMapper(typeof(Startup));
+            
+            var configCatSdkKey = Configuration.GetValue<string>("ConfigCat:Key");
+            if (string.IsNullOrEmpty(configCatSdkKey))
+            {
+                throw new InvalidOperationException("ConfigCat SDK Key is missing");
+            }
+
+            services.AddSingleton<IConfigCatClient>(sp =>
+            {
+                var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<ConfigCatClient>>();
+                return ConfigCatClient.Get(configCatSdkKey, options =>
+                {
+                    options.PollingMode = PollingModes.LazyLoad(cacheTimeToLive: TimeSpan.FromSeconds(600));
+                    options.Logger = new ConfigCatToMSLoggerAdapter(logger);
+                });
+            });
+
 
             var dynamodbLocalMode = Configuration.GetValue("DynamoDb:LocalMode", false);
             if (dynamodbLocalMode)

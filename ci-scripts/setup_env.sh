@@ -4,6 +4,10 @@ sed -i "s/{{SMTP_PASSWORD}}/${SMTP_PASSWORD}/g" weather-backend/appsettings.json
 sed -i "s/{{DB_PASSWORD}}/${DB_PASSWORD}/g" weather-backend/appsettings.json
 sed -i "s/{{DB_USER}}/${DB_USER}/g" weather-backend/appsettings.json
 sed -i "s/{{DB_DATABASE}}/${DB_DATABASE}/g" weather-backend/appsettings.json
+
+sed -i "s/{{REPLACE_ME_CONFIG_CAT_SDK_KEY}}/${CONFIG_CAT_SDK_KEY_PROD}/g" weather-backend/appsettings.Development.json
+sed -i "s/{{REPLACE_ME_CONFIG_CAT_SDK_KEY}}/${CONFIG_CAT_SDK_KEY_PROD}/g" weather-backend/appsettings.Production.json
+
 # for docker compose config
 echo "$DB_PASSWORD" >> weather-backend/POSTGRES_PASSWORD.txt
 echo "$DB_USER" >> weather-backend/POSTGRES_USER.txt
@@ -17,3 +21,5 @@ echo LETSENCRYPT_EMAIL="$LETSENCRYPT_EMAIL" >> weather-backend/.env
 echo ASPNETCORE_URLS="http://+:${PORT}" >> weather-backend/.env
 echo AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" >> weather-backend/.env
 echo AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" >> weather-backend/.env
+
+

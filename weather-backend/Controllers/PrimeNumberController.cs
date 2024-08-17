@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using ConfigCat.Client;
 using Microsoft.AspNetCore.Mvc;
 
 namespace weather_backend.Controllers
@@ -9,10 +11,23 @@ namespace weather_backend.Controllers
     [Route("api/prime-number")]
     public class PrimeNumberController : ControllerBase
     {
+        private readonly IConfigCatClient _configCatClient;
+
+        public PrimeNumberController(IConfigCatClient configCatClient)
+        {
+            _configCatClient = configCatClient;
+        }
+
         [HttpGet]
         [ProducesResponseType(typeof(string), 200)]
-        public IActionResult Get([FromQuery(Name = "number")] int number)
+        public async Task<IActionResult> Get([FromQuery(Name = "number")] int number)
         {
+            var isMyAwesomeFeatureEnabled = await _configCatClient.GetValueAsync("primenumber", false);
+            if (!isMyAwesomeFeatureEnabled)
+            {
+                return BadRequest("Not enabled");
+            }
+
             if (number == 1)
             {
                 return Ok("false");

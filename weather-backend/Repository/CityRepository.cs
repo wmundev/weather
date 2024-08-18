@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
+using Amazon.DynamoDBv2.DataModel;
+using weather_backend.Dto;
 using weather_backend.Models;
 
 namespace weather_backend.Repository
 {
-    public class CityRepository : ICityRepository
+    public class CityRepository(IDynamoDBContext amazonDynamoDbClient) : ICityRepository
     {
+        private readonly IDynamoDBContext _dynamoDbContext = amazonDynamoDbClient ?? throw new ArgumentNullException(nameof(amazonDynamoDbClient));
+
         public IEnumerable<City> GetAllCitiesFromJsonFile()
         {
             try
@@ -25,6 +30,11 @@ namespace weather_backend.Repository
             }
 
             return Array.Empty<City>();
+        }
+
+        public async Task<DynamoDbCity> GetCity(string name)
+        {
+            return await _dynamoDbContext.LoadAsync<DynamoDbCity>(name);
         }
     }
 }

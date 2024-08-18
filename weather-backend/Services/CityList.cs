@@ -37,7 +37,6 @@ namespace weather_backend.Services
 
             foreach (var city in allCities)
                 await _dynamoDbClient.SaveRecord(_mapper.Map<DynamoDbCity>(city));
-            // System.Threading.Thread.Sleep(1000);
         }
 
         public IEnumerable<City> GetAllCitiesInAustralia()
@@ -65,7 +64,7 @@ namespace weather_backend.Services
                     .SetSlidingExpiration(TimeSpan.FromSeconds(60))
                     .SetAbsoluteExpiration(TimeSpan.FromSeconds(120));
 
-                var result = await _dynamoDbClient.GetCity(name);
+                var result = await _cityRepository.GetCity(name);
 
                 cachedCity = result;
 

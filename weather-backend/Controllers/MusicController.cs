@@ -23,7 +23,7 @@ namespace weather_backend.Controllers
         public async Task<ActionResult<string>> GetAsyncCancel()
         {
             var source = new CancellationTokenSource();
-            var someTask = _client.getthings(source.Token);
+            var someTask = _client.LoadMusicDto(source.Token);
             await source.CancelAsync();
 
             try

@@ -10,9 +10,8 @@ namespace weather_backend.Repository
 {
     public interface IDynamoDbClient
     {
-        Task<MusicDto> getthings(CancellationToken token = default);
+        Task<MusicDto> LoadMusicDto(CancellationToken token = default);
         Task SaveRecord(DynamoDbCity obj);
-        Task<DynamoDbCity> GetCity(string name);
         Task<EmailCodeEntity> LoadEmailCode();
     }
 
@@ -32,7 +31,7 @@ namespace weather_backend.Repository
             return await _amazonDynamoDbClient.LoadAsync<EmailCodeEntity>(1177876938);
         }
 
-        public async Task<MusicDto> getthings(CancellationToken token = default)
+        public async Task<MusicDto> LoadMusicDto(CancellationToken token = default)
         {
             return await _amazonDynamoDbClient.LoadAsync<MusicDto>("Dream Theater", "Surrounded", token);
         }
@@ -70,11 +69,6 @@ namespace weather_backend.Repository
                     _logger.LogError("Error Message:  " + ace.Message);
                     break;
                 }
-        }
-
-        public async Task<DynamoDbCity> GetCity(string name)
-        {
-            return await _amazonDynamoDbClient.LoadAsync<DynamoDbCity>(name);
         }
     }
 }

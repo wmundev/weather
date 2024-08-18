@@ -32,7 +32,7 @@ namespace weather_backend.Repository
             return Array.Empty<City>();
         }
 
-        public async Task<DynamoDbCity> GetCity(string name)
+        public async Task<DynamoDbCity?> GetCity(string name)
         {
             return await _dynamoDbContext.LoadAsync<DynamoDbCity>(name);
         }

@@ -39,6 +39,11 @@ namespace weather_backend.Controllers
         public async Task<ActionResult<DynamoDbCity>> GetCityInformation(string name)
         {
             var city = await _cityList.GetCityInfo(name);
+            if (city is null)
+            {
+                return NotFound();
+            }
+
             return Ok(city);
         }
     }

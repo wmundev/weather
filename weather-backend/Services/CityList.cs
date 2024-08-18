@@ -54,7 +54,7 @@ namespace weather_backend.Services
             return cities.Where(city => regex.IsMatch(city.Name));
         }
 
-        public async Task<DynamoDbCity> GetCityInfo(string name)
+        public async Task<DynamoDbCity?> GetCityInfo(string name)
         {
             if (!_memoryCache.TryGetValue(name, out DynamoDbCity? cachedCity) || cachedCity is null)
             {

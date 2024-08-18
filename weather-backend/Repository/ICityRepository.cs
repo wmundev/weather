@@ -8,6 +8,6 @@ namespace weather_backend.Repository
     public interface ICityRepository
     {
         IEnumerable<City> GetAllCitiesFromJsonFile();
-        Task<DynamoDbCity> GetCity(string name);
+        Task<DynamoDbCity?> GetCity(string name);
     }
 }

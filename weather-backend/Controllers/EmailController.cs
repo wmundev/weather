@@ -17,6 +17,13 @@ namespace weather_backend.Controllers
             _client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
+        /// <summary>
+        /// Retrieves the email code entity from the database.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task{EmailCodeEntity}"/> representing the asynchronous operation,
+        /// containing the <see cref="EmailCodeEntity"/> retrieved from the database.
+        /// </returns>
         [HttpGet]
         [Route("code")]
         public async Task<EmailCodeEntity> GetEmailCode()

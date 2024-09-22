@@ -166,7 +166,7 @@ namespace weather_backend
             // });
             // services.AddSingleton<IKafkaProducer, KafkaProducer>();
             services.AddHostedService<Scheduler>();
-            services.AddHostedService<KafkaHostedService>();
+            // services.AddHostedService<KafkaHostedService>();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
             services.AddSingleton<IEncryptionService, EncryptionService>();
 

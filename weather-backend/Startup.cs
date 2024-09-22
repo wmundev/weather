@@ -51,7 +51,7 @@ namespace weather_backend
             services.AddHttpClient<ICurrentWeatherData, CurrentWeatherData>("openweathermap");
 
             services.AddAutoMapper(typeof(Startup));
-            
+
             var configCatSdkKey = Configuration.GetValue<string>("ConfigCat:Key");
             if (string.IsNullOrEmpty(configCatSdkKey))
             {
@@ -73,7 +73,7 @@ namespace weather_backend
             if (dynamodbLocalMode)
             {
                 services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-                var awsOptions = new AWSOptions { DefaultClientConfig = { ServiceURL = "http://localhost:8000" } };
+                var awsOptions = new AWSOptions {DefaultClientConfig = {ServiceURL = "http://localhost:8000"}};
                 services.AddAWSService<IAmazonDynamoDB>(awsOptions);
                 services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
             }
@@ -164,10 +164,10 @@ namespace weather_backend
             //         EnableSsl = true
             //     };
             // });
-            services.AddSingleton<IKafkaProducer, KafkaProducer>();
+            // services.AddSingleton<IKafkaProducer, KafkaProducer>();
             services.AddHostedService<Scheduler>();
             services.AddHostedService<KafkaHostedService>();
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "weather_backend", Version = "v1" }); });
+            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
             services.AddSingleton<IEncryptionService, EncryptionService>();
 
             //Other registrations

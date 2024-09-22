@@ -16,21 +16,20 @@ namespace weather_backend.Controllers
 
         public KafkaController(IKafkaProducer kafkaProducer, IBackgroundTaskQueue backgroundTaskQueue)
         {
-            _kafkaProducer = kafkaProducer ?? throw new ArgumentNullException(nameof(kafkaProducer));
+            _kafkaProducer = kafkaProducer;
             _backgroundTaskQueue = backgroundTaskQueue ?? throw new ArgumentNullException(nameof(backgroundTaskQueue));
         }
 
         [HttpGet]
-        [Route("/niceone")]
-        public async Task<ActionResult> GetKafka([FromQuery] string message, [FromQuery] string topic)
+        [Route("/queue-work-item")]
+        public async Task<ActionResult> QueueWorkItem([FromQuery] string message, [FromQuery] string topic)
         {
-            // Task.Factory.StartNew(() => _kafkaProducer.ProduceMessage(topic, message));
-            await _backgroundTaskQueue.QueueBackgroundWorkItemAsync(async token =>
-            {
-                await BuildWorkItemAsync(token, message, topic);
-                Console.WriteLine("haha");
-                Thread.Sleep(1000);
-            });
+            // await _backgroundTaskQueue.QueueBackgroundWorkItemAsync(async token =>
+            // {
+            // await BuildWorkItemAsync(token, message, topic);
+            // Console.WriteLine("haha");
+            // Thread.Sleep(1000);
+            // });
 
             return Ok();
         }

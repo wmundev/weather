@@ -9,7 +9,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.400.13" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.301" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.400.13" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.400.26" />
     <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.401.11" />
     <PackageReference Include="AWSSDK.Translate" Version="3.7.400.13" />
     <PackageReference Include="ConfigCat.Client" Version="9.3.0" />

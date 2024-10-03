@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using weather_backend.Dto;
 using weather_backend.Repository;
 
 namespace weather_backend.Controllers
@@ -18,6 +17,13 @@ namespace weather_backend.Controllers
             _client = client ?? throw new ArgumentNullException(nameof(client));
         }
 
+        /// <summary>
+        /// Retrieves the song title from the music data asynchronously, with support for cancellation.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task{ActionResult{String}}"/> representing the asynchronous operation,
+        /// containing the song title as a string if successful, or a problem detail if the task is canceled.
+        /// </returns>
         [HttpGet]
         [Route("song-title")]
         public async Task<ActionResult<string>> GetAsyncCancel()

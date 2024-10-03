@@ -16,6 +16,12 @@ namespace weather_backend.Controllers
             _encryptionService = encryptionService ?? throw new ArgumentNullException(nameof(encryptionService));
         }
 
+        /// <summary>
+        /// Encrypts a predefined message and returns the encrypted result as a Base64 string.
+        /// </summary>
+        /// <returns>
+        /// A Base64 encoded string representing the encrypted message.
+        /// </returns>
         [HttpGet]
         [Route("encrypt")]
         public string Get()

@@ -15,6 +15,13 @@ namespace weather_backend.Controllers
             _academicService = academicService;
         }
 
+        /// <summary>
+        /// Retrieves academic information by the specified ID.
+        /// </summary>
+        /// <param name="id">The ID of the academic to retrieve information for.</param>
+        /// <returns>
+        /// An <see cref="ActionResult"/> containing the <see cref="Academic"/> information.
+        /// </returns>
         [HttpGet]
         [Route("/academic")]
         public ActionResult<Academic> GetAcademicById(int id)

@@ -8,8 +8,15 @@ namespace weather_backend.Controllers
     [ApiController]
     public sealed class EnglishWordController : ControllerBase
     {
-        private readonly string[] listOfConjunctions = { "and", "or", "but", "nor", "so", "for", "yet" };
+        private readonly string[] _listOfConjunctions = {"and", "or", "but", "nor", "so", "for", "yet"};
 
+        /// <summary>
+        /// Capitalizes the first letter of each word in the input string, except for conjunctions.
+        /// </summary>
+        /// <param name="input">The input string to process.</param>
+        /// <returns>
+        /// An <see cref="ActionResult{String}"/> containing the processed string with the first letter of each word capitalized, except for conjunctions.
+        /// </returns>
         [HttpGet]
         [Route("capitalize-first-word")]
         public ActionResult<string> CapitalizeFirstWord([FromQuery] string input)
@@ -18,7 +25,7 @@ namespace weather_backend.Controllers
             var stringArrayByWhitespace = input.Split(separator);
             var capitalisedStringPerWord = stringArrayByWhitespace.Select(word =>
             {
-                if (listOfConjunctions.Contains(word))
+                if (_listOfConjunctions.Contains(word))
                 {
                     return word;
                 }

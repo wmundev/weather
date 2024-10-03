@@ -15,6 +15,12 @@ namespace weather_backend.Controllers
             _delegateService = delegateService;
         }
 
+        /// <summary>
+        /// Tests the delegate functionality by sorting items and printing the sum of each pair.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IActionResult"/> indicating the result of the operation.
+        /// </returns>
         [HttpGet]
         [Route("test")]
         public IActionResult TestDelegate()

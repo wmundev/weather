@@ -18,6 +18,12 @@ namespace weather_backend.Controllers
             _redis = redis;
         }
 
+        /// <summary>
+        /// Handles the "pattern" route and returns a simple greeting message.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IActionResult"/> indicating the result of the action.
+        /// </returns>
         [Route("pattern")]
         [HttpGet]
         public IActionResult Pattern()
@@ -29,6 +35,12 @@ namespace weather_backend.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// TODO: Generates a password and returns it.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IActionResult"/> indicating the result of the action.
+        /// </returns>
         [Route("password")]
         [HttpGet]
         public IActionResult GeneratePassword()
@@ -36,6 +48,13 @@ namespace weather_backend.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Saves a value to Redis with the key "foo".
+        /// </summary>
+        /// <param name="value">The value to save in Redis.</param>
+        /// <returns>
+        /// An <see cref="IActionResult"/> indicating the result of the action.
+        /// </returns>
         [Route("redis")]
         [HttpPost]
         public async Task<IActionResult> RedisSaveTest([FromBody] RedisSaveTestDto value)
@@ -44,9 +63,14 @@ namespace weather_backend.Controllers
             var foo = await db.StringSetAsync("foo", value.Value);
             return Ok(foo.ToString());
             // var pong = await db.PingAsync();
-            // return Ok();
         }
 
+        /// <summary>
+        /// Retrieves the value associated with the key "foo" from Redis and returns it along with the elapsed time.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IActionResult"/> containing the retrieved value and the elapsed time in milliseconds.
+        /// </returns>
         [Route("redis")]
         [HttpGet]
         public async Task<IActionResult> RedisGetTest()
@@ -58,9 +82,8 @@ namespace weather_backend.Controllers
 
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
-            return Ok(new { result = foo.ToString(), time = elapsedMs });
+            return Ok(new {result = foo.ToString(), time = elapsedMs});
             // var pong = await db.PingAsync();
-            // return Ok();
         }
     }
 }

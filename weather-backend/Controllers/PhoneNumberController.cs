@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using weather_backend.Models.PhoneService;
 using weather_backend.Services;
 
@@ -12,9 +13,19 @@ namespace weather_backend.Controllers
 
         public PhoneNumberController(IPhoneService phoneService)
         {
-            _phoneService = phoneService;
+            _phoneService = phoneService ?? throw new ArgumentNullException(nameof(phoneService));
         }
 
+        /// <summary>
+        /// Validates the provided phone number.
+        /// </summary>
+        /// <param name="phone">The phone number to validate.</param>
+        /// <returns>
+        /// An <see cref="IActionResult"/> containing the validation result if successful,
+        /// or an error message if the validation fails.
+        /// </returns>
+        /// <response code="200">Returns the validation result.</response>
+        /// <response code="400">Returns an error message if the validation fails.</response>
         [HttpGet]
         [Route("phone")]
         [ProducesResponseType(typeof(ValidatePhoneNumberModel), 200)]

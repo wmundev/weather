@@ -15,9 +15,18 @@ namespace weather_backend.Controllers
 
         public PrimeNumberController(IConfigCatClient configCatClient)
         {
-            _configCatClient = configCatClient;
+            _configCatClient = configCatClient ?? throw new ArgumentNullException(nameof(configCatClient));
         }
 
+        /// <summary>
+        /// Determines if the provided number is a prime number.
+        /// </summary>
+        /// <param name="number">The number to check for primality.</param>
+        /// <returns>
+        /// An <see cref="IActionResult"/> containing "true" if the number is prime, "false" otherwise.
+        /// </returns>
+        /// <response code="200">Returns the primality result as a string.</response>
+        /// <response code="400">Returns an error message if the feature is not enabled.</response>
         [HttpGet]
         [ProducesResponseType(typeof(string), 200)]
         public async Task<IActionResult> Get([FromQuery(Name = "number")] int number)
@@ -46,6 +55,12 @@ namespace weather_backend.Controllers
             return Ok(isPrime);
         }
 
+        /// <summary>
+        /// Iterates over a list of random integers to find the maximum value.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IActionResult"/> containing the maximum value found in the list.
+        /// </returns>
         [HttpGet("haha")]
         public IActionResult FastestIteratingOverList()
         {

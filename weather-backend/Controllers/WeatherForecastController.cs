@@ -31,6 +31,14 @@ namespace weather_backend.Controllers
             _secretService = secretService ?? throw new ArgumentNullException(nameof(secretService));
         }
 
+        /// <summary>
+        /// Retrieves the current weather data for a specific city by its ID and sends an email with the weather details.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="WeatherData"/> object containing the current weather information for the specified city.
+        /// </returns>
+        /// <response code="201">Returns the current weather data.</response>
+        /// <response code="404">Returns not found if the weather data cannot be retrieved.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

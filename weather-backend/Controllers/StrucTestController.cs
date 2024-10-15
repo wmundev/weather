@@ -7,11 +7,17 @@ namespace weather_backend.Controllers
     [ApiController]
     public sealed class StrucTestController : ControllerBase
     {
+        /// <summary>
+        /// Retrieves a modified TestStruc object.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="ActionResult{T}"/> containing the modified TestStruc object as a string.
+        /// </returns>
         [HttpGet]
         [Route("nice")]
         public ActionResult<string> Get()
         {
-            var structnew = new TestStruc() { Age = 11, Name = "haha nice" };
+            var structnew = new TestStruc() {Age = 11, Name = "haha nice"};
             modifythings(structnew);
             return Ok(structnew);
         }

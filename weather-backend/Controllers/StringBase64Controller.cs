@@ -8,6 +8,13 @@ namespace weather_backend.Controllers
     [ApiController]
     public sealed class StringBase64Controller : ControllerBase
     {
+        /// <summary>
+        /// Decodes a Base64 encoded string.
+        /// </summary>
+        /// <param name="stringToDecode">The Base64 encoded string to decode.</param>
+        /// <returns>
+        /// An <see cref="ActionResult{T}"/> containing the decoded string.
+        /// </returns>
         [HttpGet]
         [Route("decodebase64")]
         public ActionResult<string> Decode([FromQuery] string stringToDecode)
@@ -17,6 +24,13 @@ namespace weather_backend.Controllers
             return Ok(decodedString);
         }
 
+        /// <summary>
+        /// Encodes a string to Base64 format.
+        /// </summary>
+        /// <param name="stringToEncode">The string to encode to Base64 format.</param>
+        /// <returns>
+        /// An <see cref="ActionResult{T}"/> containing the Base64 encoded string.
+        /// </returns>
         [HttpGet]
         [Route("encodebase64")]
         public ActionResult<string> Encode([FromQuery] string stringToEncode)

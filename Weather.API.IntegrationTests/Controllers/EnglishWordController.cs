@@ -34,7 +34,7 @@ namespace Weather.API.IntegrationTests.Controllers
             var client = _factory.CreateClient();
             var query = new Dictionary<string, string> { { "input", "hello world and goodbye world" } };
 
-            var response = await client.GetAsync(QueryHelpers.AddQueryString(path, query));
+            var response = await client.GetAsync(QueryHelpers.AddQueryString(path, query!));
 
             Assert.Equal("Hello World and Goodbye World", await response.Content.ReadAsStringAsync());
         }

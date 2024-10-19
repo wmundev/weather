@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 using PhoneNumbers;
 using weather_backend;
@@ -29,11 +30,11 @@ namespace Weather.API.IntegrationTests.Controllers
             var response = await client.GetAsync($"{path}/phone?phone={input}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var deserialisedJsonResponse = System.Text.Json.JsonSerializer.Deserialize<ValidatePhoneNumberModel>(await response.Content.ReadAsStringAsync(), Constants.CamelCaseJsonOptions);
+            var deserialisedJsonResponse = JsonSerializer.Deserialize<ValidatePhoneNumberModel>(await response.Content.ReadAsStringAsync(), Constants.CamelCaseJsonOptions);
             Assert.NotNull(deserialisedJsonResponse);
             Assert.Equal(PhoneNumber.Types.CountryCodeSource.UNSPECIFIED, deserialisedJsonResponse.CountryCode);
             Assert.Equal(PhoneNumberType.MOBILE, deserialisedJsonResponse.NumberType);
-            Assert.Equal(true, deserialisedJsonResponse.PossibleNumber);
+            Assert.True(deserialisedJsonResponse.PossibleNumber);
         }
     }
 }

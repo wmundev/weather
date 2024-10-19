@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Amazon.DynamoDBv2.DataModel;
-using weather_backend.Dto;
-using weather_backend.Models;
+using weather_domain.DatabaseEntities;
 
-namespace weather_backend.Repository
+namespace weather_repository.City
 {
     public class CityRepository(IDynamoDBContext amazonDynamoDbClient) : ICityRepository
     {
         private readonly IDynamoDBContext _dynamoDbContext = amazonDynamoDbClient ?? throw new ArgumentNullException(nameof(amazonDynamoDbClient));
 
-        public IEnumerable<City> GetAllCitiesFromJsonFile()
+        public IEnumerable<weather_domain.Entities.City> GetAllCitiesFromJsonFile()
         {
             try
             {
@@ -20,8 +16,8 @@ namespace weather_backend.Repository
                 using var streamReader = new StreamReader(path);
                 var allCitiesStringify = streamReader.ReadToEnd();
 
-                var allCities = System.Text.Json.JsonSerializer.Deserialize<City[]>(allCitiesStringify);
-                return allCities ?? Array.Empty<City>();
+                var allCities = JsonSerializer.Deserialize<weather_domain.Entities.City[]>(allCitiesStringify);
+                return allCities ?? Array.Empty<weather_domain.Entities.City>();
             }
             catch (IOException ioException)
             {
@@ -29,7 +25,7 @@ namespace weather_backend.Repository
                 Console.WriteLine(ioException.Message);
             }
 
-            return Array.Empty<City>();
+            return Array.Empty<weather_domain.Entities.City>();
         }
 
         public async Task<DynamoDbCity?> GetCity(string name)

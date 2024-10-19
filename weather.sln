@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
@@ -12,6 +12,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weather.CLI", "Weather.CLI\Weather.CLI.csproj", "{80463ADC-8FF5-4289-A20C-9E343B8E971F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weather.CLI.UnitTests", "Weather.CLI.UnitTests\Weather.CLI.UnitTests.csproj", "{81DE1101-19A5-4084-93C1-EEC9DEB4894E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "weather-repository", "weather-repository\weather-repository.csproj", "{FB063C7D-8FC6-4AD5-B104-A706C9C71A5E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "weather-domain", "weather-domain\weather-domain.csproj", "{8EC7967C-72B8-4DE4-9725-2CCC602443A3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "weather-application", "weather-application\weather-application.csproj", "{C9F47326-26C8-4AC0-A343-15D4548362D1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,5 +48,17 @@ Global
 		{81DE1101-19A5-4084-93C1-EEC9DEB4894E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81DE1101-19A5-4084-93C1-EEC9DEB4894E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81DE1101-19A5-4084-93C1-EEC9DEB4894E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB063C7D-8FC6-4AD5-B104-A706C9C71A5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB063C7D-8FC6-4AD5-B104-A706C9C71A5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB063C7D-8FC6-4AD5-B104-A706C9C71A5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB063C7D-8FC6-4AD5-B104-A706C9C71A5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8EC7967C-72B8-4DE4-9725-2CCC602443A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8EC7967C-72B8-4DE4-9725-2CCC602443A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8EC7967C-72B8-4DE4-9725-2CCC602443A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8EC7967C-72B8-4DE4-9725-2CCC602443A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9F47326-26C8-4AC0-A343-15D4548362D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9F47326-26C8-4AC0-A343-15D4548362D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9F47326-26C8-4AC0-A343-15D4548362D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9F47326-26C8-4AC0-A343-15D4548362D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

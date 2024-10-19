@@ -5,9 +5,10 @@ using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using weather_backend.Models;
 using weather_backend.Repository;
 using weather_backend.Services;
+using weather_domain.Entities;
+using weather_repository.City;
 using Xunit;
 
 namespace weather_test.Services
@@ -25,10 +26,10 @@ namespace weather_test.Services
         public CityListTest()
         {
             _mockLogger = Substitute.For<ILogger<CityList>>();
-            _dynamoDbClient =  Substitute.For< IDynamoDbClient>();
-            _mapper = Substitute.For< IMapper>();
-            _mockMemoryCache = Substitute.For<  IMemoryCache>();
-            _mockCityRepository = Substitute.For<  ICityRepository>();
+            _dynamoDbClient = Substitute.For<IDynamoDbClient>();
+            _mapper = Substitute.For<IMapper>();
+            _mockMemoryCache = Substitute.For<IMemoryCache>();
+            _mockCityRepository = Substitute.For<ICityRepository>();
 
             _cityList = new CityList(_mockLogger, _dynamoDbClient, _mapper, _mockMemoryCache, _mockCityRepository);
         }
@@ -45,7 +46,7 @@ namespace weather_test.Services
                     Name = "Yunta",
                     State = "",
                     Country = "AU",
-                    Coordinate = new Coordinate { Latitude = -32.583328, Longitude = 139.550003 }
+                    Coordinate = new Coordinate {Latitude = -32.583328, Longitude = 139.550003}
                 }
             });
 
@@ -60,7 +61,7 @@ namespace weather_test.Services
                         Name = "Yunta",
                         State = "",
                         Country = "AU",
-                        Coordinate = new Coordinate { Latitude = -32.583328, Longitude = 139.550003 }
+                        Coordinate = new Coordinate {Latitude = -32.583328, Longitude = 139.550003}
                     });
             Assert.Equal(resultSerialised, expectedSerialised);
         }

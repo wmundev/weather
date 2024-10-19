@@ -2,7 +2,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using weather_backend;
-using weather_backend.Dto;
+using weather_domain.DatabaseEntities;
 using Weather.API.IntegrationTests.setup;
 using Xunit;
 

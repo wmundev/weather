@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using weather_backend.Dto;
-using weather_backend.Models;
+using weather_domain.DatabaseEntities;
+using weather_domain.Entities;
 
 namespace weather_backend.Mapper
 {

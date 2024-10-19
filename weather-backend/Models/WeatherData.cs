@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using weather_domain.Entities;
 
 namespace weather_backend.Models
 {

@@ -1,7 +1,7 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
-using weather_backend.Models;
+using weather_domain.Entities;
 
-namespace weather_backend.Dto
+namespace weather_domain.DatabaseEntities
 {
     [DynamoDBTable("weather")]
     public class DynamoDbCity

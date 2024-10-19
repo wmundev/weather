@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using weather_backend.Dto;
-using weather_backend.Models;
 using weather_backend.Services;
+using weather_domain.DatabaseEntities;
+using weather_domain.Entities;
 
 namespace weather_backend.Controllers
 {

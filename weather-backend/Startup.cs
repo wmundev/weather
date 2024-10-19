@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using weather_backend.Adapters;
 using weather_backend.Extensions;
@@ -22,6 +23,7 @@ using weather_backend.Repository;
 using weather_backend.Services;
 using weather_backend.Services.Scheduler;
 using weather_backend.StartupTask;
+using weather_repository;
 
 namespace weather_backend
 {
@@ -60,7 +62,7 @@ namespace weather_backend
 
             services.AddSingleton<IConfigCatClient>(sp =>
             {
-                var logger = sp.GetRequiredService<Microsoft.Extensions.Logging.ILogger<ConfigCatClient>>();
+                var logger = sp.GetRequiredService<ILogger<ConfigCatClient>>();
                 return ConfigCatClient.Get(configCatSdkKey, options =>
                 {
                     options.PollingMode = PollingModes.LazyLoad(cacheTimeToLive: TimeSpan.FromSeconds(600));
@@ -126,8 +128,8 @@ namespace weather_backend
             services.AddAWSService<IAmazonTranslate>();
             services.AddSingleton<ILanguageTranslatorService, LanguageTranslatorService>();
 
+            services.AddInfrastructureServices(Configuration);
             services.AddSingleton<IDynamoDbClient, DynamoDbClient>();
-            services.AddSingleton<ICityRepository, CityRepository>();
             services.AddTransient<EmailService>();
             services.AddTransient<CityList>();
 

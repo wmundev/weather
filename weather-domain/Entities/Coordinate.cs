@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Amazon.DynamoDBv2.DataModel;
 
-namespace weather_backend.Models
+namespace weather_domain.Entities
 {
     public class Coordinate
     {

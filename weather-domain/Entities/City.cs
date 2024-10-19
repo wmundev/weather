@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace weather_backend.Models
+namespace weather_domain.Entities
 {
     public class City
     {

@@ -5,6 +5,7 @@ using Amazon.DynamoDBv2.Model;
 using Amazon.Runtime;
 using Microsoft.Extensions.Logging;
 using weather_backend.Dto;
+using weather_domain.DatabaseEntities;
 
 namespace weather_backend.Repository
 {

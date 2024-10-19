@@ -31,4 +31,8 @@
     <Folder Include="HealthChecks\" />
     <Folder Include="Services\Scheduler\Jobs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\weather-application\weather-application.csproj"/>
+    <ProjectReference Include="..\weather-repository\weather-repository.csproj"/>
+  </ItemGroup>
 </Project>

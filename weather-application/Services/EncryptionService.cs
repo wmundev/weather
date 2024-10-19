@@ -1,9 +1,10 @@
 ﻿using System.Security.Cryptography;
 using Sodium;
+using weather_application.Services.Interfaces;
 
-namespace weather_backend.Services
+namespace weather_application.Services
 {
-    public class EncryptionService : IEncryptionService
+    public sealed class EncryptionService : IEncryptionService
     {
         public (byte[] ciphertext, byte[] nonce, byte[] key) Encrypt(byte[] textToEncrypt)
         {

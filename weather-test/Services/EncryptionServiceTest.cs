@@ -1,5 +1,6 @@
 ﻿using System.Text;
-using weather_backend.Services;
+using weather_application.Services;
+using weather_application.Services.Interfaces;
 using Xunit;
 
 namespace weather_test.Services

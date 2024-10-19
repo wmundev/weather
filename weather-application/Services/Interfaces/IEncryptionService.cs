@@ -1,4 +1,4 @@
-﻿namespace weather_backend.Services
+﻿namespace weather_application.Services.Interfaces
 {
     public interface IEncryptionService
     {

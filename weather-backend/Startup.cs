@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using weather_application;
 using weather_backend.Adapters;
 using weather_backend.Extensions;
 using weather_backend.HostedService;
@@ -129,6 +130,7 @@ namespace weather_backend
             services.AddSingleton<ILanguageTranslatorService, LanguageTranslatorService>();
 
             services.AddInfrastructureServices(Configuration);
+            services.AddApplicationServices(Configuration);
             services.AddSingleton<IDynamoDbClient, DynamoDbClient>();
             services.AddTransient<EmailService>();
             services.AddTransient<CityList>();
@@ -170,7 +172,6 @@ namespace weather_backend
             services.AddHostedService<Scheduler>();
             // services.AddHostedService<KafkaHostedService>();
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
-            services.AddSingleton<IEncryptionService, EncryptionService>();
 
             //Other registrations
             services

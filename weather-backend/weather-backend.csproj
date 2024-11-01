@@ -11,7 +11,7 @@
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.301" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.400.44" />
     <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.402.23" />
-    <PackageReference Include="AWSSDK.Translate" Version="3.7.400.26" />
+    <PackageReference Include="AWSSDK.Translate" Version="3.7.400.44" />
     <PackageReference Include="ConfigCat.Client" Version="9.3.1" />
     <PackageReference Include="Cronos" Version="0.8.4" />
     <PackageReference Include="Dapper" Version="2.1.35" />

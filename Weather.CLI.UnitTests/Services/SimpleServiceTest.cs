@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Weather.CLI.Services;
 
 namespace Weather.CLI.UnitTests.Services
@@ -8,7 +10,8 @@ namespace Weather.CLI.UnitTests.Services
         public async Task DoThings_WhenCalled_Returns100()
         {
             // Arrange
-            var simpleService = new SimpleService();
+            var logger = Substitute.For<ILogger<SimpleService>>();
+            var simpleService = new SimpleService(logger);
 
             // Act
             var result = await simpleService.DoThings();
@@ -22,7 +25,8 @@ namespace Weather.CLI.UnitTests.Services
         public async Task SafeExecutor_WhenCalledWithFuncThatThrowsException_ThrowsException()
         {
             // Arrange
-            var simpleService = new SimpleService();
+            var logger = Substitute.For<ILogger<SimpleService>>();
+            var simpleService = new SimpleService(logger);
 
             // Act
             Func<Task<int>> func = async () =>

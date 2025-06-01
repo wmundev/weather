@@ -1,7 +1,11 @@
+using Microsoft.Extensions.Logging;
+
 namespace Weather.CLI.Services
 {
-    public class SimpleService
+    public sealed class SimpleService(ILogger<SimpleService> logger)
     {
+        private readonly ILogger<SimpleService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
         public async Task<int> DoThings()
         {
             Func<Task<int>> func = async () =>
@@ -33,7 +37,7 @@ namespace Weather.CLI.Services
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                _logger.LogError(e, "An error occurred while executing the function.");
             }
 
             throw new Exception();

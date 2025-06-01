@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using Weather.CLI.Model;
+using Microsoft.Extensions.Logging;
 using Weather.CLI.Services;
 
 // Console.WriteLine("Hello, World!");
@@ -30,11 +30,16 @@ using Weather.CLI.Services;
 //
 // var simpleService = new SimpleService();
 // await simpleService.DoThings();
+var loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.AddConsole();
+    builder.SetMinimumLevel(LogLevel.Information);
+});
+var logger = loggerFactory.CreateLogger<SimpleService>();
 
-var simpleService = new SimpleService();
+var simpleService = new SimpleService(logger);
 
 for (int i = 0; i < 1000000; i++)
 {
     simpleService.DoThings();
-    Console.WriteLine("nice");
 }

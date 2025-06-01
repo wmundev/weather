@@ -6,7 +6,7 @@ namespace weather_backend.Dto
     public sealed class EmailCodeEntity
     {
         [DynamoDBHashKey] public int Id { get; init; }
-        public string Code { get; init; }
-        public string Email { get; init; }
+        public string? Code { get; init; }
+        public string? Email { get; init; }
     }
 }

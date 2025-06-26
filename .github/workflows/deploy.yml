@@ -24,7 +24,7 @@ jobs:
           dotnet-version: 8.x
 
       - name: Install AWS .NET Deployment Tool
-        run: dotnet tool install -g AWS.Deploy.Tools
+        run: dotnet tool install --global AWS.Deploy.Tools --version 2.0.1
 
       - name: Execute Deployment
         env:

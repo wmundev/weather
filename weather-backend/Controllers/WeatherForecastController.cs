@@ -56,7 +56,7 @@ namespace weather_backend.Controllers
                 throw new Exception("Receiver email in secret is null");
             }
 
-            _emailService.SendEmail($"{weatherData.name} Current Weather",
+            await _emailService.SendEmail($"{weatherData.name} Current Weather",
                 $"Current Temperature: {weatherData.main.temp}, Humidity: {weatherData.main.humidity}",
                 receiverEmail);
             return weatherData;

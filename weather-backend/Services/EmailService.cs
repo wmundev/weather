@@ -3,22 +3,27 @@ using System.ComponentModel;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using weather_backend.Models;
 using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services
 {
-    public class EmailService
+    public sealed class EmailService
     {
         private readonly IConfiguration _configuration;
         private readonly ISecretService _secretService;
+        private readonly ILogger<EmailService> _logger;
+
         private readonly SmtpClient _smtpClient;
 
-        public EmailService(IConfiguration configuration, ISecretService secretService)
+        public EmailService(IConfiguration configuration, ISecretService secretService, ILogger<EmailService> logger)
         {
-            _configuration = configuration;
-            _secretService = secretService;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _secretService = secretService ?? throw new ArgumentNullException(nameof(secretService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             var emailUsername = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))?.Result;
             var emailPassword = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword))?.Result;
@@ -34,17 +39,24 @@ namespace weather_backend.Services
             // Get the unique identifier for this asynchronous operation.
             var token = e.UserState as string;
 
-            if (e.Cancelled) Console.WriteLine("[{0}] Send canceled.", token);
+            if (e.Cancelled)
+            {
+                _logger.LogError("[{0}] Send canceled.", token);
+            }
 
             if (e.Error != null)
-                Console.WriteLine("[{0}] {1}", token, e.Error);
+            {
+                _logger.LogError("[{0}] {1}", token, e.Error);
+            }
             else
-                Console.WriteLine("Message sent.");
+            {
+                _logger.LogInformation("Message sent.");
+            }
         }
 
-        public void SendEmail(string subject, string body, string receiver)
+        public async Task SendEmail(string subject, string body, string receiver)
         {
-            var senderEmailAddress = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername)).Result;
+            var senderEmailAddress = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
             if (senderEmailAddress is null)
             {
                 throw new Exception("Sender email in secret is null");
@@ -63,11 +75,8 @@ namespace weather_backend.Services
             // The userState can be any object that allows your callback
             // method to identify this send operation.
             // For this example, the userToken is a string constant.
-            var userState = "test message1";
+            var userState = Guid.NewGuid();
             _smtpClient.SendAsync(mailMessage, userState);
-
-            //clean up
-            // mailMessage.Dispose();
         }
     }
 }

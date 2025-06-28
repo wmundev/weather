@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using weather_backend.Models;
 
-namespace weather_backend.Services
+namespace weather_backend.Services.Interfaces
 {
     public interface ICurrentWeatherData
     {

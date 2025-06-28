@@ -3,6 +3,7 @@ using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using weather_backend.Services;
+using weather_backend.Services.Interfaces;
 using weather_test.Logger;
 using Xunit.Abstractions;
 

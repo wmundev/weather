@@ -8,14 +8,10 @@ using Amazon.Translate.Model;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services
 {
-    public interface ILanguageTranslatorService
-    {
-        Task<string> GenerateLanguageFileAsync();
-    }
-
     public class LanguageTranslatorService : ILanguageTranslatorService
     {
         private readonly IAmazonTranslate _translateClient;
@@ -50,7 +46,7 @@ namespace weather_backend.Services
 
         private async Task<string> TranslateTextAsync(string text, string sourceLanguageCode, string targetLanguageCode)
         {
-            var translateRequest = new TranslateTextRequest { Text = text, SourceLanguageCode = sourceLanguageCode, TargetLanguageCode = targetLanguageCode };
+            var translateRequest = new TranslateTextRequest {Text = text, SourceLanguageCode = sourceLanguageCode, TargetLanguageCode = targetLanguageCode};
 
             var translateResponse = await _translateClient.TranslateTextAsync(translateRequest);
             var translatedText = translateResponse.TranslatedText;

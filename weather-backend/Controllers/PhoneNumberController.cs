@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using weather_backend.Models.PhoneService;
-using weather_backend.Services;
+using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Controllers
 {
@@ -37,7 +37,7 @@ namespace weather_backend.Controllers
                 var validationResult = _phoneService.ValidatePhoneNumber(phone);
                 return Ok(validationResult);
             }
-            catch (System.Exception e)
+            catch (Exception e)
             {
                 return BadRequest(e.Message);
             }

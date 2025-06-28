@@ -1,13 +1,9 @@
 ﻿using PhoneNumbers;
 using weather_backend.Models.PhoneService;
+using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services
 {
-    public interface IPhoneService
-    {
-        ValidatePhoneNumberModel ValidatePhoneNumber(string phone);
-    }
-
     public class PhoneService : IPhoneService
     {
         private readonly PhoneNumberUtil _phoneNumberUtil;

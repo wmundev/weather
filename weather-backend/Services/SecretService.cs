@@ -5,24 +5,19 @@ using Amazon.SimpleSystemsManagement;
 using Amazon.SimpleSystemsManagement.Model;
 using Microsoft.Extensions.Caching.Memory;
 using weather_backend.Models;
+using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services
 {
-    public interface ISecretService
-    {
-        public Task<string> FetchSecret(string secretKey);
-        public Task<string?> FetchSpecificSecret(string secretKey);
-    }
-
-    public class SecretService : ISecretService
+    public sealed class SecretService : ISecretService
     {
         private readonly SecretMemoryCache _memoryCache;
         private readonly IAmazonSimpleSystemsManagement _ssmClient;
 
         public SecretService(IAmazonSimpleSystemsManagement ssmClient, SecretMemoryCache memoryCache)
         {
-            _ssmClient = ssmClient;
-            _memoryCache = memoryCache;
+            _ssmClient = ssmClient ?? throw new ArgumentNullException(nameof(ssmClient));
+            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         }
 
         public async Task<string?> FetchSpecificSecret(string secretKey)
@@ -61,7 +56,7 @@ namespace weather_backend.Services
 
         private async Task<GetParameterResponse> FetchSecretFromParameterStore(string secretKey)
         {
-            var getParameterRequest = new GetParameterRequest { Name = secretKey, WithDecryption = true };
+            var getParameterRequest = new GetParameterRequest {Name = secretKey, WithDecryption = true};
             var secret = await _ssmClient.GetParameterAsync(getParameterRequest);
             return secret;
         }

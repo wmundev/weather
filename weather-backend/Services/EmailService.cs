@@ -5,6 +5,7 @@ using System.Net.Mail;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using weather_backend.Models;
+using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services
 {
@@ -24,7 +25,7 @@ namespace weather_backend.Services
             var emailHost = configuration.GetValue<string>("SMTPHost") ?? throw new NullReferenceException("Email host is null");
             var emailPort = configuration.GetValue<int>("SMTPPort");
 
-            _smtpClient = new SmtpClient { Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true };
+            _smtpClient = new SmtpClient {Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true};
             _smtpClient.SendCompleted += SendCompletedCallback;
         }
 

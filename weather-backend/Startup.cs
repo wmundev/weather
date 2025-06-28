@@ -22,6 +22,7 @@ using weather_backend.HostedService;
 using weather_backend.Middleware;
 using weather_backend.Repository;
 using weather_backend.Services;
+using weather_backend.Services.Interfaces;
 using weather_backend.Services.Scheduler;
 using weather_backend.StartupTask;
 using weather_repository;

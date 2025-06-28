@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using weather_backend.Models;
+using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services.Scheduler
 {

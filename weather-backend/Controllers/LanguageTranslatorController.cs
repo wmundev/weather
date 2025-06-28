@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using weather_backend.Services;
+using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Controllers
 {

@@ -7,22 +7,22 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.505.2" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.508.4" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.400" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.501.18" />
-    <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.502.4" />
-    <PackageReference Include="AWSSDK.Translate" Version="3.7.500.27" />
+    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.502.1" />
+    <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.503.8" />
+    <PackageReference Include="AWSSDK.Translate" Version="3.7.501.4" />
     <PackageReference Include="ConfigCat.Client" Version="9.4.3" />
     <PackageReference Include="Cronos" Version="0.11.1" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="libphonenumber-csharp" Version="8.13.55" />
-    <PackageReference Include="NewRelic.Agent" Version="10.44.1" />
+    <PackageReference Include="NewRelic.Agent" Version="10.46.0" />
     <PackageReference Include="Npgsql" Version="7.0.10" />
     <PackageReference Include="Sodium.Core" Version="1.4.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.9.25" />
+    <PackageReference Include="StackExchange.Redis" Version="2.9.32" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.20" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.21" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>

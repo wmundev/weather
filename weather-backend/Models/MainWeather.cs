@@ -15,5 +15,9 @@ namespace weather_backend.Models
         [JsonProperty("pressure")] public int pressure { get; set; }
 
         [JsonProperty("humidity")] public int humidity { get; set; }
+
+        [JsonProperty("sea_level")] public int? sea_level { get; set; }
+
+        [JsonProperty("grnd_level")] public int? grnd_level { get; set; }
     }
 }

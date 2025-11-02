@@ -135,6 +135,7 @@ namespace weather_backend
             services.AddSingleton<IDynamoDbClient, DynamoDbClient>();
             services.AddTransient<EmailService>();
             services.AddTransient<CityList>();
+            services.AddSingleton<IWeatherCacheService, WeatherCacheService>();
 
             services.AddTransient<ThreadExample>();
             services.AddTransient<AcademicService>();

@@ -7,5 +7,7 @@ namespace weather_backend.Models
         [JsonProperty("speed")] public double speed { get; set; }
 
         [JsonProperty("deg")] public int deg { get; set; }
+
+        [JsonProperty("gust")] public double? gust { get; set; }
     }
 }

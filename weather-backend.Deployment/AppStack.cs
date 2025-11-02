@@ -164,6 +164,7 @@ namespace weather_backend.Deployment
                             { 
                                 Actions = new[] 
                                 { 
+                                    "dynamodb:DescribeTable",
                                     "dynamodb:GetItem",
                                     "dynamodb:PutItem",
                                     "dynamodb:UpdateItem",

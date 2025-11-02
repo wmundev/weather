@@ -15,11 +15,17 @@ namespace weather_backend.Deployment
     public class AppStack : Stack
     {
         private readonly Configuration _configuration;
+        private string _accountId;
+        private string _region;
 
         internal AppStack(Construct scope, IDeployToolStackProps<Configuration> props)
             : base(scope, props.StackName, props)
         {
             _configuration = props.RecipeProps.Settings;
+            
+            // Get AWS account ID and region from stack context
+            _accountId = this.Account;
+            _region = this.Region;
 
             // Setup callback for generated construct to provide access to customize CDK properties before creating constructs.
             CDKRecipeCustomizer<Recipe>.CustomizeCDKProps += CustomizeCDKProps;
@@ -148,30 +154,55 @@ namespace weather_backend.Deployment
             {
                 if (evnt.Props is RoleProps props)
                 {
-                    var managedPolicies = props.ManagedPolicies;
-                    if (managedPolicies is null)
-                    {
-                        props.ManagedPolicies =
-                            new[] { ManagedPolicy.FromAwsManagedPolicyName("AmazonDynamoDBReadOnlyAccess") };
-                    }
-                    else
-                    {
-                        props.ManagedPolicies = managedPolicies.Concat(
-                            new[] { ManagedPolicy.FromAwsManagedPolicyName("AmazonDynamoDBReadOnlyAccess") }
-                        ).ToArray();
-                    }
-
+                    // DynamoDB weather table access policy
+                    const string dynamoDbInlinePolicyName = "weather-backend-app-dynamodb-weather-table";
+                    var dynamoDbInlinePolicy = new PolicyDocument(new PolicyDocumentProps 
+                    { 
+                        Statements = new[] 
+                        { 
+                            new PolicyStatement(new PolicyStatementProps 
+                            { 
+                                Actions = new[] 
+                                { 
+                                    "dynamodb:GetItem",
+                                    "dynamodb:PutItem",
+                                    "dynamodb:UpdateItem",
+                                    "dynamodb:DeleteItem",
+                                    "dynamodb:Query",
+                                    "dynamodb:Scan"
+                                }, 
+                                Resources = new[] 
+                                { 
+                                    $"arn:aws:dynamodb:{_region}:{_accountId}:table/weather"
+                                } 
+                            }) 
+                        } 
+                    });
 
                     const string parameterStoreInlinePolicyName = "weather-backend-app-parameter-store";
-                    var parameterStoreInlinePolicy = new PolicyDocument(new PolicyDocumentProps { Statements = new[] { new PolicyStatement(new PolicyStatementProps { Actions = new[] { "ssm:DescribeParameters" }, Resources = new[] { "*" } }), new PolicyStatement(new PolicyStatementProps { Actions = new[] { "ssm:GetParameter" }, Resources = new[] { "arn:aws:ssm:us-east-1:775267081896:parameter/weather_secrets" } }) } });
+                    var parameterStoreInlinePolicy = new PolicyDocument(new PolicyDocumentProps
+                    {
+                        Statements = new[]
+                        {
+                            new PolicyStatement(
+                                new PolicyStatementProps { Actions = new[] { "ssm:DescribeParameters" }, Resources = new[] { "*" } }), 
+                            new PolicyStatement(
+                                new PolicyStatementProps { Actions = new[] { "ssm:GetParameter" }, Resources = new[] { $"arn:aws:ssm:{_region}:{_accountId}:parameter/weather_secrets" } })
+                        }
+                    });
 
                     if (props.InlinePolicies != null)
                     {
+                        props.InlinePolicies.Add(dynamoDbInlinePolicyName, dynamoDbInlinePolicy);
                         props.InlinePolicies.Add(parameterStoreInlinePolicyName, parameterStoreInlinePolicy);
                     }
                     else
                     {
-                        props.InlinePolicies = new Dictionary<string, PolicyDocument> { { parameterStoreInlinePolicyName, parameterStoreInlinePolicy } };
+                        props.InlinePolicies = new Dictionary<string, PolicyDocument> 
+                        { 
+                            { dynamoDbInlinePolicyName, dynamoDbInlinePolicy },
+                            { parameterStoreInlinePolicyName, parameterStoreInlinePolicy } 
+                        };
                     }
                 }
             }

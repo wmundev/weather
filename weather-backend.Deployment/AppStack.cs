@@ -103,6 +103,47 @@ namespace weather_backend.Deployment
                 }
             }
 
+            if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.BeanstalkServiceRole)))
+            {
+                if (evnt.Props is RoleProps props)
+                {
+                    // Add EC2 tagging permissions required for Elastic Beanstalk to create and tag resources like Elastic IPs
+                    const string ec2TaggingInlinePolicyName = "weather-backend-eb-ec2-tagging";
+                    var ec2TaggingInlinePolicy = new PolicyDocument(new PolicyDocumentProps 
+                    { 
+                        Statements = new[] 
+                        { 
+                            new PolicyStatement(new PolicyStatementProps 
+                            { 
+                                Actions = new[] 
+                                { 
+                                    "ec2:CreateTags",
+                                    "ec2:DeleteTags"
+                                }, 
+                                Resources = new[] 
+                                { 
+                                    "arn:aws:ec2:*:*:elastic-ip/*",
+                                    "arn:aws:ec2:*:*:instance/*",
+                                    "arn:aws:ec2:*:*:volume/*",
+                                    "arn:aws:ec2:*:*:snapshot/*",
+                                    "arn:aws:ec2:*:*:network-interface/*",
+                                    "arn:aws:ec2:*:*:security-group/*"
+                                } 
+                            }) 
+                        } 
+                    });
+
+                    if (props.InlinePolicies != null)
+                    {
+                        props.InlinePolicies.Add(ec2TaggingInlinePolicyName, ec2TaggingInlinePolicy);
+                    }
+                    else
+                    {
+                        props.InlinePolicies = new Dictionary<string, PolicyDocument> { { ec2TaggingInlinePolicyName, ec2TaggingInlinePolicy } };
+                    }
+                }
+            }
+
             if (string.Equals(evnt.ResourceLogicalName, nameof(evnt.Construct.AppIAMRole)))
             {
                 if (evnt.Props is RoleProps props)

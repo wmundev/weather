@@ -85,3 +85,5 @@ weather-backend/Assets/Generated
 out
 
 **/node_modules
+
+database/dynamodb/docker/dynamodb/shared-local-instance.db

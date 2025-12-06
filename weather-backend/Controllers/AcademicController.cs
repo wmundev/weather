@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using weather_backend.Models;
-using weather_backend.Services;
+using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Controllers
 {
@@ -8,9 +8,9 @@ namespace weather_backend.Controllers
     [Route("[controller]")]
     public class AcademicController : ControllerBase
     {
-        private readonly AcademicService _academicService;
+        private readonly IAcademicService _academicService;
 
-        public AcademicController(AcademicService academicService)
+        public AcademicController(IAcademicService academicService)
         {
             _academicService = academicService;
         }

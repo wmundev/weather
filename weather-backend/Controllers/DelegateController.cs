@@ -5,7 +5,7 @@ using weather_backend.Services;
 namespace weather_backend.Controllers
 {
     [ApiController]
-    [Route("delegate")]
+    [Route("api/delegates")]
     public class DelegateController : ControllerBase
     {
         private readonly DelegateService _delegateService;
@@ -22,7 +22,6 @@ namespace weather_backend.Controllers
         /// An <see cref="IActionResult"/> indicating the result of the operation.
         /// </returns>
         [HttpGet]
-        [Route("test")]
         public IActionResult TestDelegate()
         {
             _delegateService.SortThings((i, i1) => { Console.WriteLine(i + i1); });

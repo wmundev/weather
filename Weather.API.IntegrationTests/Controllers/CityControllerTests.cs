@@ -69,5 +69,47 @@ namespace Weather.API.IntegrationTests.Controllers
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
+
+        [Fact]
+        public async Task GetCities_Default_ReturnsCities()
+        {
+            var client = factory.CreateClient();
+
+            var response = await client.GetAsync("/city/all");
+
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            var cities = JsonSerializer.Deserialize<DynamoDbCity[]>(content, Constants.CamelCaseJsonOptions); // Returns IEnumerable<City> which serializes to array
+
+            Assert.NotNull(cities);
+            Assert.NotEmpty(cities);
+        }
+
+        [Fact]
+        public async Task GetCities_WithNum_ReturnsCount()
+        {
+            var client = factory.CreateClient();
+            int limit = 5;
+
+            var response = await client.GetAsync($"/city/all?num={limit}");
+
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            var cities = JsonSerializer.Deserialize<DynamoDbCity[]>(content, Constants.CamelCaseJsonOptions);
+
+            Assert.NotNull(cities);
+            Assert.True(cities.Length <= limit);
+        }
+
+        [Fact]
+        public async Task GetCities_TooLarge_ReturnsBadRequest()
+        {
+            var client = factory.CreateClient();
+            int limit = 600;
+
+            var response = await client.GetAsync($"/city/all?num={limit}");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
     }
 }

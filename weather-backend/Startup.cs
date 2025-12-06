@@ -138,7 +138,7 @@ namespace weather_backend
             services.AddSingleton<IWeatherCacheService, WeatherCacheService>();
 
             services.AddTransient<ThreadExample>();
-            services.AddTransient<AcademicService>();
+            services.AddTransient<IAcademicService, AcademicService>();
 
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 

@@ -4,10 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 using weather_backend.Models;
+using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services
 {
-    public class AcademicService
+    public class AcademicService : IAcademicService
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<AcademicService> _logger;
@@ -28,7 +29,7 @@ namespace weather_backend.Services
 
             using (var connection = new NpgsqlConnection(connectionString))
             {
-                var parameters = new { Id = id };
+                var parameters = new {Id = id};
                 var query = "select * from academic where ACNUM = @Id";
                 var result = connection.Query<Academic>(query, parameters);
 

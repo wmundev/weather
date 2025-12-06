@@ -14,7 +14,6 @@ namespace weather_backend.Controllers
         /// An <see cref="ActionResult{T}"/> containing the modified TestStruc object as a string.
         /// </returns>
         [HttpGet]
-        [Route("nice")]
         public ActionResult<string> Get()
         {
             var structnew = new TestStruc() {Age = 11, Name = "haha nice"};

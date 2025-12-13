@@ -36,5 +36,16 @@ namespace Weather.API.IntegrationTests.Controllers
             Assert.Equal(PhoneNumberType.MOBILE, deserialisedJsonResponse.NumberType);
             Assert.True(deserialisedJsonResponse.PossibleNumber);
         }
+
+        [Fact]
+        public async Task ValidatePhoneNumber_InvalidInput_ReturnsBadRequest()
+        {
+            var client = _factory.CreateClient();
+            const string input = "implementing_this_feature_was_a_mistake";
+
+            var response = await client.GetAsync($"{path}/phone?phone={input}");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
     }
 }

@@ -7,12 +7,12 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public sealed class EnglishWordController : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public sealed class EnglishWordControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
         private const string path = "/api/v1/word/capitalize-first-word";
         private readonly CustomWebApplicationFactory<Startup> _factory;
 
-        public EnglishWordController(CustomWebApplicationFactory<Startup> factory)
+        public EnglishWordControllerTests(CustomWebApplicationFactory<Startup> factory)
         {
             _factory = factory;
         }
@@ -32,7 +32,7 @@ namespace Weather.API.IntegrationTests.Controllers
         public async Task CapitalizeFirstWordWithConjunctionTest()
         {
             var client = _factory.CreateClient();
-            var query = new Dictionary<string, string> { { "input", "hello world and goodbye world" } };
+            var query = new Dictionary<string, string> {{"input", "hello world and goodbye world"}};
 
             var response = await client.GetAsync(QueryHelpers.AddQueryString(path, query!));
 

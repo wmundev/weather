@@ -1,4 +1,10 @@
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using ConfigCat.Client;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 using weather_backend;
 using Weather.API.IntegrationTests.setup;
 using Xunit;
@@ -25,7 +31,10 @@ namespace Weather.API.IntegrationTests.Controllers
         [InlineData("97")]
         public async Task GetPrimeNumber_IsPrime_ReturnsTrue(string input)
         {
-            var client = _factory.CreateClient();
+            var mockConfigCat = Substitute.For<IConfigCatClient>();
+            mockConfigCat.GetValueAsync("primenumber", false).Returns(true);
+
+            var client = CreateClientWithMockConfigCat(mockConfigCat);
 
             var response = await client.GetAsync($"{path}?number={input}");
 
@@ -43,12 +52,29 @@ namespace Weather.API.IntegrationTests.Controllers
         [InlineData("100")]
         public async Task GetPrimeNumber_IsNotAPrime_ReturnsFalse(string input)
         {
-            var client = _factory.CreateClient();
+            var mockConfigCat = Substitute.For<IConfigCatClient>();
+            mockConfigCat.GetValueAsync("primenumber", false).Returns(true);
+
+            var client = CreateClientWithMockConfigCat(mockConfigCat);
 
             var response = await client.GetAsync($"{path}?number={input}");
 
             response.EnsureSuccessStatusCode();
             Assert.Equal("false", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task GetPrimeNumber_FeatureDisabled_ReturnsBadRequest()
+        {
+            var mockConfigCat = Substitute.For<IConfigCatClient>();
+            mockConfigCat.GetValueAsync("primenumber", false).Returns(false);
+
+            var client = CreateClientWithMockConfigCat(mockConfigCat);
+
+            var response = await client.GetAsync($"{path}?number=7");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Equal("Not enabled", await response.Content.ReadAsStringAsync());
         }
 
         [Fact]
@@ -59,6 +85,22 @@ namespace Weather.API.IntegrationTests.Controllers
             var response = await client.GetAsync($"{path}/haha");
 
             response.EnsureSuccessStatusCode();
+        }
+
+        private HttpClient CreateClientWithMockConfigCat(IConfigCatClient? mockConfigCat = null)
+        {
+            if (mockConfigCat == null)
+            {
+                mockConfigCat = Substitute.For<IConfigCatClient>();
+            }
+
+            return _factory.WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddSingleton(mockConfigCat);
+                });
+            }).CreateClient();
         }
     }
 }

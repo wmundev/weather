@@ -5,6 +5,10 @@ on:
   push:
     branches: [ main ]
 
+concurrency:
+  group: deploy-to-aws
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest

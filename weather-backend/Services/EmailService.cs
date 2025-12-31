@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using weather_backend.Exceptions;
 using weather_backend.Models;
 using weather_backend.Services.Interfaces;
 
@@ -46,7 +47,7 @@ namespace weather_backend.Services
 
                 var emailUsername = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
                 var emailPassword = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword));
-                var emailHost = _configuration.GetValue<string>("SMTPHost") ?? throw new InvalidOperationException("Email host is null");
+                var emailHost = _configuration.GetValue<string>("SMTPHost") ?? throw new ConfigurationException("SMTP host is not configured");
                 var emailPort = _configuration.GetValue<int>("SMTPPort");
 
                 _smtpClient = new SmtpClient { Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true };
@@ -89,7 +90,7 @@ namespace weather_backend.Services
             var senderEmailAddress = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
             if (senderEmailAddress is null)
             {
-                throw new InvalidOperationException("Sender email in secret is null");
+                throw new SecretNotFoundException(nameof(AllSecrets.SMTPUsername));
             }
 
             var senderEmailAddressMailAddress = new MailAddress(senderEmailAddress);

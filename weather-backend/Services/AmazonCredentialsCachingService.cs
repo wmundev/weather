@@ -16,6 +16,7 @@ namespace weather_backend.Services
         private readonly ILogger<AmazonCredentialsCachingService> _logger;
         private readonly CancellationTokenSource _cancellationTokenSource = new();
         private readonly Task _backgroundTask;
+        private bool _disposed;
 
         public AmazonCredentialsCachingService(IAmazonSecurityTokenService _credentialsProvider, ILogger<AmazonCredentialsCachingService> logger)
         {
@@ -23,7 +24,7 @@ namespace weather_backend.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             
             // Start the background refresh task and properly observe exceptions
-            _backgroundTask = Task.Run(async () => await RefreshCredentialsLoop(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
+            _backgroundTask = Task.Run(() => RefreshCredentialsLoop(_cancellationTokenSource.Token), _cancellationTokenSource.Token);
         }
 
         private async Task RefreshCredentialsLoop(CancellationToken cancellationToken)
@@ -81,22 +82,25 @@ namespace weather_backend.Services
 
         public void Dispose()
         {
-            if (!_cancellationTokenSource.IsCancellationRequested)
+            if (_disposed)
             {
-                _cancellationTokenSource.Cancel();
-                try
-                {
-                    // Wait a reasonable time for the background task to complete
-                    _backgroundTask.Wait(TimeSpan.FromSeconds(5));
-                }
-                catch (AggregateException)
-                {
-                    // Task was already canceled or faulted, which is expected
-                }
-                finally
-                {
-                    _cancellationTokenSource.Dispose();
-                }
+                return;
+            }
+
+            _cancellationTokenSource.Cancel();
+            try
+            {
+                // Wait a reasonable time for the background task to complete
+                _backgroundTask.Wait(TimeSpan.FromSeconds(5));
+            }
+            catch (AggregateException)
+            {
+                // Task was already canceled or faulted, which is expected
+            }
+            finally
+            {
+                _cancellationTokenSource.Dispose();
+                _disposed = true;
             }
         }
     }

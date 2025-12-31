@@ -154,7 +154,7 @@ namespace weather_backend.Services
 
             if (weatherData == null)
             {
-                throw new InvalidOperationException("Failed to deserialize weather data");
+                throw new WeatherServiceException("Failed to deserialize weather data");
             }
 
             return weatherData;

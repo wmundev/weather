@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -11,27 +12,52 @@ using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services
 {
-    public sealed class EmailService
+    public sealed class EmailService : IDisposable
     {
         private readonly IConfiguration _configuration;
         private readonly ISecretService _secretService;
         private readonly ILogger<EmailService> _logger;
 
-        private readonly SmtpClient _smtpClient;
+        private SmtpClient? _smtpClient;
+        private bool _disposed;
+        private readonly SemaphoreSlim _initializationLock = new(1, 1);
 
         public EmailService(IConfiguration configuration, ISecretService secretService, ILogger<EmailService> logger)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _secretService = secretService ?? throw new ArgumentNullException(nameof(secretService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
-            var emailUsername = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))?.Result;
-            var emailPassword = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword))?.Result;
-            var emailHost = configuration.GetValue<string>("SMTPHost") ?? throw new NullReferenceException("Email host is null");
-            var emailPort = configuration.GetValue<int>("SMTPPort");
+        private async Task<SmtpClient> GetSmtpClientAsync()
+        {
+            if (_smtpClient != null)
+            {
+                return _smtpClient;
+            }
 
-            _smtpClient = new SmtpClient {Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true};
-            _smtpClient.SendCompleted += SendCompletedCallback;
+            await _initializationLock.WaitAsync();
+            try
+            {
+                if (_smtpClient != null)
+                {
+                    return _smtpClient;
+                }
+
+                var emailUsername = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
+                var emailPassword = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword));
+                var emailHost = _configuration.GetValue<string>("SMTPHost") ?? throw new InvalidOperationException("Email host is null");
+                var emailPort = _configuration.GetValue<int>("SMTPPort");
+
+                _smtpClient = new SmtpClient { Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true };
+                _smtpClient.SendCompleted += SendCompletedCallback;
+
+                return _smtpClient;
+            }
+            finally
+            {
+                _initializationLock.Release();
+            }
         }
 
         private void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
@@ -56,10 +82,14 @@ namespace weather_backend.Services
 
         public async Task SendEmail(string subject, string body, string receiver)
         {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+
+            var smtpClient = await GetSmtpClientAsync();
+
             var senderEmailAddress = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
             if (senderEmailAddress is null)
             {
-                throw new Exception("Sender email in secret is null");
+                throw new InvalidOperationException("Sender email in secret is null");
             }
 
             var senderEmailAddressMailAddress = new MailAddress(senderEmailAddress);
@@ -76,7 +106,17 @@ namespace weather_backend.Services
             // method to identify this send operation.
             // For this example, the userToken is a string constant.
             var userState = Guid.NewGuid();
-            _smtpClient.SendAsync(mailMessage, userState);
+            smtpClient.SendAsync(mailMessage, userState);
+        }
+
+        public void Dispose()
+        {
+            if (!_disposed)
+            {
+                _smtpClient?.Dispose();
+                _initializationLock?.Dispose();
+                _disposed = true;
+            }
         }
     }
 }

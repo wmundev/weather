@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Amazon.Runtime;
 using Amazon.SecurityToken;
 using Amazon.SecurityToken.Model;
+using Microsoft.Extensions.Logging;
 
 namespace weather_backend.Services
 {
@@ -10,15 +11,17 @@ namespace weather_backend.Services
     {
         volatile ImmutableCredentials? token;
         private readonly IAmazonSecurityTokenService credentialsProvider;
+        private readonly ILogger<AmazonCredentialsCachingService> _logger;
 
-        public AmazonCredentialsCachingService(IAmazonSecurityTokenService _credentialsProvider)
+        public AmazonCredentialsCachingService(IAmazonSecurityTokenService _credentialsProvider, ILogger<AmazonCredentialsCachingService> logger)
         {
             credentialsProvider = _credentialsProvider;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Task.Run(new Action(async () =>
             {
                 while (true)
                 {
-                    Console.WriteLine("getting creds");
+                    _logger.LogDebug("Refreshing AWS credentials from AssumeRole");
                     var durationTokenValidSeconds = 900;
                     // var creds = await credentialsProvider.AssumeRoleWithWebIdentityAsync(
                     //     new AssumeRoleWithWebIdentityRequest {

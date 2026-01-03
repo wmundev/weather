@@ -15,7 +15,10 @@ namespace weather_backend.ActionFilter
         // do something after the action executes
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            if (context.Canceled) throw new Exception("sad");
+            if (context.Canceled)
+            {
+                throw new InvalidOperationException("Action was canceled");
+            }
         }
     }
 }

@@ -133,7 +133,7 @@ namespace weather_backend
             services.AddInfrastructureServices(Configuration);
             services.AddApplicationServices(Configuration);
             services.AddSingleton<IDynamoDbClient, DynamoDbClient>();
-            services.AddTransient<EmailService>();
+            services.AddScoped<EmailService>();
             services.AddTransient<CityList>();
             services.AddSingleton<IWeatherCacheService, WeatherCacheService>();
 

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Amazon.SimpleSystemsManagement;
 using Amazon.SimpleSystemsManagement.Model;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using weather_backend.Models;
 using weather_backend.Services.Interfaces;
 
@@ -13,11 +14,13 @@ namespace weather_backend.Services
     {
         private readonly SecretMemoryCache _memoryCache;
         private readonly IAmazonSimpleSystemsManagement _ssmClient;
+        private readonly ILogger<SecretService> _logger;
 
-        public SecretService(IAmazonSimpleSystemsManagement ssmClient, SecretMemoryCache memoryCache)
+        public SecretService(IAmazonSimpleSystemsManagement ssmClient, SecretMemoryCache memoryCache, ILogger<SecretService> logger)
         {
             _ssmClient = ssmClient ?? throw new ArgumentNullException(nameof(ssmClient));
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<string?> FetchSpecificSecret(string secretKey)
@@ -34,7 +37,7 @@ namespace weather_backend.Services
 
             if (!_memoryCache.Cache.TryGetValue(cacheKey, out string? cacheValue))
             {
-                Console.WriteLine("not using cache");
+                _logger.LogDebug("Secret cache miss for key: {SecretKey}", secretKey);
                 var parameterStoreValue = await FetchSecretFromParameterStore(secretKey);
 
                 cacheValue = parameterStoreValue?.Parameter?.Value;
@@ -48,7 +51,7 @@ namespace weather_backend.Services
             }
             else
             {
-                Console.WriteLine("using cache");
+                _logger.LogDebug("Secret cache hit for key: {SecretKey}", secretKey);
             }
 
             return cacheValue ?? "{}";

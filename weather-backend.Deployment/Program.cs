@@ -15,7 +15,7 @@ namespace weather_backend.Deployment
             var app = new App();
 
             var builder = new ConfigurationBuilder().AddAWSDeployToolConfiguration(app);
-            var recipeProps = builder.Build().Get<RecipeProps<Configuration>>();
+            var recipeProps = builder.Build().Get<RecipeProps<Configuration>>()!;
             var appStackProps = new DeployToolStackProps<Configuration>(recipeProps)
             {
                 Env = new Environment

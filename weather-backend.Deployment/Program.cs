@@ -15,7 +15,8 @@ namespace weather_backend.Deployment
             var app = new App();
 
             var builder = new ConfigurationBuilder().AddAWSDeployToolConfiguration(app);
-            var recipeProps = builder.Build().Get<RecipeProps<Configuration>>()!;
+            var recipeProps = builder.Build().Get<RecipeProps<Configuration>>()
+                ?? throw new System.InvalidOperationException("Failed to load recipe configuration. Ensure the AWS Deploy Tool configuration is properly set up.");
             var appStackProps = new DeployToolStackProps<Configuration>(recipeProps)
             {
                 Env = new Environment

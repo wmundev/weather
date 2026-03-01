@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.510.3" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.512.1" />
     <ProjectReference Include="..\weather-application\weather-application.csproj"/>
   </ItemGroup>
 

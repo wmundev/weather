@@ -241,9 +241,16 @@ namespace weather_backend.Deployment
             {
                 optionSettingProperties.Add(new CfnEnvironment.OptionSettingProperty
                 {
-                    Namespace = "aws:autoscaling:launchconfiguration",
-                    OptionName = "InstanceType",
+                    Namespace = "aws:ec2:instances",
+                    OptionName = "InstanceTypes",
                     Value = settings.InstanceType
+                });
+                
+                optionSettingProperties.Add(new CfnEnvironment.OptionSettingProperty
+                {
+                    Namespace = "aws:ec2:instances",
+                    OptionName = "EnableSpot",
+                    Value = "true"
                 });
             }
 

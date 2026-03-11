@@ -33,7 +33,9 @@
               "net5.0",
               "net6.0",
               "net7.0",
-              "net8.0"
+              "net8.0",
+              "net9.0",
+              "net10.0"
             ]
           }
         }
@@ -253,14 +255,8 @@
       "Category": "Compute",
       "Description": "The EC2 instance type of the EC2 instances created for the environment.",
       "Type": "String",
-      "TypeHint": "InstanceType",
       "AdvancedSetting": true,
-      "Updatable": true,
-      "Validators": [
-        {
-          "ValidatorType": "InstanceType"
-        }
-      ]
+      "Updatable": true
     },
     {
       "Id": "EnvironmentType",

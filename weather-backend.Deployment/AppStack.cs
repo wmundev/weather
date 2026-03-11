@@ -64,48 +64,19 @@ namespace weather_backend.Deployment
             {
                 if (evnt.Props is CfnEnvironmentProps props)
                 {
-                    // See https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html#command-options-general-autoscalingasg
+                    var optionSettingsArray = props.OptionSettings as CfnEnvironment.OptionSettingProperty[];
+                    var optionList = optionSettingsArray?.ToList() ?? [];
 
-                    // var optionSettingsArray = props.OptionSettings as CfnEnvironment.OptionSettingProperty[];
-                    // var optionList = optionSettingsArray.ToList(); 
-                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    //     Namespace = "aws:autoscaling:launchconfiguration",
-                    //     OptionName = "RootVolumeType",
-                    //     ResourceName = null,
-                    //     Value = "gp3"
-                    // });
-                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    //     Namespace = "aws:autoscaling:launchconfiguration",
-                    //     OptionName = "RootVolumeIOPS",
-                    //     ResourceName = null,
-                    //     Value = "3000"
-                    // });
-                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    //     Namespace = "aws:autoscaling:launchconfiguration",
-                    //     OptionName = "RootVolumeThroughput",
-                    //     ResourceName = null,
-                    //     Value = "125"
-                    // });
-                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    //     Namespace = "aws:autoscaling:launchconfiguration",
-                    //     OptionName = "RootVolumeSize",
-                    //     ResourceName = null,
-                    //     Value = "10"
-                    // });
-                    // props.OptionSettings = optionList;
+                    optionList.RemoveAll(o => o.Namespace == "aws:ec2:instances" && o.OptionName == "EnableSpot");
 
-                    // throw new Exception(JsonSerializer.Serialize(props.OptionSettings));
+                    optionList.Add(new CfnEnvironment.OptionSettingProperty
+                    {
+                        Namespace = "aws:ec2:instances",
+                        OptionName = "EnableSpot",
+                        Value = "true"
+                    });
 
-                    // optionSettingsArray.ToList().Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    // Namespace = "aws:ec2:instances",
-                    // OptionName = "EnableSpot",
-                    // Value = "false"
-                    // });
+                    props.OptionSettings = optionList.ToArray();
                 }
             }
 

@@ -3,7 +3,7 @@
     "version": "1.10.0",
     "description": "CDK apps for AWS.Deploy",
     "devDependencies": {
-        "aws-cdk": "2.43.1"
+        "aws-cdk": "^2.1033.0"
     },
     "scripts": {
         "cdk": "cdk"

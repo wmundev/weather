@@ -8,7 +8,6 @@ using Amazon.Translate;
 using ConfigCat.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -140,7 +139,7 @@ namespace weather_backend
             services.AddTransient<ThreadExample>();
             services.AddTransient<IAcademicService, AcademicService>();
 
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+            services.AddHttpContextAccessor();
 
             services.AddSingleton<IPhoneService, PhoneService>();
             services.AddSingleton<DelegateService>();

@@ -25,7 +25,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
 
       - name: Install AWS .NET Deployment Tool
         run: dotnet tool install --global AWS.Deploy.Tools --version 2.0.4

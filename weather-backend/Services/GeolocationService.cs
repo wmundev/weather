@@ -3,24 +3,24 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Http;
 
 namespace weather_backend.Services
 {
     public class GeolocationService : IGeolocationService
     {
-        private readonly IActionContextAccessor _accessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
 
-        public GeolocationService(HttpClient httpClient, IActionContextAccessor accessor)
+        public GeolocationService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _accessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         public Task<string> GetIpAddress()
         {
-            var clientIpAddress = _accessor.ActionContext?.HttpContext.Connection.RemoteIpAddress?.ToString();
+            var clientIpAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
             return Task.FromResult(clientIpAddress ?? "");
         }
 

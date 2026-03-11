@@ -193,7 +193,7 @@ namespace weather_backend.Deployment
                     ApplicationName = beanstalkApplicationName
                 }));
 
-                ApplicationVersion.AddDependsOn(BeanstalkApplication);
+                ApplicationVersion.AddDependency(BeanstalkApplication);
             }
 
             return beanstalkApplicationName;

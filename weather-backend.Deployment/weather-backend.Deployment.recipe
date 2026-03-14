@@ -255,18 +255,8 @@
       "Category": "Compute",
       "Description": "The EC2 instance type of the EC2 instances created for the environment.",
       "Type": "String",
-      "TypeHint": "InstanceType",
       "AdvancedSetting": true,
-      "Updatable": true,
-      "AllowedValues": [
-        "t3.micro",
-        "t3a.micro"
-      ],
-      "Validators": [
-        {
-          "ValidatorType": "InstanceType"
-        }
-      ]
+      "Updatable": true
     },
     {
       "Id": "EnvironmentType",

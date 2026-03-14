@@ -65,36 +65,17 @@ namespace weather_backend.Deployment
                 if (evnt.Props is CfnEnvironmentProps props)
                 {
                     var optionSettingsArray = props.OptionSettings as CfnEnvironment.OptionSettingProperty[];
-                    var optionList = optionSettingsArray?.ToList() ?? new List<CfnEnvironment.OptionSettingProperty>();
-                    
-                    // Remove any existing InstanceTypes and Spot settings to avoid CloudFormation duplicate option errors
-                    optionList.RemoveAll(o => o.Namespace == "aws:ec2:instances" && o.OptionName == "InstanceTypes");
+                    var optionList = optionSettingsArray?.ToList() ?? [];
+
                     optionList.RemoveAll(o => o.Namespace == "aws:ec2:instances" && o.OptionName == "EnableSpot");
 
-                    // Add support for ARM64 Graviton instances
-                    optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    {
-                        Namespace = "aws:ec2:instances",
-                        OptionName = "SupportedArchitectures",
-                        Value = "arm64"
-                    });
-                    
-                    // Explicitly set the ARM instances
-                    optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    {
-                        Namespace = "aws:ec2:instances",
-                        OptionName = "InstanceTypes",
-                        Value = "t4g.micro, t4g.small"
-                    });
-
-                    // Enable spot instances
                     optionList.Add(new CfnEnvironment.OptionSettingProperty
                     {
                         Namespace = "aws:ec2:instances",
                         OptionName = "EnableSpot",
                         Value = "true"
                     });
-                    
+
                     props.OptionSettings = optionList.ToArray();
                 }
             }

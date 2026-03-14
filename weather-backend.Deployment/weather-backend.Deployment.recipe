@@ -258,6 +258,10 @@
       "TypeHint": "InstanceType",
       "AdvancedSetting": true,
       "Updatable": true,
+      "AllowedValues": [
+        "t3.micro",
+        "t3a.micro"
+      ],
       "Validators": [
         {
           "ValidatorType": "InstanceType"

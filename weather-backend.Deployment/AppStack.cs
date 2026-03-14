@@ -64,48 +64,38 @@ namespace weather_backend.Deployment
             {
                 if (evnt.Props is CfnEnvironmentProps props)
                 {
-                    // See https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html#command-options-general-autoscalingasg
+                    var optionSettingsArray = props.OptionSettings as CfnEnvironment.OptionSettingProperty[];
+                    var optionList = optionSettingsArray?.ToList() ?? new List<CfnEnvironment.OptionSettingProperty>();
+                    
+                    // Remove any existing InstanceTypes and Spot settings to avoid CloudFormation duplicate option errors
+                    optionList.RemoveAll(o => o.Namespace == "aws:ec2:instances" && o.OptionName == "InstanceTypes");
+                    optionList.RemoveAll(o => o.Namespace == "aws:ec2:instances" && o.OptionName == "EnableSpot");
 
-                    // var optionSettingsArray = props.OptionSettings as CfnEnvironment.OptionSettingProperty[];
-                    // var optionList = optionSettingsArray.ToList(); 
-                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    //     Namespace = "aws:autoscaling:launchconfiguration",
-                    //     OptionName = "RootVolumeType",
-                    //     ResourceName = null,
-                    //     Value = "gp3"
-                    // });
-                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    //     Namespace = "aws:autoscaling:launchconfiguration",
-                    //     OptionName = "RootVolumeIOPS",
-                    //     ResourceName = null,
-                    //     Value = "3000"
-                    // });
-                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    //     Namespace = "aws:autoscaling:launchconfiguration",
-                    //     OptionName = "RootVolumeThroughput",
-                    //     ResourceName = null,
-                    //     Value = "125"
-                    // });
-                    // optionList.Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    //     Namespace = "aws:autoscaling:launchconfiguration",
-                    //     OptionName = "RootVolumeSize",
-                    //     ResourceName = null,
-                    //     Value = "10"
-                    // });
-                    // props.OptionSettings = optionList;
+                    // Add support for ARM64 Graviton instances
+                    optionList.Add(new CfnEnvironment.OptionSettingProperty
+                    {
+                        Namespace = "aws:ec2:instances",
+                        OptionName = "SupportedArchitectures",
+                        Value = "arm64"
+                    });
+                    
+                    // Explicitly set the ARM instances
+                    optionList.Add(new CfnEnvironment.OptionSettingProperty
+                    {
+                        Namespace = "aws:ec2:instances",
+                        OptionName = "InstanceTypes",
+                        Value = "t4g.micro, t4g.small"
+                    });
 
-                    // throw new Exception(JsonSerializer.Serialize(props.OptionSettings));
-
-                    // optionSettingsArray.ToList().Add(new CfnEnvironment.OptionSettingProperty
-                    // {
-                    // Namespace = "aws:ec2:instances",
-                    // OptionName = "EnableSpot",
-                    // Value = "false"
-                    // });
+                    // Enable spot instances
+                    optionList.Add(new CfnEnvironment.OptionSettingProperty
+                    {
+                        Namespace = "aws:ec2:instances",
+                        OptionName = "EnableSpot",
+                        Value = "true"
+                    });
+                    
+                    props.OptionSettings = optionList.ToArray();
                 }
             }
 

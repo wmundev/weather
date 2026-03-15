@@ -1,8 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -11,47 +11,44 @@ using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services
 {
-    public sealed class EmailService
+    public sealed class EmailService : IDisposable
     {
         private readonly IConfiguration _configuration;
         private readonly ISecretService _secretService;
         private readonly ILogger<EmailService> _logger;
 
-        private readonly SmtpClient _smtpClient;
+        private SmtpClient? _smtpClient;
+        private readonly SemaphoreSlim _smtpInitLock = new(1, 1);
 
         public EmailService(IConfiguration configuration, ISecretService secretService, ILogger<EmailService> logger)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _secretService = secretService ?? throw new ArgumentNullException(nameof(secretService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            var emailUsername = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))?.Result;
-            var emailPassword = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword))?.Result;
-            var emailHost = configuration.GetValue<string>("SMTPHost") ?? throw new NullReferenceException("Email host is null");
-            var emailPort = configuration.GetValue<int>("SMTPPort");
-
-            _smtpClient = new SmtpClient {Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true};
-            _smtpClient.SendCompleted += SendCompletedCallback;
         }
 
-        private void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
+        private async Task<SmtpClient> GetSmtpClientAsync()
         {
-            // Get the unique identifier for this asynchronous operation.
-            var token = e.UserState as string;
+            if (_smtpClient != null) return _smtpClient;
 
-            if (e.Cancelled)
+            await _smtpInitLock.WaitAsync();
+            try
             {
-                _logger.LogError("[{0}] Send canceled.", token);
+                if (_smtpClient != null) return _smtpClient;
+
+                var emailUsername = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
+                var emailPassword = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword));
+                var emailHost = _configuration.GetValue<string>("SMTPHost") ?? throw new InvalidOperationException("Email host is not configured");
+                var emailPort = _configuration.GetValue<int>("SMTPPort");
+
+                _smtpClient = new SmtpClient {Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true};
+            }
+            finally
+            {
+                _smtpInitLock.Release();
             }
 
-            if (e.Error != null)
-            {
-                _logger.LogError("[{0}] {1}", token, e.Error);
-            }
-            else
-            {
-                _logger.LogInformation("Message sent.");
-            }
+            return _smtpClient;
         }
 
         public async Task SendEmail(string subject, string body, string receiver)
@@ -62,21 +59,27 @@ namespace weather_backend.Services
                 throw new Exception("Sender email in secret is null");
             }
 
+            var smtpClient = await GetSmtpClientAsync();
+
             var senderEmailAddressMailAddress = new MailAddress(senderEmailAddress);
             var toEmailAddress = new MailAddress(receiver);
 
-            var mailMessage = new MailMessage(senderEmailAddressMailAddress, toEmailAddress);
-            mailMessage.Subject = subject;
-            mailMessage.Body = body;
+            using var mailMessage = new MailMessage(senderEmailAddressMailAddress, toEmailAddress)
+            {
+                Subject = subject,
+                Body = body,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
+            };
 
-            mailMessage.BodyEncoding = Encoding.UTF8;
-            mailMessage.SubjectEncoding = Encoding.UTF8;
+            await smtpClient.SendMailAsync(mailMessage);
+            _logger.LogInformation("Message sent.");
+        }
 
-            // The userState can be any object that allows your callback
-            // method to identify this send operation.
-            // For this example, the userToken is a string constant.
-            var userState = Guid.NewGuid();
-            _smtpClient.SendAsync(mailMessage, userState);
+        public void Dispose()
+        {
+            _smtpClient?.Dispose();
+            _smtpInitLock.Dispose();
         }
     }
 }

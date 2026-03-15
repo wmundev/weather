@@ -24,7 +24,14 @@ namespace weather_backend.Services
         {
             var allSecrets = await FetchSecret(Constants.SECRETS_KEY);
             var deserialisedObject = JsonSerializer.Deserialize<AllSecrets>(allSecrets);
-            return typeof(AllSecrets).GetProperty(secretKey)?.GetValue(deserialisedObject)?.ToString();
+            if (deserialisedObject is null) return null;
+            return secretKey switch
+            {
+                nameof(AllSecrets.OpenWeatherApiKey) => deserialisedObject.OpenWeatherApiKey,
+                nameof(AllSecrets.SMTPUsername) => deserialisedObject.SMTPUsername,
+                nameof(AllSecrets.SMTPPassword) => deserialisedObject.SMTPPassword,
+                _ => null
+            };
         }
 
 

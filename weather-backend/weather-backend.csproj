@@ -7,22 +7,22 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.512.1" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.513.1" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.400.1" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.504.47" />
     <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.505.12" />
     <PackageReference Include="AWSSDK.Translate" Version="3.7.501.56" />
-    <PackageReference Include="ConfigCat.Client" Version="9.4.3" />
+    <PackageReference Include="ConfigCat.Client" Version="9.5.0" />
     <PackageReference Include="Cronos" Version="0.11.1" />
-    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Dapper" Version="2.1.72" />
     <PackageReference Include="libphonenumber-csharp" Version="8.13.55" />
-    <PackageReference Include="NewRelic.Agent" Version="10.49.0" />
+    <PackageReference Include="NewRelic.Agent" Version="10.50.0" />
     <PackageReference Include="Npgsql" Version="7.0.10" />
     <PackageReference Include="Sodium.Core" Version="1.4.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.11.8" />
+    <PackageReference Include="StackExchange.Redis" Version="2.12.8" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0"/>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.5"/>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>

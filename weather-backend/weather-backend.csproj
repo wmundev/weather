@@ -10,7 +10,7 @@
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.512.1" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.400.1" />
     <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.504.37" />
-    <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.505.2" />
+    <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.505.12" />
     <PackageReference Include="AWSSDK.Translate" Version="3.7.501.46" />
     <PackageReference Include="ConfigCat.Client" Version="9.4.3" />
     <PackageReference Include="Cronos" Version="0.11.1" />

@@ -1,4 +1,6 @@
 using System;
+using System.Net;
+using System.Net.Http;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.Extensions.NETCore.Setup;
@@ -51,7 +53,11 @@ namespace weather_backend
             services.AddControllers();
             services.AddHttpClient();
             services.AddHttpClient<IGeolocationService, GeolocationService>("geolocation");
-            services.AddHttpClient<ICurrentWeatherData, CurrentWeatherData>("openweathermap");
+            services.AddHttpClient<ICurrentWeatherData, CurrentWeatherData>("openweathermap", client =>
+            {
+                client.DefaultRequestVersion = HttpVersion.Version20;
+                client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+            });
 
             services.AddAutoMapper(typeof(Startup));
 

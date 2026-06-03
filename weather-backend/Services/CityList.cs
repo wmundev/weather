@@ -43,8 +43,18 @@ namespace weather_backend.Services
         public IEnumerable<City> GetAllCitiesInAustralia()
         {
             const string AUSTRALIA_COUNTRY_CODE = "AU";
-            var allCities = _cityRepository.GetAllCitiesFromJsonFile();
-            var australiaCities = allCities.Where(city => city.Country == AUSTRALIA_COUNTRY_CODE);
+            const string cacheKey = "cities_au";
+
+            if (!_memoryCache.TryGetValue(cacheKey, out IEnumerable<City>? australiaCities) || australiaCities is null)
+            {
+                var allCities = _cityRepository.GetAllCitiesFromJsonFile();
+                australiaCities = allCities.Where(city => city.Country == AUSTRALIA_COUNTRY_CODE).ToList();
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+                _memoryCache.Set(cacheKey, australiaCities, cacheEntryOptions);
+            }
+
             return australiaCities;
         }
 

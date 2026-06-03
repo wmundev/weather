@@ -52,7 +52,7 @@ namespace weather_backend.Repository
                     _logger.LogError("throughput exceeded, retrying...");
                     _logger.LogError("Error Message:  " + throughputExceededException.Message);
                     retry += 1;
-                    Thread.Sleep(1000);
+                    await Task.Delay(1000);
                 }
                 catch (AmazonServiceException ase)
                 {

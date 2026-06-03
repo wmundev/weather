@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using weather_backend.Exceptions;
 using weather_backend.Models;
 using weather_backend.Services.Interfaces;
 
@@ -36,7 +37,7 @@ namespace weather_backend.Services.Scheduler
             var receiverEmail = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
             if (receiverEmail is null)
             {
-                throw new Exception("Receiver email in secret is null");
+                throw new SecretNotFoundException(nameof(AllSecrets.SMTPUsername));
             }
 
             await _emailService.SendEmail($"{weatherData.name} Current Weather",

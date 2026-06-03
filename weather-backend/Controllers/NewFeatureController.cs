@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using weather_backend.Dto;
 
@@ -12,10 +13,12 @@ namespace weather_backend.Controllers
     public class NewFeatureController : ControllerBase
     {
         private readonly IConnectionMultiplexer _redis;
+        private readonly ILogger<NewFeatureController> _logger;
 
-        public NewFeatureController(IConnectionMultiplexer redis)
+        public NewFeatureController(IConnectionMultiplexer redis, ILogger<NewFeatureController> logger)
         {
             _redis = redis;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -30,7 +33,7 @@ namespace weather_backend.Controllers
         {
             var greeting = "nice one";
 
-            if (greeting is { } thisisgreeting) Console.WriteLine(thisisgreeting);
+            if (greeting is { } thisisgreeting) _logger.LogInformation("Greeting: {Greeting}", thisisgreeting);
 
             return Ok();
         }

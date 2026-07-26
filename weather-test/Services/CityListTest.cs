@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using AutoMapper;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -17,8 +16,6 @@ namespace weather_test.Services
     {
         private readonly CityList _cityList;
         private readonly IDynamoDbClient _dynamoDbClient;
-        private readonly IMapper _mapper;
-
         private readonly ILogger<CityList> _mockLogger;
         private readonly IMemoryCache _mockMemoryCache;
         private readonly ICityRepository _mockCityRepository;
@@ -27,11 +24,11 @@ namespace weather_test.Services
         {
             _mockLogger = Substitute.For<ILogger<CityList>>();
             _dynamoDbClient = Substitute.For<IDynamoDbClient>();
-            _mapper = Substitute.For<IMapper>();
+
             _mockMemoryCache = Substitute.For<IMemoryCache>();
             _mockCityRepository = Substitute.For<ICityRepository>();
 
-            _cityList = new CityList(_mockLogger, _dynamoDbClient, _mapper, _mockMemoryCache, _mockCityRepository);
+            _cityList = new CityList(_mockLogger, _dynamoDbClient, _mockMemoryCache, _mockCityRepository);
         }
 
 

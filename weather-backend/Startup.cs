@@ -59,7 +59,6 @@ namespace weather_backend
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             });
 
-            services.AddAutoMapper(typeof(Startup));
 
             var configCatSdkKey = Configuration.GetValue<string>("ConfigCat:Key");
             if (string.IsNullOrEmpty(configCatSdkKey))

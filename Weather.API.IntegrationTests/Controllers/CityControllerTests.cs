@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using weather_backend;
 using weather_domain.DatabaseEntities;
+using weather_domain.Entities;
 using Weather.API.IntegrationTests.setup;
 using Xunit;
 
@@ -96,7 +97,7 @@ namespace Weather.API.IntegrationTests.Controllers
 
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
-            var cities = JsonSerializer.Deserialize<DynamoDbCity[]>(content, Constants.CamelCaseJsonOptions);
+            var cities = JsonSerializer.Deserialize<City[]>(content, Constants.CamelCaseJsonOptions);
 
             Assert.NotNull(cities);
             Assert.True(cities.Length <= limit);

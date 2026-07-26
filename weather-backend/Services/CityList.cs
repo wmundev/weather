@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AutoMapper;
+using weather_domain.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using weather_backend.Repository;
@@ -17,16 +17,14 @@ namespace weather_backend.Services
     {
         private readonly IDynamoDbClient _dynamoDbClient;
         private readonly ILogger<CityList> _logger;
-        private readonly IMapper _mapper;
         private readonly IMemoryCache _memoryCache;
         private readonly ICityRepository _cityRepository;
 
 
-        public CityList(ILogger<CityList> logger, IDynamoDbClient dynamoDbClient, IMapper mapper, IMemoryCache memoryCache, ICityRepository cityRepository)
+        public CityList(ILogger<CityList> logger, IDynamoDbClient dynamoDbClient, IMemoryCache memoryCache, ICityRepository cityRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _dynamoDbClient = dynamoDbClient ?? throw new ArgumentNullException(nameof(dynamoDbClient));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _cityRepository = cityRepository ?? throw new ArgumentNullException(nameof(cityRepository));
         }
@@ -37,7 +35,7 @@ namespace weather_backend.Services
             var allCities = _cityRepository.GetAllCitiesFromJsonFile();
 
             foreach (var city in allCities)
-                await _dynamoDbClient.SaveRecord(_mapper.Map<DynamoDbCity>(city));
+                await _dynamoDbClient.SaveRecord(city.ToDynamoDbCity());
         }
 
         public IEnumerable<City> GetAllCitiesInAustralia()

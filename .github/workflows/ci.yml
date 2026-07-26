@@ -25,28 +25,12 @@ jobs:
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
-      - name: Check formatting
-        continue-on-error: true
-        run: dotnet format --verify-no-changes --verbosity diagnostic
-
-  unit-tests:
-    needs: build
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v5
-        with:
-          dotnet-version: 10.x
-
       - name: Run API unit tests
-        run: dotnet test --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+        run: dotnet test --no-build --no-restore --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
         working-directory: ./weather-test
 
       - name: Run CLI unit tests
-        run: dotnet test --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+        run: dotnet test --no-build --no-restore --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
         working-directory: ./Weather.CLI.UnitTests
 
       - name: Upload unit test coverage
@@ -57,6 +41,10 @@ jobs:
             ./weather-test/coverage/**/coverage.cobertura.xml
             ./Weather.CLI.UnitTests/coverage/**/coverage.cobertura.xml
           retention-days: 7
+
+      - name: Check formatting
+        continue-on-error: true
+        run: dotnet format --verify-no-changes --verbosity diagnostic
 
   integration-tests:
     needs: build
@@ -94,7 +82,7 @@ jobs:
           retention-days: 7
 
   coverage:
-    needs: [ unit-tests, integration-tests ]
+    needs: [ build, integration-tests ]
     runs-on: ubuntu-24.04-arm
     timeout-minutes: 10
     steps:

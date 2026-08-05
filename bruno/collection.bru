@@ -1,0 +1,56 @@
+auth {
+  mode: none
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  # Weather API
+
+  Complete collection of every HTTP endpoint exposed by `weather-backend`.
+
+  Converted from `Weather-API-Postman-Collection.json` and extended to cover the
+  controllers that the Postman collection never included.
+
+  ## Running the API locally
+
+  ```
+  dotnet run --project weather-backend/weather-backend.csproj
+  ```
+
+  The `weather_backend` launch profile listens on `http://localhost:5000` and
+  `https://localhost:5001`. Swagger UI is served at `/swagger` in Development.
+
+  ## Environments
+
+  | Environment  | baseUrl                  | Notes                                    |
+  | ------------ | ------------------------ | ---------------------------------------- |
+  | `Local`      | http://localhost:5000    | Default `dotnet run` profile             |
+  | `Local HTTPS`| https://localhost:5001   | Needs the ASP.NET dev cert trusted       |
+  | `Docker`     | http://localhost:8080    | Container default (`ASPNETCORE_HTTP_PORTS`) |
+
+  ## Caching
+
+  The four `/weather/*` lookup endpoints cache responses in DynamoDB for one
+  hour, keyed by the full query (endpoint + location + units + language).
+  Changing any parameter produces a different cache key and therefore a cache
+  miss. The legacy `GET /weather` endpoint is **not** cached.
+
+  ## External dependencies
+
+  Several folders need backing services and will fail without them:
+
+  - **Weather / City** - OpenWeatherMap API key + DynamoDB
+  - **Redis Feature** - a reachable Redis instance
+  - **Email / Music** - DynamoDB tables
+  - **Prime Number** - the `primenumber` ConfigCat feature flag must be on
+  - **Geolocation** - outbound access to the IP geolocation provider
+
+  ## Keeping this collection current
+
+  This collection is expected to stay in lockstep with the controllers under
+  `weather-backend/Controllers/`. Run the `bruno-collection-sync` skill after
+  adding, renaming, or removing any endpoint.
+}

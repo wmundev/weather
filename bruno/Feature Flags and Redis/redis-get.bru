@@ -1,0 +1,32 @@
+meta {
+  name: Redis Get
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/feature/redis
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("returns the value written by Redis Set", function () {
+    expect(res.getBody().result).to.equal("hello from bruno");
+  });
+
+  test("reports how long the Redis read took", function () {
+    expect(res.getBody()).to.have.property("time");
+  });
+}
+
+docs {
+  `GET /feature/redis`
+
+  Reads the key `foo` and returns `{ result, time }`, where `time` is the read
+  latency in milliseconds. Run **Redis Set** first.
+}

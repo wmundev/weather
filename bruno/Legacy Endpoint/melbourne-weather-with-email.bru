@@ -1,0 +1,31 @@
+meta {
+  name: Melbourne Weather with Email
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/weather
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /weather`
+
+  Legacy endpoint. Fetches weather for Melbourne (`Constants.DEFAULT_CITY_ID`,
+  city ID `7839805`) **and sends an email notification** to the address stored in
+  the `SMTPUsername` secret.
+
+  Two things to know before firing this:
+
+  - It has **no caching** - every call hits OpenWeatherMap.
+  - It has a **side effect** - it sends a real email. Do not use it for load or
+    smoke testing.
+
+  Throws if the receiver email secret is not configured.
+}

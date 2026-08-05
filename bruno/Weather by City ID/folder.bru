@@ -1,0 +1,22 @@
+meta {
+  name: Weather by City ID
+  seq: 3
+}
+
+docs {
+  `GET /weather/city/{cityId}`
+
+  Get weather by OpenWeatherMap city ID. The most precise lookup - use it to
+  avoid the ambiguity of duplicate city names.
+
+  | Param    | In    | Required | Default  | Notes                                |
+  | -------- | ----- | -------- | -------- | ------------------------------------ |
+  | `cityId` | path  | yes      | -        | OpenWeatherMap city ID               |
+  | `units`  | query | no       | `Metric` | `Standard` \| `Metric` \| `Imperial` |
+  | `lang`   | query | no       | -        | Two-letter language code             |
+
+  City ID lists are published at http://bulk.openweathermap.org/sample/
+
+  Melbourne (`7839805`) is the API's default city - see `Constants.DEFAULT_CITY_ID`,
+  used by the legacy `GET /weather` endpoint and the nightly digest job.
+}

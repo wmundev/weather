@@ -1,0 +1,25 @@
+meta {
+  name: Silicon Valley, USA (94040)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/weather/zip?zipCode=94040&countryCode=us&units=Imperial
+  body: none
+  auth: inherit
+}
+
+params:query {
+  zipCode: 94040
+  countryCode: us
+  units: Imperial
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Mountain View, CA (Silicon Valley) via US ZIP code.
+}

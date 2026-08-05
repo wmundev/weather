@@ -1,0 +1,26 @@
+meta {
+  name: Sydney, Australia (Metric)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/weather/coordinates?latitude=-33.8688&longitude=151.2093&units=Metric
+  body: none
+  auth: inherit
+}
+
+params:query {
+  latitude: -33.8688
+  longitude: 151.2093
+  units: Metric
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Sydney, Australia. `lang` is omitted, so the upstream default
+  (English) is used.
+}

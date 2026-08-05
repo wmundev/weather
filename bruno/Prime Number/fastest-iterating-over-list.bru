@@ -1,0 +1,22 @@
+meta {
+  name: Fastest Iterating Over List
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/prime-number/haha
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /api/prime-number/haha`
+
+  Benchmark scratch endpoint - builds 10,000 seeded random ints and finds the
+  max via `CollectionsMarshal.AsSpan`. Returns that max. Not feature-flagged.
+}

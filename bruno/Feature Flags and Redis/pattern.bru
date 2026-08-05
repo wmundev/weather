@@ -1,0 +1,22 @@
+meta {
+  name: Pattern
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/feature/pattern
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /feature/pattern`
+
+  Scratch endpoint demonstrating C# pattern matching. Returns an empty `200`;
+  the interesting output goes to the console.
+}

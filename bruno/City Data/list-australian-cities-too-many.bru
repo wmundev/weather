@@ -1,0 +1,26 @@
+meta {
+  name: List Australian Cities - Over Limit (400)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/city/all?num=501
+  body: none
+  auth: inherit
+}
+
+params:query {
+  num: 501
+}
+
+assert {
+  res.status: eq 400
+}
+
+docs {
+  `GET /city/all` with `num` above the 500 ceiling.
+
+  Negative case - expects `400 Bad Request` with a `ProblemDetails` body of
+  `{ "type": "too large", "detail": "size is too large" }`.
+}

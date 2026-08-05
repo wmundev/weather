@@ -1,0 +1,26 @@
+meta {
+  name: Check Prime Number
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/prime-number?number=97
+  body: none
+  auth: inherit
+}
+
+params:query {
+  number: 97
+}
+
+docs {
+  `GET /api/prime-number`
+
+  | Param    | Required | Notes                     |
+  | -------- | -------- | ------------------------- |
+  | `number` | yes      | Integer to test           |
+
+  Returns `true`/`false`. Returns `400 "Not enabled"` when the `primenumber`
+  ConfigCat flag is off, so no status assertion is set here.
+}

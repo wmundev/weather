@@ -1,0 +1,31 @@
+meta {
+  name: List Australian Cities
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/city/all?num=100
+  body: none
+  auth: inherit
+}
+
+params:query {
+  num: 100
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /city/all`
+
+  Returns cities in Australia from the in-memory city list.
+
+  | Param | Required | Default | Notes                              |
+  | ----- | -------- | ------- | ---------------------------------- |
+  | `num` | no       | `100`   | Max cities to return, **max 500**  |
+
+  Passing `num` greater than 500 returns `400` with a `ProblemDetails` body.
+}

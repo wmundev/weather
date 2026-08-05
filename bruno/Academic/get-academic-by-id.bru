@@ -1,0 +1,26 @@
+meta {
+  name: Get Academic By Id
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/academic?id=1
+  body: none
+  auth: inherit
+}
+
+params:query {
+  id: 1
+}
+
+docs {
+  `GET /academic`
+
+  | Param | Required | Notes                    |
+  | ----- | -------- | ------------------------ |
+  | `id`  | yes      | Academic record ID       |
+
+  Returns the `Academic` record, or `404` when no record matches the ID. No
+  status assertion is set because the seeded IDs depend on `AcademicService`.
+}

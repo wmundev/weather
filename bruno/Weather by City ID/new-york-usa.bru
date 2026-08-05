@@ -1,0 +1,27 @@
+meta {
+  name: New York, USA (ID: 5128581)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/weather/city/:cityId?units=Imperial
+  body: none
+  auth: inherit
+}
+
+params:query {
+  units: Imperial
+}
+
+params:path {
+  cityId: 5128581
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for New York using city ID with Imperial units.
+}

@@ -1,0 +1,36 @@
+meta {
+  name: Capitalize First Word
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/word/capitalize-first-word?input=the quick brown fox and the lazy dog
+  body: none
+  auth: inherit
+}
+
+params:query {
+  input: the quick brown fox and the lazy dog
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("capitalises each word but leaves conjunctions alone", function () {
+    expect(res.getBody()).to.equal("The Quick Brown Fox and The Lazy Dog");
+  });
+}
+
+docs {
+  `GET /api/v1/word/capitalize-first-word`
+
+  Capitalises the first letter of every whitespace-separated word, except the
+  coordinating conjunctions `and`, `or`, `but`, `nor`, `so`, `for`, `yet`.
+
+  | Param   | Required | Notes                |
+  | ------- | -------- | -------------------- |
+  | `input` | yes      | Text to capitalise   |
+}

@@ -1,0 +1,26 @@
+meta {
+  name: New York, USA (Imperial, English)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/weather/coordinates?latitude=40.7128&longitude=-74.0060&units=Imperial&lang=en
+  body: none
+  auth: inherit
+}
+
+params:query {
+  latitude: 40.7128
+  longitude: -74.0060
+  units: Imperial
+  lang: en
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for New York using coordinates with Imperial units (Fahrenheit).
+}

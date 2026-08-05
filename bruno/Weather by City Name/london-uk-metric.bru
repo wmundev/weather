@@ -1,0 +1,25 @@
+meta {
+  name: London, UK (Metric)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/weather/city?cityName=London&countryCode=GB&units=Metric
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cityName: London
+  countryCode: GB
+  units: Metric
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for London, UK using city name plus country code.
+}

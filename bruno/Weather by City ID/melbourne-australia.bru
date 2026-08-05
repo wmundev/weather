@@ -1,0 +1,27 @@
+meta {
+  name: Melbourne, Australia (ID: 7839805)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/weather/city/:cityId?units=Metric
+  body: none
+  auth: inherit
+}
+
+params:query {
+  units: Metric
+}
+
+params:path {
+  cityId: 7839805
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Melbourne using its OpenWeatherMap city ID. This is the API's default city.
+}

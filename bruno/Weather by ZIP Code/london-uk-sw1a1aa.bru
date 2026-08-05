@@ -1,0 +1,25 @@
+meta {
+  name: London, UK (SW1A1AA)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/weather/zip?zipCode=SW1A1AA&countryCode=GB&units=Metric
+  body: none
+  auth: inherit
+}
+
+params:query {
+  zipCode: SW1A1AA
+  countryCode: GB
+  units: Metric
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for London via UK postcode. Note `countryCode=GB` is required - the default `us` would not resolve this.
+}

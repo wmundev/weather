@@ -1,0 +1,12 @@
+meta {
+  name: Prime Number
+  seq: 13
+}
+
+docs {
+  `PrimeNumberController` - primality check gated behind a ConfigCat feature
+  flag, plus a span-iteration benchmark.
+
+  The `primenumber` flag in ConfigCat must be **enabled** for the check
+  endpoint; when it is off the endpoint returns `400 Not enabled`.
+}

@@ -1,0 +1,34 @@
+meta {
+  name: Decode Base64
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/stringbase64/decodebase64?stringToDecode={{encodedString}}
+  body: none
+  auth: inherit
+}
+
+params:query {
+  stringToDecode: {{encodedString}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("round-trips back to the original text", function () {
+    expect(res.getBody()).to.equal("hello from bruno");
+  });
+}
+
+docs {
+  `GET /api/stringbase64/decodebase64`
+
+  Decodes a Base64 string back to UTF-8 text. Uses the `encodedString` variable
+  set by **Encode Base64**, so run that first.
+
+  Invalid Base64 input throws and surfaces as a `500`.
+}

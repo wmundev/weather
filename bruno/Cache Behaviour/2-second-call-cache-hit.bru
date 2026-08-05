@@ -1,0 +1,38 @@
+meta {
+  name: 2. Second Call - Cache Hit (Fast)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/weather/city?cityName=TestCity&countryCode=GB&units=Metric
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cityName: TestCity
+  countryCode: GB
+  units: Metric
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("status code is 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("response time suggests a cache hit (< 300ms)", function () {
+    expect(res.getResponseTime()).to.be.below(300);
+  });
+
+  console.log("Response time: " + res.getResponseTime() + "ms");
+}
+
+docs {
+  Identical parameters to request 1, so this hits the cache and should be
+  markedly faster. Server log: `Returning cached weather data`.
+}

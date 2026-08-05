@@ -1,0 +1,29 @@
+meta {
+  name: London, UK (Metric, English)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/weather/coordinates?latitude=51.5074&longitude=-0.1278&units=Metric&lang=en
+  body: none
+  auth: inherit
+}
+
+params:query {
+  latitude: 51.5074
+  longitude: -0.1278
+  units: Metric
+  lang: en
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for London, UK using coordinates.
+
+  The first call is slower (cache miss, upstream OpenWeatherMap request); the
+  second is served from the DynamoDB cache.
+}

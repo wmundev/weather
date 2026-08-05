@@ -1,0 +1,24 @@
+meta {
+  name: Validate Phone Number - Invalid (400)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/phone-number/phone?phone=not-a-number
+  body: none
+  auth: inherit
+}
+
+params:query {
+  phone: not-a-number
+}
+
+assert {
+  res.status: eq 400
+}
+
+docs {
+  Negative case - an unparseable phone number returns `400` with the parser's
+  error message as the body.
+}

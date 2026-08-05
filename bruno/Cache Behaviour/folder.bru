@@ -1,0 +1,22 @@
+meta {
+  name: Cache Behaviour
+  seq: 6
+}
+
+docs {
+  Run these three requests **in order** to observe the DynamoDB response cache.
+
+  The cache key is derived from the full request - endpoint, location, units and
+  language - so changing any single parameter produces a different key and a
+  fresh upstream call. Entries live for one hour.
+
+  Watch the API logs while running:
+
+  - `Cache miss - fetching fresh weather data for {Query}`
+  - `Returning cached weather data for {Query}`
+
+  The response-time assertions are indicative, not exact: they assume a cold
+  cache and a reachable OpenWeatherMap API. If request 1 fails its timing
+  assertion, the entry was probably already cached from an earlier run - wait
+  out the hour TTL or change `cityName`.
+}

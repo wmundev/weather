@@ -1,0 +1,27 @@
+meta {
+  name: Paris, France (ID: 2988507)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/weather/city/:cityId?units=Metric
+  body: none
+  auth: inherit
+}
+
+params:query {
+  units: Metric
+}
+
+params:path {
+  cityId: 2988507
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Paris using city ID.
+}

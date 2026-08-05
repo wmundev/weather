@@ -1,0 +1,30 @@
+meta {
+  name: Health Check
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("reports Healthy", function () {
+    expect(res.getBody()).to.equal("Healthy");
+  });
+}
+
+docs {
+  `GET /health`
+
+  ASP.NET Core health check endpoint, registered in `Startup.Configure` via
+  `endpoints.MapHealthChecks("/health")`. Returns the plain text `Healthy`.
+
+  This is the probe used by the AWS ECS deployment.
+}

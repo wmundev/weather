@@ -1,0 +1,21 @@
+meta {
+  name: Weather by City Name
+  seq: 2
+}
+
+docs {
+  `GET /weather/city`
+
+  Get weather by city name, optionally narrowed by state (US only) and country.
+
+  | Param         | Required | Default  | Notes                                 |
+  | ------------- | -------- | -------- | ------------------------------------- |
+  | `cityName`    | yes      | -        | e.g. `London`                         |
+  | `stateCode`   | no       | -        | US only, e.g. `TX`                    |
+  | `countryCode` | no       | -        | ISO 3166 alpha-2, e.g. `GB`           |
+  | `units`       | no       | `Metric` | `Standard` \| `Metric` \| `Imperial`  |
+  | `lang`        | no       | -        | Two-letter language code              |
+
+  City names are ambiguous across countries. Prefer **Weather by City ID** when
+  you need a guaranteed-unique location.
+}

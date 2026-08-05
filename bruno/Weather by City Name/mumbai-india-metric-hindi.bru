@@ -1,0 +1,26 @@
+meta {
+  name: Mumbai, India (Metric, Hindi)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/weather/city?cityName=Mumbai&countryCode=IN&units=Metric&lang=hi
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cityName: Mumbai
+  countryCode: IN
+  units: Metric
+  lang: hi
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Mumbai with Hindi language output.
+}

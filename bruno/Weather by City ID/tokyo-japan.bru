@@ -1,0 +1,28 @@
+meta {
+  name: Tokyo, Japan (ID: 1850144)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/weather/city/:cityId?units=Metric&lang=ja
+  body: none
+  auth: inherit
+}
+
+params:query {
+  units: Metric
+  lang: ja
+}
+
+params:path {
+  cityId: 1850144
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Tokyo using city ID with Japanese language output.
+}

@@ -1,0 +1,32 @@
+meta {
+  name: Redis Set
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/feature/redis
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "value": "hello from bruno"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `POST /feature/redis`
+
+  Writes `value` to Redis under the hard-coded key `foo`. Returns the
+  `StringSetAsync` result (`True`).
+}

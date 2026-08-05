@@ -1,0 +1,38 @@
+meta {
+  name: 1. First Call - Cache Miss (Slow)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/weather/city?cityName=TestCity&countryCode=GB&units=Metric
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cityName: TestCity
+  countryCode: GB
+  units: Metric
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("status code is 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("response time suggests an upstream API call (> 300ms)", function () {
+    expect(res.getResponseTime()).to.be.above(300);
+  });
+
+  console.log("Response time: " + res.getResponseTime() + "ms");
+}
+
+docs {
+  First call for this query - expect a cache miss and a slower response while
+  the API calls OpenWeatherMap. Server log: `Cache miss - fetching fresh weather data`.
+}

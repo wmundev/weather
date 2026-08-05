@@ -1,0 +1,21 @@
+meta {
+  name: Get IP Address
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/geolocation/ipaddress
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /geolocation/ipaddress`
+
+  Returns the caller's IP address as a plain string.
+}

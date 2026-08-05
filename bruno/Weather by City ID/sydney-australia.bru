@@ -1,0 +1,27 @@
+meta {
+  name: Sydney, Australia (ID: 2147714)
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/weather/city/:cityId?units=Metric
+  body: none
+  auth: inherit
+}
+
+params:query {
+  units: Metric
+}
+
+params:path {
+  cityId: 2147714
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Sydney using city ID.
+}

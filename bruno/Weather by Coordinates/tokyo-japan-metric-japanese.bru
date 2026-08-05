@@ -1,0 +1,26 @@
+meta {
+  name: Tokyo, Japan (Metric, Japanese)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/weather/coordinates?latitude=35.6762&longitude=139.6503&units=Metric&lang=ja
+  body: none
+  auth: inherit
+}
+
+params:query {
+  latitude: 35.6762
+  longitude: 139.6503
+  units: Metric
+  lang: ja
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Tokyo with Japanese language output.
+}

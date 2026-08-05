@@ -1,0 +1,15 @@
+meta {
+  name: Encryption
+  seq: 9
+}
+
+docs {
+  `EncryptionController` - authenticated symmetric encryption round-trip.
+
+  Run **Encrypt Message** first: it captures `encryptedMessage`, `nonce` and
+  `key` into runtime variables that **Decrypt Message** then consumes, so the
+  two requests chain without any copy-paste.
+
+  The key is returned to the caller in the response, so treat this as a demo
+  endpoint rather than a way to protect real secrets.
+}

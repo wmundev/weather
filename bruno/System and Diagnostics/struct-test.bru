@@ -1,0 +1,23 @@
+meta {
+  name: Struct Test
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/struc
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /api/struc`
+
+  Scratch endpoint demonstrating that structs are passed by value: the returned
+  `Name` is still `"haha nice"` even though the private helper assigns to it,
+  because the helper mutates its own copy.
+}

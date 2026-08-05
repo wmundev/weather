@@ -1,0 +1,22 @@
+meta {
+  name: Get Song Title
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/music/song-title
+  body: none
+  auth: inherit
+}
+
+docs {
+  `GET /api/music/song-title`
+
+  Demonstrates `CancellationToken` handling: the controller starts the DynamoDB
+  load and then **immediately cancels it**. If the cancellation wins you get
+  `400` with `ProblemDetails { type: "typeisfailed", detail: "Failed" }`; if the
+  load completes first you get `200` with the song title.
+
+  The outcome is a race, so no status assertion is set.
+}

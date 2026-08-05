@@ -1,0 +1,20 @@
+meta {
+  name: Weather by Coordinates
+  seq: 1
+}
+
+docs {
+  `GET /weather/coordinates`
+
+  Get weather by geographic coordinates. The most accurate method for any
+  location on Earth, since it bypasses name/geocoding ambiguity entirely.
+
+  | Param       | Required | Default  | Notes                                  |
+  | ----------- | -------- | -------- | -------------------------------------- |
+  | `latitude`  | yes      | -        | Decimal degrees, -90 to 90             |
+  | `longitude` | yes      | -        | Decimal degrees, -180 to 180           |
+  | `units`     | no       | `Metric` | `Standard` \| `Metric` \| `Imperial`   |
+  | `lang`      | no       | -        | Two-letter language code (`en`, `ja`)  |
+
+  Responses are cached for one hour, keyed on all four parameters.
+}

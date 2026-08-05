@@ -1,0 +1,26 @@
+meta {
+  name: Austin, Texas, USA (Imperial)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/weather/city?cityName=Austin&stateCode=TX&countryCode=US&units=Imperial
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cityName: Austin
+  stateCode: TX
+  countryCode: US
+  units: Imperial
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Austin, Texas with Imperial units. Demonstrates `stateCode`, which only applies to US locations.
+}

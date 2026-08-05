@@ -1,0 +1,26 @@
+meta {
+  name: Get City Information
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/city/:name
+  body: none
+  auth: inherit
+}
+
+params:path {
+  name: Melbourne
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /city/{name}`
+
+  Looks a city up by name in DynamoDB and returns its `DynamoDbCity` record.
+  Returns `404` when the city is not present in the table.
+}

@@ -1,0 +1,13 @@
+meta {
+  name: Geolocation
+  seq: 8
+}
+
+docs {
+  `GeolocationController` - resolves the calling client's IP address and
+  approximate location.
+
+  Calling these from `localhost` typically yields a loopback address, which the
+  upstream geolocation provider cannot resolve - `/geolocation/location` then
+  returns `400`.
+}

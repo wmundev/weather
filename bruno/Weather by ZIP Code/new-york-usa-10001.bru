@@ -1,0 +1,25 @@
+meta {
+  name: New York, USA (10001)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/weather/zip?zipCode=10001&countryCode=us&units=Imperial
+  body: none
+  auth: inherit
+}
+
+params:query {
+  zipCode: 10001
+  countryCode: us
+  units: Imperial
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for New York via US ZIP code.
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Berlin, Germany (10115)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/weather/zip?zipCode=10115&countryCode=DE&units=Metric&lang=de
+  body: none
+  auth: inherit
+}
+
+params:query {
+  zipCode: 10115
+  countryCode: DE
+  units: Metric
+  lang: de
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Berlin via German postal code.
+}

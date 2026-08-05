@@ -1,0 +1,38 @@
+meta {
+  name: 3. Different Units - Cache Miss (Slow)
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/weather/city?cityName=TestCity&countryCode=GB&units=Imperial
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cityName: TestCity
+  countryCode: GB
+  units: Imperial
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("status code is 200", function () {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("response time suggests an upstream API call (> 300ms)", function () {
+    expect(res.getResponseTime()).to.be.above(300);
+  });
+
+  console.log("Response time: " + res.getResponseTime() + "ms");
+}
+
+docs {
+  Same city as requests 1 and 2 but `units=Imperial`, which changes the cache
+  key - so this misses the cache even though the location is already cached.
+}

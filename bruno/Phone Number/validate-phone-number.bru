@@ -1,0 +1,30 @@
+meta {
+  name: Validate Phone Number
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/phone-number/phone?phone=+61412345678
+  body: none
+  auth: inherit
+}
+
+params:query {
+  phone: +61412345678
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /phone-number/phone`
+
+  | Param   | Required | Notes                                        |
+  | ------- | -------- | -------------------------------------------- |
+  | `phone` | yes      | Phone number, E.164 format works best        |
+
+  Returns a `ValidatePhoneNumberModel` on success, or `400` with the exception
+  message when the number cannot be parsed.
+}

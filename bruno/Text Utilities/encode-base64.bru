@@ -1,0 +1,30 @@
+meta {
+  name: Encode Base64
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/stringbase64/encodebase64?stringToEncode=hello from bruno
+  body: none
+  auth: inherit
+}
+
+params:query {
+  stringToEncode: hello from bruno
+}
+
+assert {
+  res.status: eq 200
+}
+
+vars:post-response {
+  encodedString: res.body
+}
+
+docs {
+  `GET /api/stringbase64/encodebase64`
+
+  UTF-8 encodes the input and returns it as a Base64 string. The result is
+  stored in the `encodedString` runtime variable for **Decode Base64**.
+}

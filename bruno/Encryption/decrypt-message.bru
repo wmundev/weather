@@ -1,0 +1,48 @@
+meta {
+  name: Decrypt Message
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/encryption/decrypt
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "message": "{{encryptedMessage}}",
+    "nonce": "{{nonce}}",
+    "key": "{{key}}"
+  }
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("round-trips back to the original plaintext", function () {
+    expect(res.getBody().message).to.equal("hello from bruno");
+  });
+}
+
+docs {
+  `POST /api/encryption/decrypt`
+
+  Body fields (all Base64):
+
+  | Field     | Notes                                    |
+  | --------- | ---------------------------------------- |
+  | `message` | Ciphertext from **Encrypt Message**      |
+  | `nonce`   | Nonce from **Encrypt Message**           |
+  | `key`     | Key from **Encrypt Message**             |
+
+  Run **Encrypt Message** first - this request reads the `{{encryptedMessage}}`,
+  `{{nonce}}` and `{{key}}` runtime variables it sets.
+}

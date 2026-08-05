@@ -1,0 +1,26 @@
+meta {
+  name: Paris, France (75001)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/weather/zip?zipCode=75001&countryCode=FR&units=Metric&lang=fr
+  body: none
+  auth: inherit
+}
+
+params:query {
+  zipCode: 75001
+  countryCode: FR
+  units: Metric
+  lang: fr
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Paris via French postal code.
+}

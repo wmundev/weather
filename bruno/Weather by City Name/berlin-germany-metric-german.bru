@@ -1,0 +1,26 @@
+meta {
+  name: Berlin, Germany (Metric, German)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/weather/city?cityName=Berlin&countryCode=DE&units=Metric&lang=de
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cityName: Berlin
+  countryCode: DE
+  units: Metric
+  lang: de
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Berlin with German language output.
+}

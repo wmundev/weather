@@ -1,0 +1,26 @@
+meta {
+  name: Dubai, UAE (Metric, Arabic)
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/weather/city?cityName=Dubai&countryCode=AE&units=Metric&lang=ar
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cityName: Dubai
+  countryCode: AE
+  units: Metric
+  lang: ar
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Dubai with Arabic language output.
+}

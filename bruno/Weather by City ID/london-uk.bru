@@ -1,0 +1,28 @@
+meta {
+  name: London, UK (ID: 2643743)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/weather/city/:cityId?units=Metric&lang=en
+  body: none
+  auth: inherit
+}
+
+params:query {
+  units: Metric
+  lang: en
+}
+
+params:path {
+  cityId: 2643743
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for London using city ID.
+}

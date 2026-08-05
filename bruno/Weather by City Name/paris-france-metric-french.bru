@@ -1,0 +1,26 @@
+meta {
+  name: Paris, France (Metric, French)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/weather/city?cityName=Paris&countryCode=FR&units=Metric&lang=fr
+  body: none
+  auth: inherit
+}
+
+params:query {
+  cityName: Paris
+  countryCode: FR
+  units: Metric
+  lang: fr
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  Weather for Paris with French language output.
+}

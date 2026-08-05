@@ -1,0 +1,26 @@
+meta {
+  name: Generate Language File
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/LanguageTranslator/generate
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `POST /api/LanguageTranslator/generate`
+
+  **Currently a no-op.** The call to `GenerateLanguageFileAsync()` is commented
+  out in the controller so that routine test runs do not spend AWS Translate
+  credits. Uncomment it in `LanguageTranslatorController.cs` to actually
+  regenerate the files.
+
+  Supported language codes are listed in `Constants.LANGUAGE_CODE`.
+}

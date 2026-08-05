@@ -1,0 +1,22 @@
+meta {
+  name: Delegate Test
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/delegates
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /api/delegates`
+
+  Scratch endpoint exercising `DelegateService.SortThings` with a lambda.
+  Returns an empty `200`; the sums are written to the console.
+}

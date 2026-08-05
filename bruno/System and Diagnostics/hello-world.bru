@@ -1,0 +1,27 @@
+meta {
+  name: Hello World
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/hello-world
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("returns the greeting", function () {
+    expect(res.getBody()).to.equal("Hello World");
+  });
+}
+
+docs {
+  `GET /hello-world`
+
+  Minimal smoke test - returns the string `Hello World`.
+}

@@ -1,0 +1,19 @@
+meta {
+  name: Weather by ZIP Code
+  seq: 4
+}
+
+docs {
+  `GET /weather/zip`
+
+  Get weather by ZIP or postal code. International postal codes are supported,
+  but you must pass the matching `countryCode` - the default is `us`, so a
+  non-US postcode without it will resolve to the wrong place or 404.
+
+  | Param         | Required | Default  | Notes                                |
+  | ------------- | -------- | -------- | ------------------------------------ |
+  | `zipCode`     | yes      | -        | ZIP / postal code                    |
+  | `countryCode` | no       | `us`     | ISO 3166 alpha-2                     |
+  | `units`       | no       | `Metric` | `Standard` \| `Metric` \| `Imperial` |
+  | `lang`        | no       | -        | Two-letter language code             |
+}

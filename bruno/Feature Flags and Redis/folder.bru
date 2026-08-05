@@ -1,0 +1,12 @@
+meta {
+  name: Feature Flags and Redis
+  seq: 14
+}
+
+docs {
+  `NewFeatureController` - scratch endpoints plus a Redis read/write round-trip.
+
+  The Redis requests need a reachable Redis instance (see the connection string
+  in `appsettings*.json`). Both use the fixed key `foo`, so run **Redis Set**
+  before **Redis Get**.
+}

@@ -1,0 +1,21 @@
+meta {
+  name: Get Email Code
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/email/code
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /api/email/code`
+
+  Loads the `EmailCodeEntity` from DynamoDB.
+}

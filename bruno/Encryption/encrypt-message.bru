@@ -1,0 +1,44 @@
+meta {
+  name: Encrypt Message
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/encryption/encrypt?message=hello from bruno
+  body: none
+  auth: inherit
+}
+
+params:query {
+  message: hello from bruno
+}
+
+assert {
+  res.status: eq 200
+}
+
+vars:post-response {
+  encryptedMessage: res.body.encryptedMessage
+  nonce: res.body.nonce
+  key: res.body.key
+}
+
+tests {
+  test("returns the ciphertext, nonce and key", function () {
+    expect(res.getBody()).to.have.property("encryptedMessage");
+    expect(res.getBody()).to.have.property("nonce");
+    expect(res.getBody()).to.have.property("key");
+  });
+}
+
+docs {
+  `GET /api/encryption/encrypt`
+
+  | Param     | Required | Notes                     |
+  | --------- | -------- | ------------------------- |
+  | `message` | yes      | Plaintext to encrypt      |
+
+  Returns `{ encryptedMessage, nonce, key }`, all Base64 encoded. Those three
+  values are stored as runtime variables for the **Decrypt Message** request.
+}

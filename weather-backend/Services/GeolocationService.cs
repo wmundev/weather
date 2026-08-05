@@ -1,7 +1,5 @@
-﻿using System;
-using System.Net;
+using System;
 using System.Net.Http;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -9,8 +7,9 @@ namespace weather_backend.Services
 {
     public class GeolocationService : IGeolocationService
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private const string BaseUrl = "http://ip-api.com/json";
         private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public GeolocationService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
@@ -24,20 +23,19 @@ namespace weather_backend.Services
             return Task.FromResult(clientIpAddress ?? "");
         }
 
-        public async Task<string> GetLocation()
+        /// <summary>
+        /// Looks up the caller's location, or returns null when the remote IP address is unavailable
+        /// (for example when the request did not arrive over a socket).
+        /// </summary>
+        public async Task<string?> GetLocation()
         {
             var clientIpAddress = await GetIpAddress();
+            if (string.IsNullOrEmpty(clientIpAddress))
+            {
+                return null;
+            }
 
-            Console.WriteLine(isLocalIpAddress(clientIpAddress));
-
-            var baseUrl = "http://ip-api.com/json";
-            var locationInfo = await _httpClient.GetStringAsync($"{baseUrl}/{clientIpAddress}");
-            return locationInfo;
-        }
-
-        private bool isLocalIpAddress(string ipAddress)
-        {
-            return IPAddress.Parse(ipAddress).AddressFamily == AddressFamily.InterNetwork;
+            return await _httpClient.GetStringAsync($"{BaseUrl}/{clientIpAddress}");
         }
     }
 }

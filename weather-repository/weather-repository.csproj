@@ -14,7 +14,8 @@
 
   <ItemGroup>
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.513.4" />
-    <ProjectReference Include="..\weather-application\weather-application.csproj"/>
+    <!-- Infrastructure depends on the domain only; it must not reference the application layer. -->
+    <ProjectReference Include="..\weather-domain\weather-domain.csproj"/>
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,9 @@
 using System;
-using System.Text.Json;
-using System.Threading.Tasks;
+using System.Globalization;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using weather_backend.Dto;
 using weather_backend.Models;
-using weather_domain.DatabaseEntities;
-using weather_repository;
 
 namespace weather_backend.Services
 {
@@ -14,12 +12,12 @@ namespace weather_backend.Services
         /// <summary>
         /// Get cached weather data if available and not expired
         /// </summary>
-        Task<WeatherData?> GetCachedWeatherData(string cacheKey);
+        WeatherData? GetCachedWeatherData(string cacheKey);
 
         /// <summary>
         /// Save weather data to cache with 1-hour TTL
         /// </summary>
-        Task CacheWeatherData(string cacheKey, string queryType, WeatherData weatherData, string? parameters = null);
+        void CacheWeatherData(string cacheKey, WeatherData weatherData);
 
         /// <summary>
         /// Generate cache key for coordinates query
@@ -42,66 +40,47 @@ namespace weather_backend.Services
         string GenerateCacheKey(ZipCodeWeatherRequestDto request);
     }
 
+    /// <summary>
+    /// Caches OpenWeatherMap responses in process memory for an hour.
+    /// The cache is per instance and does not survive a restart; it exists to keep repeated identical
+    /// queries off the upstream API, not to be a durable store.
+    /// </summary>
     public class WeatherCacheService : IWeatherCacheService
     {
-        private readonly IWeatherCacheRepository _cacheRepository;
-        private readonly ILogger<WeatherCacheService> _logger;
-        private const int CacheTTLSeconds = 3600; // 1 hour
+        private static readonly TimeSpan CacheTimeToLive = TimeSpan.FromHours(1);
 
-        public WeatherCacheService(IWeatherCacheRepository cacheRepository, ILogger<WeatherCacheService> logger)
+        private readonly ILogger<WeatherCacheService> _logger;
+        private readonly IMemoryCache _memoryCache;
+
+        public WeatherCacheService(IMemoryCache memoryCache, ILogger<WeatherCacheService> logger)
         {
-            _cacheRepository = cacheRepository ?? throw new ArgumentNullException(nameof(cacheRepository));
+            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<WeatherData?> GetCachedWeatherData(string cacheKey)
+        public WeatherData? GetCachedWeatherData(string cacheKey)
         {
-            try
-            {
-                var cachedData = await _cacheRepository.GetCachedWeather(cacheKey);
-                if (cachedData == null)
-                {
-                    return null;
-                }
-
-                var weatherData = JsonSerializer.Deserialize<WeatherData>(cachedData.WeatherDataJson);
-                return weatherData;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deserializing cached weather data for key: {CacheKey}", cacheKey);
-                return null;
-            }
+            return _memoryCache.TryGetValue(cacheKey, out WeatherData? cachedData) ? cachedData : null;
         }
 
-        public async Task CacheWeatherData(string cacheKey, string queryType, WeatherData weatherData, string? parameters = null)
+        public void CacheWeatherData(string cacheKey, WeatherData weatherData)
         {
-            try
-            {
-                var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                var weatherCache = new WeatherCache
-                {
-                    CacheKey = cacheKey,
-                    QueryType = queryType,
-                    WeatherDataJson = JsonSerializer.Serialize(weatherData),
-                    CreatedAt = now,
-                    TTL = now + CacheTTLSeconds,
-                    Parameters = parameters
-                };
+            // Cache keys are built from caller-supplied query parameters, so entries carry a size and
+            // the shared cache enforces a limit on how many can accumulate.
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(CacheTimeToLive)
+                .SetSize(1);
 
-                await _cacheRepository.SaveWeatherCache(weatherCache);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error caching weather data for key: {CacheKey}", cacheKey);
-                // Don't throw - caching failures should not break the API
-            }
+            _memoryCache.Set(cacheKey, weatherData, cacheEntryOptions);
+
+            _logger.LogDebug("Cached weather data for key {CacheKey}", cacheKey);
         }
 
         public string GenerateCacheKey(CoordinatesWeatherRequestDto request)
         {
-            var lat = Math.Round(request.Latitude, 4);
-            var lon = Math.Round(request.Longitude, 4);
+            // Formatted with the invariant culture so the key shape does not change with the host locale.
+            var lat = Math.Round(request.Latitude, 4).ToString(CultureInfo.InvariantCulture);
+            var lon = Math.Round(request.Longitude, 4).ToString(CultureInfo.InvariantCulture);
             var units = request.Units.ToString().ToLowerInvariant();
             var lang = string.IsNullOrEmpty(request.Language) ? "none" : request.Language.ToLowerInvariant();
             return $"coordinates:{lat}:{lon}:{units}:{lang}";
@@ -119,9 +98,10 @@ namespace weather_backend.Services
 
         public string GenerateCacheKey(CityIdWeatherRequestDto request)
         {
+            var cityId = request.CityId.ToString(CultureInfo.InvariantCulture);
             var units = request.Units.ToString().ToLowerInvariant();
             var lang = string.IsNullOrEmpty(request.Language) ? "none" : request.Language.ToLowerInvariant();
-            return $"cityid:{request.CityId}:{units}:{lang}";
+            return $"cityid:{cityId}:{units}:{lang}";
         }
 
         public string GenerateCacheKey(ZipCodeWeatherRequestDto request)

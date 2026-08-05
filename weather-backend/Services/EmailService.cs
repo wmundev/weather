@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+using System;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
@@ -14,69 +13,53 @@ namespace weather_backend.Services
     public sealed class EmailService
     {
         private readonly IConfiguration _configuration;
-        private readonly ISecretService _secretService;
         private readonly ILogger<EmailService> _logger;
-
-        private readonly SmtpClient _smtpClient;
+        private readonly ISecretService _secretService;
 
         public EmailService(IConfiguration configuration, ISecretService secretService, ILogger<EmailService> logger)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _secretService = secretService ?? throw new ArgumentNullException(nameof(secretService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            var emailUsername = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))?.Result;
-            var emailPassword = _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword))?.Result;
-            var emailHost = configuration.GetValue<string>("SMTPHost") ?? throw new NullReferenceException("Email host is null");
-            var emailPort = configuration.GetValue<int>("SMTPPort");
-
-            _smtpClient = new SmtpClient {Host = emailHost, Port = emailPort, Credentials = new NetworkCredential(emailUsername, emailPassword), EnableSsl = true};
-            _smtpClient.SendCompleted += SendCompletedCallback;
         }
 
-        private void SendCompletedCallback(object sender, AsyncCompletedEventArgs e)
-        {
-            // Get the unique identifier for this asynchronous operation.
-            var token = e.UserState as string;
-
-            if (e.Cancelled)
-            {
-                _logger.LogError("[{0}] Send canceled.", token);
-            }
-
-            if (e.Error != null)
-            {
-                _logger.LogError("[{0}] {1}", token, e.Error);
-            }
-            else
-            {
-                _logger.LogInformation("Message sent.");
-            }
-        }
-
+        /// <summary>
+        /// Sends an email. The returned task completes only once the message has been handed to the SMTP server.
+        /// </summary>
         public async Task SendEmail(string subject, string body, string receiver)
         {
-            var senderEmailAddress = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
-            if (senderEmailAddress is null)
+            // Credentials are fetched here rather than in the constructor: FetchSpecificSecret is async,
+            // and blocking on it during construction stalls every request that resolves this service.
+            var senderEmailAddress = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))
+                                     ?? throw new InvalidOperationException("SMTP username is not configured.");
+            var senderPassword = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword))
+                                 ?? throw new InvalidOperationException("SMTP password is not configured.");
+
+            var emailHost = _configuration.GetValue<string>("SMTPHost")
+                            ?? throw new InvalidOperationException("SMTPHost is not configured.");
+            var emailPort = _configuration.GetValue<int>("SMTPPort");
+
+            // One client per send: SmtpClient rejects concurrent sends on a single instance, which a
+            // shared instance would hit as soon as two requests overlap.
+            using var smtpClient = new SmtpClient
             {
-                throw new Exception("Sender email in secret is null");
-            }
+                Host = emailHost,
+                Port = emailPort,
+                Credentials = new NetworkCredential(senderEmailAddress, senderPassword),
+                EnableSsl = true
+            };
 
-            var senderEmailAddressMailAddress = new MailAddress(senderEmailAddress);
-            var toEmailAddress = new MailAddress(receiver);
+            using var mailMessage = new MailMessage(new MailAddress(senderEmailAddress), new MailAddress(receiver))
+            {
+                Subject = subject,
+                Body = body,
+                BodyEncoding = Encoding.UTF8,
+                SubjectEncoding = Encoding.UTF8
+            };
 
-            var mailMessage = new MailMessage(senderEmailAddressMailAddress, toEmailAddress);
-            mailMessage.Subject = subject;
-            mailMessage.Body = body;
+            await smtpClient.SendMailAsync(mailMessage);
 
-            mailMessage.BodyEncoding = Encoding.UTF8;
-            mailMessage.SubjectEncoding = Encoding.UTF8;
-
-            // The userState can be any object that allows your callback
-            // method to identify this send operation.
-            // For this example, the userToken is a string constant.
-            var userState = Guid.NewGuid();
-            _smtpClient.SendAsync(mailMessage, userState);
+            _logger.LogInformation("Email with subject {Subject} sent", subject);
         }
     }
 }

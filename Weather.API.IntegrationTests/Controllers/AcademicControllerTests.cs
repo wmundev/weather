@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -50,6 +51,22 @@ namespace Weather.API.IntegrationTests.Controllers
             Assert.NotNull(content);
             Assert.Equal(expectedAcademic.ACNUM, content.ACNUM);
             Assert.Equal(expectedAcademic.FAMNAME, content.FAMNAME);
+        }
+
+        [Fact]
+        public async Task GetAcademicById_WhenTheAcademicDoesNotExist_Returns404()
+        {
+            // Arrange
+            var mockService = Substitute.For<IAcademicService>();
+            mockService.GetAcademicById(Arg.Any<int>()).Returns((Academic?) null);
+
+            var client = CreateClientWithMockService(mockService);
+
+            // Act
+            var response = await client.GetAsync("/academic?id=999999");
+
+            // Assert: the service used to call First() on an empty result, which surfaced as a 500.
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         private HttpClient CreateClientWithMockService(IAcademicService? mockService = null)

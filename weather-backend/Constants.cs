@@ -9,9 +9,16 @@ namespace weather_backend
 
         public const string CRON_EXPRESSION_SCHEDULE_JOB = "0 22 * * *";
 
-        public static JsonSerializerOptions DefaultJsonOptions => new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true};
+        /// <summary>
+        /// OpenWeatherMap city id for Melbourne, used by the daily digest and the legacy /weather endpoint.
+        /// </summary>
+        public const double DEFAULT_CITY_ID = 7839805;
 
-        public static JsonSerializerOptions CamelCaseJsonOptions => new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
+        // Cached instances, not properties: System.Text.Json builds and caches serialization metadata per
+        // options object, so handing out a fresh instance on every access throws that cache away.
+        public static readonly JsonSerializerOptions DefaultJsonOptions = new() {PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true};
+
+        public static readonly JsonSerializerOptions CamelCaseJsonOptions = new() {PropertyNamingPolicy = JsonNamingPolicy.CamelCase};
 
         /**
          * See https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html

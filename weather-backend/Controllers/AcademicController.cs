@@ -24,9 +24,17 @@ namespace weather_backend.Controllers
         /// </returns>
         [HttpGet]
         [Route("/academic")]
+        [ProducesResponseType(typeof(Academic), 200)]
+        [ProducesResponseType(404)]
         public ActionResult<Academic> GetAcademicById(int id)
         {
-            return Ok(_academicService.GetAcademicById(id));
+            var academic = _academicService.GetAcademicById(id);
+            if (academic is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(academic);
         }
     }
 }

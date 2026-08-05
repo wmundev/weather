@@ -39,9 +39,17 @@ namespace weather_backend.Controllers
         /// </returns>
         [HttpGet]
         [Route("location")]
+        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(400)]
         public async Task<ActionResult<string>> GetLocation()
         {
-            return await _geolocationService.GetLocation();
+            var location = await _geolocationService.GetLocation();
+            if (location is null)
+            {
+                return BadRequest(new ProblemDetails {Title = "Unknown client IP address", Detail = "The remote IP address of this request is not available."});
+            }
+
+            return Ok(location);
         }
     }
 }

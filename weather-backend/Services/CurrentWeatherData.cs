@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -48,9 +49,9 @@ namespace weather_backend.Services
                 throw new Exception("OpenWeatherMap API key is not configured");
             }
 
-            var url = BuildUrl(new() {["id"] = Convert.ToString(request.CityId), ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
+            var url = BuildUrl(new() {["id"] = request.CityId.ToString(CultureInfo.InvariantCulture), ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
 
-            return await FetchWeatherData(url);
+            return await FetchWeatherData(url, $"cityId={request.CityId.ToString(CultureInfo.InvariantCulture)}");
         }
 
         /// <summary>
@@ -64,9 +65,12 @@ namespace weather_backend.Services
                 throw new Exception("OpenWeatherMap API key is not configured");
             }
 
-            var url = BuildUrl(new() {["lat"] = request.Latitude.ToString(), ["lon"] = request.Longitude.ToString(), ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
+            var latitude = request.Latitude.ToString(CultureInfo.InvariantCulture);
+            var longitude = request.Longitude.ToString(CultureInfo.InvariantCulture);
 
-            return await FetchWeatherData(url);
+            var url = BuildUrl(new() {["lat"] = latitude, ["lon"] = longitude, ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
+
+            return await FetchWeatherData(url, $"lat={latitude},lon={longitude}");
         }
 
         /// <summary>
@@ -93,7 +97,7 @@ namespace weather_backend.Services
 
             var url = BuildUrl(new() {["q"] = queryValue, ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
 
-            return await FetchWeatherData(url);
+            return await FetchWeatherData(url, $"q={queryValue}");
         }
 
         /// <summary>
@@ -111,7 +115,7 @@ namespace weather_backend.Services
 
             var url = BuildUrl(new() {["zip"] = zipQuery, ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
 
-            return await FetchWeatherData(url);
+            return await FetchWeatherData(url, $"zip={zipQuery}");
         }
 
         /// <summary>
@@ -137,11 +141,13 @@ namespace weather_backend.Services
         }
 
         /// <summary>
-        /// Fetch weather data from OpenWeatherMap API
+        /// Fetch weather data from OpenWeatherMap API.
         /// </summary>
-        private async Task<WeatherData> FetchWeatherData(string url)
+        /// <param name="url">The fully built request URL. Never logged - it carries the API key in the appid parameter.</param>
+        /// <param name="queryDescription">A secret-free description of the query, safe to log.</param>
+        private async Task<WeatherData> FetchWeatherData(string url, string queryDescription)
         {
-            _logger.LogInformation("Fetching weather data from: {Url}", url);
+            _logger.LogInformation("Fetching weather data from OpenWeatherMap for {Query}", queryDescription);
 
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url);
             var response = await _httpClient.SendAsync(httpRequestMessage);

@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace weather_backend.Models
 {
     public class Wind
     {
-        [JsonProperty("speed")] public double speed { get; set; }
+        [JsonPropertyName("speed")] public double speed { get; set; }
 
-        [JsonProperty("deg")] public int deg { get; set; }
+        [JsonPropertyName("deg")] public int deg { get; set; }
 
-        [JsonProperty("gust")] public double? gust { get; set; }
+        [JsonPropertyName("gust")] public double? gust { get; set; }
     }
 }

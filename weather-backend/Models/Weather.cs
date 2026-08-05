@@ -1,15 +1,15 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace weather_backend.Models
 {
     public class Weather
     {
-        [JsonProperty("id")] public required int id { get; set; }
+        [JsonPropertyName("id")] public required int id { get; set; }
 
-        [JsonProperty("main")] public required string main { get; set; }
+        [JsonPropertyName("main")] public required string main { get; set; }
 
-        [JsonProperty("description")] public required string description { get; set; }
+        [JsonPropertyName("description")] public required string description { get; set; }
 
-        [JsonProperty("icon")] public required string icon { get; set; }
+        [JsonPropertyName("icon")] public required string icon { get; set; }
     }
 }

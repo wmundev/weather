@@ -1,68 +1,79 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Cronos;
 using Microsoft.Extensions.Hosting;
-using Timer = System.Timers.Timer;
+using Microsoft.Extensions.Logging;
 
 namespace weather_backend.Services
 {
-    public abstract class CronJobService : IHostedService, IDisposable
+    /// <summary>
+    /// Runs <see cref="DoWork"/> on a cron schedule for as long as the host is running.
+    /// </summary>
+    public abstract class CronJobService : BackgroundService
     {
         private readonly CronExpression _expression;
+        private readonly ILogger _logger;
         private readonly TimeZoneInfo _timeZoneInfo;
-        private Timer? _timer;
 
-        protected CronJobService(string cronExpression, TimeZoneInfo timeZoneInfo)
+        protected CronJobService(string cronExpression, TimeZoneInfo timeZoneInfo, ILogger logger)
         {
             _expression = CronExpression.Parse(cronExpression);
             _timeZoneInfo = timeZoneInfo;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public virtual void Dispose()
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _timer?.Dispose();
-        }
+            var jobName = GetType().Name;
 
-        public virtual async Task StartAsync(CancellationToken cancellationToken)
-        {
-            await ScheduleJob(cancellationToken);
-        }
-
-        public virtual async Task StopAsync(CancellationToken cancellationToken)
-        {
-            _timer?.Stop();
-            await Task.CompletedTask;
-        }
-
-        protected virtual async Task ScheduleJob(CancellationToken cancellationToken)
-        {
-            var next = _expression.GetNextOccurrence(DateTimeOffset.Now, _timeZoneInfo);
-            if (next.HasValue)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                var delay = next.Value - DateTimeOffset.Now;
-                if (delay.TotalMilliseconds <= 0) // prevent non-positive values from being passed into Timer
-                    await ScheduleJob(cancellationToken);
-
-                _timer = new Timer(delay.TotalMilliseconds);
-                _timer.Elapsed += async (sender, args) =>
+                var now = DateTimeOffset.UtcNow;
+                var next = _expression.GetNextOccurrence(now, _timeZoneInfo);
+                if (next is null)
                 {
-                    _timer.Dispose(); // reset and dispose timer
-                    _timer = null;
+                    _logger.LogWarning("Cron expression for {JobName} has no further occurrences; the job will not run again", jobName);
+                    return;
+                }
 
-                    if (!cancellationToken.IsCancellationRequested) await DoWork(cancellationToken);
+                var delay = next.Value - now;
+                if (delay > TimeSpan.Zero)
+                {
+                    try
+                    {
+                        await Task.Delay(delay, stoppingToken);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        return;
+                    }
+                }
 
-                    if (!cancellationToken.IsCancellationRequested) await ScheduleJob(cancellationToken); // reschedule next
-                };
-                _timer.Start();
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    return;
+                }
+
+                try
+                {
+                    await DoWork(stoppingToken);
+                }
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+                {
+                    return;
+                }
+                catch (Exception exception)
+                {
+                    // A failing job must not bring the host down - log it and wait for the next occurrence.
+                    _logger.LogError(exception, "Scheduled job {JobName} failed", jobName);
+                }
             }
-
-            await Task.CompletedTask;
         }
 
-        public virtual async Task DoWork(CancellationToken cancellationToken)
+        public virtual Task DoWork(CancellationToken cancellationToken)
         {
-            await Task.Delay(5000, cancellationToken); // do the work
+            return Task.CompletedTask;
         }
     }
 }

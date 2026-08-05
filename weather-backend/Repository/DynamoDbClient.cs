@@ -1,8 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
-using Amazon.Runtime;
 using Microsoft.Extensions.Logging;
 using weather_backend.Dto;
 using weather_domain.DatabaseEntities;
@@ -39,37 +39,24 @@ namespace weather_backend.Repository
 
         public async Task SaveRecord(DynamoDbCity obj)
         {
-            var retry = 0;
-            var maxRetry = 3;
-            while (retry < maxRetry)
+            const int maxAttempts = 3;
+
+            for (var attempt = 1; attempt <= maxAttempts; attempt++)
                 try
                 {
                     await _amazonDynamoDbClient.SaveAsync(obj);
-                    break;
+                    return;
                 }
-                catch (ProvisionedThroughputExceededException throughputExceededException)
+                catch (ProvisionedThroughputExceededException exception) when (attempt < maxAttempts)
                 {
-                    _logger.LogError("throughput exceeded, retrying...");
-                    _logger.LogError("Error Message:  " + throughputExceededException.Message);
-                    retry += 1;
-                    Thread.Sleep(1000);
+                    // Task.Delay, not Thread.Sleep: this runs on a thread-pool thread that other requests need.
+                    var backoff = TimeSpan.FromSeconds(Math.Pow(2, attempt - 1));
+                    _logger.LogWarning(exception, "DynamoDB throughput exceeded saving {CityName}, retrying in {Backoff}", obj.Name, backoff);
+                    await Task.Delay(backoff);
                 }
-                catch (AmazonServiceException ase)
-                {
-                    _logger.LogError("Could not complete operation");
-                    _logger.LogError("Error Message:  " + ase.Message);
-                    _logger.LogError("HTTP Status:    " + ase.StatusCode);
-                    _logger.LogError("AWS Error Code: " + ase.ErrorCode);
-                    _logger.LogError("Error Type:     " + ase.ErrorType);
-                    _logger.LogError("Request ID:     " + ase.RequestId);
-                    break;
-                }
-                catch (AmazonClientException ace)
-                {
-                    _logger.LogError("Internal error occurred communicating with DynamoDB");
-                    _logger.LogError("Error Message:  " + ace.Message);
-                    break;
-                }
+
+            // Any other AWS failure, and throttling on the final attempt, propagate to the caller - the
+            // previous version logged and returned, which let callers treat an unsaved record as saved.
         }
     }
 }

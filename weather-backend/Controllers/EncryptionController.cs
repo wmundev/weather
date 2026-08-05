@@ -28,7 +28,7 @@ namespace weather_backend.Controllers
         [Route("encrypt")]
         public EncryptMessageResponse EncryptMessage(EncryptMessageRequest request)
         {
-            var message = Encoding.ASCII.GetBytes(request.Message);
+            var message = Encoding.UTF8.GetBytes(request.Message);
             var (encryptedResult, nonce, key) = _encryptionService.Encrypt(message);
             return new EncryptMessageResponse {EncryptedMessage = Convert.ToBase64String(encryptedResult), Nonce = Convert.ToBase64String(nonce), Key = Convert.ToBase64String(key)};
         }
@@ -41,7 +41,7 @@ namespace weather_backend.Controllers
             var nonce = Convert.FromBase64String(request.Nonce);
             var key = Convert.FromBase64String(request.Key);
             var decryptedMessage = _encryptionService.Decrypt(encryptedMessage, nonce, key);
-            return new DecryptMessageResponse {Message = Encoding.ASCII.GetString(decryptedMessage)};
+            return new DecryptMessageResponse {Message = Encoding.UTF8.GetString(decryptedMessage)};
         }
     }
 }

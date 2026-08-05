@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -52,9 +53,7 @@ namespace weather_backend.Controllers
         [Route("/weather")]
         public async Task<WeatherData> GetCurrentWeatherDataById()
         {
-            //melbourne cityid: 7839805
-            double cityId = 7839805;
-            var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(cityId);
+            var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(Constants.DEFAULT_CITY_ID);
 
             var receiverEmail = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
             if (receiverEmail is null)
@@ -90,44 +89,13 @@ namespace weather_backend.Controllers
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
             [FromQuery] string? lang = null)
         {
-            try
-            {
-                var request = new CoordinatesWeatherRequestDto {Latitude = latitude, Longitude = longitude, Units = units, Language = lang};
+            var request = new CoordinatesWeatherRequestDto {Latitude = latitude, Longitude = longitude, Units = units, Language = lang};
 
-                // Generate cache key
-                var cacheKey = _weatherCacheService.GenerateCacheKey(request);
-
-                // Try to get from cache
-                var cachedData = await _weatherCacheService.GetCachedWeatherData(cacheKey);
-                if (cachedData != null)
-                {
-                    _logger.LogInformation("Returning cached weather data for coordinates: {Latitude}, {Longitude}", latitude, longitude);
-                    return Ok(cachedData);
-                }
-
-                // Cache miss - fetch from API
-                _logger.LogInformation("Cache miss - fetching fresh weather data for coordinates: {Latitude}, {Longitude}", latitude, longitude);
-                var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCoordinates(request);
-
-                // Cache the result
-                await _weatherCacheService.CacheWeatherData(
-                    cacheKey,
-                    "coordinates",
-                    weatherData,
-                    $"lat:{latitude},lon:{longitude},units:{units},lang:{lang ?? "none"}");
-
-                return Ok(weatherData);
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Failed to fetch weather data for coordinates: {Latitude}, {Longitude}", latitude, longitude);
-                return NotFound(new {message = "Weather data not found for the specified coordinates"});
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching weather data for coordinates: {Latitude}, {Longitude}", latitude, longitude);
-                return BadRequest(new {message = ex.Message});
-            }
+            return await GetOrFetchAsync(
+                _weatherCacheService.GenerateCacheKey(request),
+                () => _currentWeatherData.GetCurrentWeatherDataByCoordinates(request),
+                $"coordinates {latitude}, {longitude}",
+                "Weather data not found for the specified coordinates");
         }
 
         /// <summary>
@@ -154,51 +122,20 @@ namespace weather_backend.Controllers
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
             [FromQuery] string? lang = null)
         {
-            try
+            var request = new CityNameWeatherRequestDto
             {
-                var request = new CityNameWeatherRequestDto
-                {
-                    CityName = cityName,
-                    StateCode = stateCode,
-                    CountryCode = countryCode,
-                    Units = units,
-                    Language = lang
-                };
+                CityName = cityName,
+                StateCode = stateCode,
+                CountryCode = countryCode,
+                Units = units,
+                Language = lang
+            };
 
-                // Generate cache key
-                var cacheKey = _weatherCacheService.GenerateCacheKey(request);
-
-                // Try to get from cache
-                var cachedData = await _weatherCacheService.GetCachedWeatherData(cacheKey);
-                if (cachedData != null)
-                {
-                    _logger.LogInformation("Returning cached weather data for city: {CityName}", cityName);
-                    return Ok(cachedData);
-                }
-
-                // Cache miss - fetch from API
-                _logger.LogInformation("Cache miss - fetching fresh weather data for city: {CityName}", cityName);
-                var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityName(request);
-
-                // Cache the result
-                await _weatherCacheService.CacheWeatherData(
-                    cacheKey,
-                    "cityname",
-                    weatherData,
-                    $"city:{cityName},state:{stateCode ?? "none"},country:{countryCode ?? "none"},units:{units},lang:{lang ?? "none"}");
-
-                return Ok(weatherData);
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Failed to fetch weather data for city: {CityName}", cityName);
-                return NotFound(new {message = $"Weather data not found for city: {cityName}"});
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching weather data for city: {CityName}", cityName);
-                return BadRequest(new {message = ex.Message});
-            }
+            return await GetOrFetchAsync(
+                _weatherCacheService.GenerateCacheKey(request),
+                () => _currentWeatherData.GetCurrentWeatherDataByCityName(request),
+                $"city {cityName}",
+                $"Weather data not found for city: {cityName}");
         }
 
         /// <summary>
@@ -221,44 +158,13 @@ namespace weather_backend.Controllers
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
             [FromQuery] string? lang = null)
         {
-            try
-            {
-                var request = new CityIdWeatherRequestDto {CityId = cityId, Units = units, Language = lang};
+            var request = new CityIdWeatherRequestDto {CityId = cityId, Units = units, Language = lang};
 
-                // Generate cache key
-                var cacheKey = _weatherCacheService.GenerateCacheKey(request);
-
-                // Try to get from cache
-                var cachedData = await _weatherCacheService.GetCachedWeatherData(cacheKey);
-                if (cachedData != null)
-                {
-                    _logger.LogInformation("Returning cached weather data for city ID: {CityId}", cityId);
-                    return Ok(cachedData);
-                }
-
-                // Cache miss - fetch from API
-                _logger.LogInformation("Cache miss - fetching fresh weather data for city ID: {CityId}", cityId);
-                var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(request);
-
-                // Cache the result
-                await _weatherCacheService.CacheWeatherData(
-                    cacheKey,
-                    "cityid",
-                    weatherData,
-                    $"cityId:{cityId},units:{units},lang:{lang ?? "none"}");
-
-                return Ok(weatherData);
-            }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Failed to fetch weather data for city ID: {CityId}", cityId);
-                return NotFound(new {message = $"Weather data not found for city ID: {cityId}"});
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error fetching weather data for city ID: {CityId}", cityId);
-                return BadRequest(new {message = ex.Message});
-            }
+            return await GetOrFetchAsync(
+                _weatherCacheService.GenerateCacheKey(request),
+                () => _currentWeatherData.GetCurrentWeatherDataByCityId(request),
+                $"city ID {cityId}",
+                $"Weather data not found for city ID: {cityId}");
         }
 
         /// <summary>
@@ -283,42 +189,52 @@ namespace weather_backend.Controllers
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
             [FromQuery] string? lang = null)
         {
+            var request = new ZipCodeWeatherRequestDto {ZipCode = zipCode, CountryCode = countryCode, Units = units, Language = lang};
+
+            return await GetOrFetchAsync(
+                _weatherCacheService.GenerateCacheKey(request),
+                () => _currentWeatherData.GetCurrentWeatherDataByZipCode(request),
+                $"ZIP code {zipCode}",
+                $"Weather data not found for ZIP code: {zipCode}");
+        }
+
+        /// <summary>
+        /// Serves a weather query from the cache, falling back to the OpenWeatherMap API and caching the result.
+        /// </summary>
+        /// <param name="cacheKey">Cache key for this query.</param>
+        /// <param name="fetch">Fetches fresh data when the cache misses.</param>
+        /// <param name="logContext">Description of the query used in log messages.</param>
+        /// <param name="notFoundMessage">Message returned when the upstream API has no data for the query.</param>
+        private async Task<ActionResult<WeatherData>> GetOrFetchAsync(
+            string cacheKey,
+            Func<Task<WeatherData>> fetch,
+            string logContext,
+            string notFoundMessage)
+        {
             try
             {
-                var request = new ZipCodeWeatherRequestDto {ZipCode = zipCode, CountryCode = countryCode, Units = units, Language = lang};
-
-                // Generate cache key
-                var cacheKey = _weatherCacheService.GenerateCacheKey(request);
-
-                // Try to get from cache
-                var cachedData = await _weatherCacheService.GetCachedWeatherData(cacheKey);
+                var cachedData = _weatherCacheService.GetCachedWeatherData(cacheKey);
                 if (cachedData != null)
                 {
-                    _logger.LogInformation("Returning cached weather data for ZIP code: {ZipCode}", zipCode);
+                    _logger.LogInformation("Returning cached weather data for {Query}", logContext);
                     return Ok(cachedData);
                 }
 
-                // Cache miss - fetch from API
-                _logger.LogInformation("Cache miss - fetching fresh weather data for ZIP code: {ZipCode}", zipCode);
-                var weatherData = await _currentWeatherData.GetCurrentWeatherDataByZipCode(request);
+                _logger.LogInformation("Cache miss - fetching fresh weather data for {Query}", logContext);
+                var weatherData = await fetch();
 
-                // Cache the result
-                await _weatherCacheService.CacheWeatherData(
-                    cacheKey,
-                    "zipcode",
-                    weatherData,
-                    $"zip:{zipCode},country:{countryCode},units:{units},lang:{lang ?? "none"}");
+                _weatherCacheService.CacheWeatherData(cacheKey, weatherData);
 
                 return Ok(weatherData);
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "Failed to fetch weather data for ZIP code: {ZipCode}", zipCode);
-                return NotFound(new {message = $"Weather data not found for ZIP code: {zipCode}"});
+                _logger.LogError(ex, "Failed to fetch weather data for {Query}", logContext);
+                return NotFound(new {message = notFoundMessage});
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching weather data for ZIP code: {ZipCode}", zipCode);
+                _logger.LogError(ex, "Error fetching weather data for {Query}", logContext);
                 return BadRequest(new {message = ex.Message});
             }
         }

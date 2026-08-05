@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Weather.CLI.Services;
+using Weather.CLI.UnitTests.TestHelpers;
 
 namespace Weather.CLI.UnitTests.Services
 {
@@ -37,6 +38,27 @@ namespace Weather.CLI.UnitTests.Services
 
             // Assert
             await Assert.ThrowsAsync<Exception>(() => simpleService.SafeExecutor<int>(func));
+        }
+
+        [Fact]
+        public async Task SafeExecutor_WhenTheDelegateFails_LogsTheFailure()
+        {
+            // Arrange
+            var logger = new RecordingLogger<SimpleService>();
+            var simpleService = new SimpleService(logger);
+
+            Func<Task<int>> func = async () =>
+            {
+                await Task.Yield();
+                throw new InvalidOperationException("boom");
+            };
+
+            // Act
+            await Assert.ThrowsAsync<InvalidOperationException>(() => simpleService.SafeExecutor(func));
+
+            // Assert: returning the task without awaiting it put the failure outside the try block, so
+            // the catch - and this log call - could never run.
+            Assert.Contains(logger.Messages, message => message.Contains("An error occurred", StringComparison.Ordinal));
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using weather_domain.Extensions;
 using Microsoft.Extensions.Caching.Memory;
@@ -46,31 +45,33 @@ namespace weather_backend.Services
             return australiaCities;
         }
 
-        public IEnumerable<City> FilterCitiesByCityName(IEnumerable<City> cities, string cityName)
-        {
-            var regex = new Regex($"^.*?{cityName}.*?$");
-
-            return cities.Where(city => regex.IsMatch(city.Name));
-        }
-
         public async Task<DynamoDbCity?> GetCityInfo(string name)
         {
-            if (!_memoryCache.TryGetValue(name, out DynamoDbCity? cachedCity) || cachedCity is null)
+            // The key is prefixed because the cache is shared, and the name comes straight from the route.
+            var cacheKey = $"city:{name}";
+
+            if (_memoryCache.TryGetValue(cacheKey, out DynamoDbCity? cachedCity))
             {
-                Console.WriteLine("fetching from db");
-
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromSeconds(60))
-                    .SetAbsoluteExpiration(TimeSpan.FromSeconds(120));
-
-                var result = await _cityRepository.GetCity(name);
-
-                cachedCity = result;
-
-                _memoryCache.Set(name, result, cacheEntryOptions);
+                return cachedCity;
             }
 
-            return cachedCity;
+            _logger.LogDebug("Cache miss for city {CityName}, fetching from DynamoDB", name);
+
+            var result = await _cityRepository.GetCity(name);
+
+            // Misses are not cached: an unknown name is usually a typo or a probe, and caching them
+            // would let arbitrary input grow the shared cache without bound.
+            if (result is not null)
+            {
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromSeconds(60))
+                    .SetAbsoluteExpiration(TimeSpan.FromSeconds(120))
+                    .SetSize(1);
+
+                _memoryCache.Set(cacheKey, result, cacheEntryOptions);
+            }
+
+            return result;
         }
     }
 }

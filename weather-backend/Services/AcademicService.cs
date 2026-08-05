@@ -31,15 +31,15 @@ namespace weather_backend.Services
             {
                 var parameters = new {Id = id};
                 var query = "select * from academic where ACNUM = @Id";
-                var result = connection.Query<Academic>(query, parameters);
 
-                var firstResult = result.First();
+                // FirstOrDefault, not First: an unknown id is a not-found result, not an exception.
+                var firstResult = connection.Query<Academic>(query, parameters).FirstOrDefault();
                 if (firstResult is null)
                 {
+                    _logger.LogInformation("No academic found with id {AcademicId}", id);
                     return null;
                 }
 
-                _logger.Log(LogLevel.Warning, firstResult.ACNUM.ToString());
                 return firstResult;
             }
         }

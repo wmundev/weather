@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace weather_backend.Models
 {
     public class WeatherSystem
     {
-        [JsonProperty("type")] public int type { get; set; }
-        [JsonProperty("id")] public int id { get; set; }
-        [JsonProperty("country")] public required string country { get; set; }
-        [JsonProperty("sunrise")] public required int sunrise { get; set; }
-        [JsonProperty("sunset")] public required int sunset { get; set; }
+        [JsonPropertyName("type")] public int type { get; set; }
+        [JsonPropertyName("id")] public int id { get; set; }
+        [JsonPropertyName("country")] public required string country { get; set; }
+        [JsonPropertyName("sunrise")] public required int sunrise { get; set; }
+        [JsonPropertyName("sunset")] public required int sunset { get; set; }
     }
 }

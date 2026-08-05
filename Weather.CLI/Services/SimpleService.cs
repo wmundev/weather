@@ -29,18 +29,19 @@ namespace Weather.CLI.Services
         }
 
 
-        public Task<T> SafeExecutor<T>(Func<Task<T>> func)
+        public async Task<T> SafeExecutor<T>(Func<Task<T>> func)
         {
             try
             {
-                return func();
+                // Awaited, not just returned: returning the task unawaited puts the delegate's failure
+                // outside the try block, so the catch below could never observe it.
+                return await func();
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "An error occurred while executing the function.");
+                throw;
             }
-
-            throw new Exception();
         }
     }
 }

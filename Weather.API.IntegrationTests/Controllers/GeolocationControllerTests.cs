@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.TestHost;
@@ -48,6 +49,20 @@ namespace Weather.API.IntegrationTests.Controllers
             response.EnsureSuccessStatusCode();
             var resultString = await response.Content.ReadAsStringAsync();
             Assert.Equal("Melbourne, Australia", resultString);
+        }
+
+        [Fact]
+        public async Task GetLocation_WhenTheClientIpIsUnavailable_ReturnsBadRequest()
+        {
+            var mockService = Substitute.For<IGeolocationService>();
+            mockService.GetLocation().Returns((string?) null);
+
+            var client = CreateClientWithMockService(mockService);
+
+            var response = await client.GetAsync($"{path}/location");
+
+            // The service used to call IPAddress.Parse("") here, which surfaced as a 500.
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         private HttpClient CreateClientWithMockService(IGeolocationService? mockService = null)

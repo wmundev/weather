@@ -5,6 +5,10 @@ namespace weather_backend.Services
     public interface IGeolocationService
     {
         Task<string> GetIpAddress();
-        Task<string> GetLocation();
+
+        /// <summary>
+        /// Returns the caller's location, or null when the remote IP address is unavailable.
+        /// </summary>
+        Task<string?> GetLocation();
     }
 }

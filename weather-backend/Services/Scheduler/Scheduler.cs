@@ -13,12 +13,12 @@ namespace weather_backend.Services.Scheduler
         private readonly IConfiguration _configuration;
         private readonly ICurrentWeatherData _currentWeatherData;
         private readonly EmailService _emailService;
+        private readonly ILogger<Scheduler> _logger;
         private readonly ISecretService _secretService;
-        private ILogger<Scheduler> _logger;
 
         public Scheduler(EmailService emailService, ICurrentWeatherData currentWeatherData, ILogger<Scheduler> logger,
             IConfiguration configuration, ISecretService secretService) :
-            base(Constants.CRON_EXPRESSION_SCHEDULE_JOB, TimeZoneInfo.Utc)
+            base(Constants.CRON_EXPRESSION_SCHEDULE_JOB, TimeZoneInfo.Utc, logger)
         {
             _emailService = emailService;
             _currentWeatherData = currentWeatherData;
@@ -30,9 +30,7 @@ namespace weather_backend.Services.Scheduler
         public override async Task DoWork(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Executing schedule");
-            //melbourne cityid: 7839805
-            double cityId = 7839805;
-            var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(cityId);
+            var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(Constants.DEFAULT_CITY_ID);
             var receiverEmail = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
             if (receiverEmail is null)
             {
@@ -42,11 +40,6 @@ namespace weather_backend.Services.Scheduler
             await _emailService.SendEmail($"{weatherData.name} Current Weather",
                 $"Current Temperature: {weatherData.main.temp}, Humidity: {weatherData.main.humidity}",
                 receiverEmail);
-        }
-
-        public override Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -23,12 +22,10 @@ namespace weather_backend.Middleware
             // headers are case insensitive
             var correlationId = headers["CorrelationID"];
             if (!string.IsNullOrEmpty(correlationId))
-            {
-                var strings = new StringBuilder();
-                strings.Append("Correlation: ");
-                strings.Append(correlationId);
-                _logger.LogInformation(strings.ToString());
-            }
+                // The header is caller-controlled, so it must be passed as a log parameter and never as
+                // part of the message template - otherwise braces in the value corrupt structured
+                // formatting and newlines can be used to forge log entries.
+                _logger.LogInformation("Correlation: {CorrelationId}", correlationId.ToString());
 
             await _next(context);
         }

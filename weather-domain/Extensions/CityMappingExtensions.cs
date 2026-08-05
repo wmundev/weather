@@ -1,3 +1,4 @@
+using System.Globalization;
 using weather_domain.DatabaseEntities;
 using weather_domain.Entities;
 
@@ -9,7 +10,8 @@ public static class CityMappingExtensions
     {
         return new DynamoDbCity
         {
-            Id = city.Id.ToString(),
+            // Invariant culture: this value becomes a persisted DynamoDB attribute and must not vary by locale.
+            Id = city.Id.ToString(CultureInfo.InvariantCulture),
             Name = city.Name,
             State = city.State,
             Country = city.Country,

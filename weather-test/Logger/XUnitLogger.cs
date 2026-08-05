@@ -28,13 +28,13 @@ namespace weather_test.Logger
             return logLevel != LogLevel.None;
         }
 
-        public IDisposable BeginScope<TState>(TState state)
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull
         {
             return _scopeProvider.Push(state);
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
-            Func<TState, Exception, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
+            Func<TState, Exception?, string> formatter)
         {
             var sb = new StringBuilder();
             sb.Append(GetLogLevelString(logLevel))
@@ -81,7 +81,7 @@ namespace weather_test.Logger
     internal sealed class XUnitLogger<T> : XUnitLogger, ILogger<T>
     {
         public XUnitLogger(ITestOutputHelper testOutputHelper, LoggerExternalScopeProvider scopeProvider)
-            : base(testOutputHelper, scopeProvider, typeof(T).FullName)
+            : base(testOutputHelper, scopeProvider, typeof(T).FullName ?? typeof(T).Name)
         {
         }
     }

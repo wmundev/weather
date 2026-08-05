@@ -45,7 +45,9 @@ namespace weather_backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMemoryCache();
+            // A size limit is required to stop route-supplied cache keys (see CityList) growing the
+            // cache without bound; every entry written to this cache must therefore call SetSize.
+            services.AddMemoryCache(options => options.SizeLimit = 1024);
             services.AddHealthChecks();
 
             services.AddAWSService<IAmazonSecurityTokenService>();
@@ -54,10 +56,14 @@ namespace weather_backend
             services.AddHttpClient();
             services.AddHttpClient<IGeolocationService, GeolocationService>("geolocation");
             services.AddHttpClient<ICurrentWeatherData, CurrentWeatherData>("openweathermap", client =>
-            {
-                client.DefaultRequestVersion = HttpVersion.Version20;
-                client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
-            });
+                {
+                    client.DefaultRequestVersion = HttpVersion.Version20;
+                    client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+                })
+                // The OpenWeatherMap API key travels in the "appid" query parameter, and the default
+                // HttpClient loggers write the full request URI at Information level. Suppress them so
+                // the key never reaches the logs; CurrentWeatherData logs a secret-free description instead.
+                .RemoveAllLoggers();
 
 
             var configCatSdkKey = Configuration.GetValue<string>("ConfigCat:Key");
@@ -88,18 +94,6 @@ namespace weather_backend
             else
             {
                 services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-                // TODO uncomment for caching aws creds
-                // services.AddSingleton<AmazonCredentialsCachingService>();
-                // TODO uncomment for caching aws creds
-                // services.AddSingleton<IDynamoDBContext>(provider =>
-                // {
-                //     var awsOptions = new AWSOptions();
-                //     awsOptions.Credentials = provider.GetRequiredService<AmazonCredentialsCachingService>();
-                //
-                //     var dynamodbClient = awsOptions.CreateServiceClient<IAmazonDynamoDB>();
-                //     DynamoDBContext context = new DynamoDBContext(dynamodbClient);
-                //     return context;
-                // });
                 services.AddAWSService<IAmazonDynamoDB>();
                 services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
             }
@@ -137,7 +131,9 @@ namespace weather_backend
             services.AddInfrastructureServices(Configuration);
             services.AddApplicationServices(Configuration);
             services.AddSingleton<IDynamoDbClient, DynamoDbClient>();
-            services.AddTransient<EmailService>();
+            // Singleton: EmailService is stateless now that the SmtpClient is created per send, and the
+            // singleton Scheduler depends on it.
+            services.AddSingleton<EmailService>();
             services.AddTransient<CityList>();
             services.AddSingleton<IWeatherCacheService, WeatherCacheService>();
 
@@ -180,9 +176,7 @@ namespace weather_backend
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
 
             //Other registrations
-            services
-                .AddStartupTask<WarmupServicesStartupTask>()
-                .TryAddSingleton(services);
+            services.AddStartupTask<WarmupServicesStartupTask>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

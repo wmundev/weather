@@ -8,11 +8,12 @@ namespace weather_application.Services
     {
         public (byte[] ciphertext, byte[] nonce, byte[] key) Encrypt(byte[] textToEncrypt)
         {
+            // RandomNumberGenerator.Fill uses the shared generator, so nothing needs disposing here.
             var key = new byte[32];
-            RandomNumberGenerator.Create().GetBytes(key);
+            RandomNumberGenerator.Fill(key);
 
             var nonce = new byte[24];
-            RandomNumberGenerator.Create().GetBytes(nonce);
+            RandomNumberGenerator.Fill(nonce);
 
             var ciphertext = SecretAeadXChaCha20Poly1305.Encrypt(textToEncrypt, nonce, key);
 

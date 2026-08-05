@@ -23,27 +23,6 @@ namespace weather_backend.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private async Task<bool> IsFileExist(string filePath)
-        {
-            using StreamReader streamReader = new(filePath);
-            try
-            {
-                await streamReader.ReadToEndAsync();
-            }
-            catch (FileNotFoundException)
-            {
-                _logger.LogWarning("file not found");
-                return false;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e.Message + e.StackTrace);
-                return false;
-            }
-
-            return true;
-        }
-
         private async Task<string> TranslateTextAsync(string text, string sourceLanguageCode, string targetLanguageCode)
         {
             var translateRequest = new TranslateTextRequest {Text = text, SourceLanguageCode = sourceLanguageCode, TargetLanguageCode = targetLanguageCode};

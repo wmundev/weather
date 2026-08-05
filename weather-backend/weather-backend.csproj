@@ -20,11 +20,14 @@
     <PackageReference Include="StackExchange.Redis" Version="2.13.17" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10"/>
+    <!-- Newtonsoft.Json is used by LanguageTranslatorService (ExpandoObjectConverter) only;
+         the weather models are serialized with System.Text.Json. -->
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Assets" />
+    <!-- The city dataset must reach the output directory: a <Folder> entry is only an IDE marker and
+         copies nothing, which left CityRepository reading a path that does not exist once published. -->
+    <Content Update="Assets\city.list.json" CopyToOutputDirectory="PreserveNewest" />
     <Folder Include="HealthChecks\" />
     <Folder Include="Services\Scheduler\Jobs" />
   </ItemGroup>

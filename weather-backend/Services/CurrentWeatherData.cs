@@ -7,6 +7,7 @@ using System.Web;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using weather_backend.Dto;
+using weather_backend.Exceptions;
 using weather_backend.Models;
 using weather_backend.Services.Interfaces;
 
@@ -45,7 +46,7 @@ namespace weather_backend.Services
             var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
             if (string.IsNullOrEmpty(apiKey))
             {
-                throw new Exception("OpenWeatherMap API key is not configured");
+                throw new ConfigurationException("OpenWeatherMap API key is not configured");
             }
 
             var url = BuildUrl(new() {["id"] = Convert.ToString(request.CityId), ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
@@ -61,7 +62,7 @@ namespace weather_backend.Services
             var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
             if (string.IsNullOrEmpty(apiKey))
             {
-                throw new Exception("OpenWeatherMap API key is not configured");
+                throw new ConfigurationException("OpenWeatherMap API key is not configured");
             }
 
             var url = BuildUrl(new() {["lat"] = request.Latitude.ToString(), ["lon"] = request.Longitude.ToString(), ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
@@ -77,7 +78,7 @@ namespace weather_backend.Services
             var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
             if (string.IsNullOrEmpty(apiKey))
             {
-                throw new Exception("OpenWeatherMap API key is not configured");
+                throw new ConfigurationException("OpenWeatherMap API key is not configured");
             }
 
             // Build query string: cityName or cityName,countryCode or cityName,stateCode,countryCode
@@ -104,7 +105,7 @@ namespace weather_backend.Services
             var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
             if (string.IsNullOrEmpty(apiKey))
             {
-                throw new Exception("OpenWeatherMap API key is not configured");
+                throw new ConfigurationException("OpenWeatherMap API key is not configured");
             }
 
             var zipQuery = $"{request.ZipCode},{request.CountryCode}";
@@ -153,7 +154,7 @@ namespace weather_backend.Services
 
             if (weatherData == null)
             {
-                throw new Exception("Failed to deserialize weather data");
+                throw new WeatherServiceException("Failed to deserialize weather data");
             }
 
             return weatherData;

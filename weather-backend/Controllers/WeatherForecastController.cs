@@ -5,8 +5,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Polly.CircuitBreaker;
+using Polly.Timeout;
 using weather_backend.Dto;
 using weather_backend.Models;
 using weather_backend.Services;
@@ -16,55 +17,35 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class WeatherForecastController : ControllerBase
     {
-        private readonly CityList _cityList;
-        private readonly IConfiguration _configuration;
         private readonly ICurrentWeatherData _currentWeatherData;
-        private readonly EmailService _emailService;
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly ISecretService _secretService;
         private readonly IWeatherCacheService _weatherCacheService;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IConfiguration configuration,
-            ICurrentWeatherData currentWeatherData, EmailService emailService, CityList cityList,
-            ISecretService secretService, IWeatherCacheService weatherCacheService)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger,
+            ICurrentWeatherData currentWeatherData, IWeatherCacheService weatherCacheService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _currentWeatherData = currentWeatherData ?? throw new ArgumentNullException(nameof(currentWeatherData));
-            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-            _cityList = cityList ?? throw new ArgumentNullException(nameof(cityList));
-            _secretService = secretService ?? throw new ArgumentNullException(nameof(secretService));
             _weatherCacheService = weatherCacheService ?? throw new ArgumentNullException(nameof(weatherCacheService));
         }
 
         /// <summary>
-        /// Retrieves the current weather data for a specific city by its ID and sends an email with the weather details.
+        /// Retrieves the current weather data for the default city.
         /// </summary>
         /// <returns>
         /// A <see cref="WeatherData"/> object containing the current weather information for the specified city.
         /// </returns>
-        /// <response code="201">Returns the current weather data.</response>
-        /// <response code="404">Returns not found if the weather data cannot be retrieved.</response>
+        /// <response code="200">Returns the current weather data.</response>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [Route("/weather")]
-        public async Task<WeatherData> GetCurrentWeatherDataById()
+        public async Task<ActionResult<WeatherData>> GetCurrentWeatherDataById()
         {
             var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(Constants.DEFAULT_CITY_ID);
-
-            var receiverEmail = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
-            if (receiverEmail is null)
-            {
-                throw new Exception("Receiver email in secret is null");
-            }
-
-            await _emailService.SendEmail($"{weatherData.name} Current Weather",
-                $"Current Temperature: {weatherData.main.temp}, Humidity: {weatherData.main.humidity}",
-                receiverEmail);
-            return weatherData;
+            return Ok(weatherData);
         }
 
         /// <summary>
@@ -78,11 +59,13 @@ namespace weather_backend.Controllers
         /// <response code="200">Returns the current weather data</response>
         /// <response code="400">If the request parameters are invalid</response>
         /// <response code="404">If weather data cannot be found for the coordinates</response>
+        /// <response code="503">If the upstream weather provider is unavailable or the circuit breaker is open</response>
         [HttpGet]
         [Route("/weather/coordinates")]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
         public async Task<ActionResult<WeatherData>> GetWeatherByCoordinates(
             [FromQuery, Required] double latitude,
             [FromQuery, Required] double longitude,
@@ -110,11 +93,13 @@ namespace weather_backend.Controllers
         /// <response code="200">Returns the current weather data</response>
         /// <response code="400">If the request parameters are invalid</response>
         /// <response code="404">If the city cannot be found</response>
+        /// <response code="503">If the upstream weather provider is unavailable or the circuit breaker is open</response>
         [HttpGet]
         [Route("/weather/city")]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
         public async Task<ActionResult<WeatherData>> GetWeatherByCityName(
             [FromQuery, Required] string cityName,
             [FromQuery] string? stateCode = null,
@@ -148,11 +133,13 @@ namespace weather_backend.Controllers
         /// <response code="200">Returns the current weather data</response>
         /// <response code="400">If the request parameters are invalid</response>
         /// <response code="404">If the city ID cannot be found</response>
+        /// <response code="503">If the upstream weather provider is unavailable or the circuit breaker is open</response>
         [HttpGet]
         [Route("/weather/city/{cityId}")]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
         public async Task<ActionResult<WeatherData>> GetWeatherByCityId(
             [FromRoute, Required] double cityId,
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
@@ -178,11 +165,13 @@ namespace weather_backend.Controllers
         /// <response code="200">Returns the current weather data</response>
         /// <response code="400">If the request parameters are invalid</response>
         /// <response code="404">If the ZIP code cannot be found</response>
+        /// <response code="503">If the upstream weather provider is unavailable or the circuit breaker is open</response>
         [HttpGet]
         [Route("/weather/zip")]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
         public async Task<ActionResult<WeatherData>> GetWeatherByZipCode(
             [FromQuery, Required] string zipCode,
             [FromQuery] string countryCode = "us",
@@ -226,6 +215,21 @@ namespace weather_backend.Controllers
                 _weatherCacheService.CacheWeatherData(cacheKey, weatherData);
 
                 return Ok(weatherData);
+            }
+            // Ordered before the HttpRequestException catch: the resilience pipeline gives up on its own
+            // terms rather than by returning a status code, so an upstream that is slow or has tripped the
+            // circuit breaker arrives here as a timeout or a broken circuit. Neither is a caller error and
+            // neither means "no such city", so they must not become a 400 or a 404.
+            catch (Exception ex) when (ex is TimeoutRejectedException or BrokenCircuitException)
+            {
+                _logger.LogError(ex, "Upstream weather API unavailable for {Query}", logContext);
+                return StatusCode(StatusCodes.Status503ServiceUnavailable,
+                    new ProblemDetails
+                    {
+                        Status = StatusCodes.Status503ServiceUnavailable,
+                        Title = "Weather provider unavailable.",
+                        Detail = "The upstream weather provider did not respond in time. Please retry shortly."
+                    });
             }
             catch (HttpRequestException ex)
             {

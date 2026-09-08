@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using Amazon.DynamoDBv2;
@@ -14,8 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Polly;
 using weather_application;
 using weather_backend.Adapters;
 using weather_backend.Extensions;
@@ -42,6 +44,35 @@ namespace weather_backend
 
         public IConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Retry, circuit breaker and timeouts for the third-party APIs this service calls. Both
+        /// upstreams are read-only GETs, so replaying a request is safe.
+        /// </summary>
+        /// <remarks>
+        /// The timings are tighter than the library defaults (30s total / 10s per attempt) because
+        /// these calls sit inline in a request the caller is waiting on: four attempts at 4s each
+        /// still fits inside the 20s ceiling, so a caller waits at most that long rather than 30s.
+        /// The sampling window must stay at or above twice the attempt timeout or the options
+        /// validator rejects it at startup.
+        /// </remarks>
+        private static void ConfigureUpstreamResilience(HttpStandardResilienceOptions options)
+        {
+            options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(20);
+            options.AttemptTimeout.Timeout = TimeSpan.FromSeconds(4);
+
+            options.Retry.MaxRetryAttempts = 3;
+            options.Retry.Delay = TimeSpan.FromMilliseconds(500);
+            options.Retry.BackoffType = DelayBackoffType.Exponential;
+            // Jitter matters here because the daily digest fans out over many cities at once; without
+            // it a shared upstream blip would put every retry on the same schedule.
+            options.Retry.UseJitter = true;
+
+            options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
+            options.CircuitBreaker.FailureRatio = 0.5;
+            options.CircuitBreaker.MinimumThroughput = 10;
+            options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(15);
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -59,7 +90,8 @@ namespace weather_backend
 
             services.AddControllers();
             services.AddHttpClient();
-            services.AddHttpClient<IGeolocationService, GeolocationService>("geolocation");
+            services.AddHttpClient<IGeolocationService, GeolocationService>("geolocation")
+                .AddStandardResilienceHandler(ConfigureUpstreamResilience);
             services.AddHttpClient<ICurrentWeatherData, CurrentWeatherData>("openweathermap", client =>
                 {
                     client.DefaultRequestVersion = HttpVersion.Version20;
@@ -68,7 +100,8 @@ namespace weather_backend
                 // The OpenWeatherMap API key travels in the "appid" query parameter, and the default
                 // HttpClient loggers write the full request URI at Information level. Suppress them so
                 // the key never reaches the logs; CurrentWeatherData logs a secret-free description instead.
-                .RemoveAllLoggers();
+                .RemoveAllLoggers()
+                .AddStandardResilienceHandler(ConfigureUpstreamResilience);
 
 
             var configCatSdkKey = Configuration.GetValue<string>("ConfigCat:Key");

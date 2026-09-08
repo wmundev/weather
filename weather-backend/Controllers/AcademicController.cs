@@ -6,6 +6,7 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class AcademicController : ControllerBase
     {
         private readonly IAcademicService _academicService;

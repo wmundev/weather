@@ -8,6 +8,7 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("api/music")]
+    [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class MusicController : ControllerBase
     {
         private readonly IDynamoDbClient _client;

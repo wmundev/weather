@@ -5,6 +5,7 @@ namespace weather_backend.Controllers
 {
     [Route("api/struc")]
     [ApiController]
+    [ProducesResponseType(typeof(ProblemDetails), 500)]
     public sealed class StrucTestController : ControllerBase
     {
         /// <summary>

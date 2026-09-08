@@ -4,9 +4,12 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Polly.CircuitBreaker;
+using Polly.Timeout;
 using NSubstitute;
 using weather_backend;
 using weather_backend.Dto;
+using Microsoft.AspNetCore.Mvc;
 using weather_backend.Models;
 using weather_backend.Services.Interfaces;
 using weather_domain.Entities;
@@ -56,6 +59,23 @@ namespace Weather.API.IntegrationTests.Controllers
                 id = 7839805,
                 cod = 200
             };
+        }
+
+        [Fact]
+        public async Task GetCurrentWeatherDataById_WhenRetrieved_ShouldReturnOk()
+        {
+            var mockWeather = Substitute.For<ICurrentWeatherData>();
+            var expectedWeather = CreateValidWeatherData("Melbourne");
+            mockWeather.GetCurrentWeatherDataByCityId(weather_backend.Constants.DEFAULT_CITY_ID).Returns(expectedWeather);
+
+            var client = CreateClientWithMockService(mockWeather);
+
+            var response = await client.GetAsync("/weather");
+
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadFromJsonAsync<WeatherData>();
+            Assert.Equal("Melbourne", content?.name);
+            await mockWeather.Received(1).GetCurrentWeatherDataByCityId(weather_backend.Constants.DEFAULT_CITY_ID);
         }
 
         [Fact]
@@ -130,32 +150,6 @@ namespace Weather.API.IntegrationTests.Controllers
             Assert.Equal("Zip City", content?.name);
         }
 
-        // [Fact]
-        // public async Task GetCurrentWeatherDataByCityIdTest()
-        // {
-        //      var mockWeather = Substitute.For<ICurrentWeatherData>();
-        //      var expectedWeather = CreateValidWeatherData("Melbourne");
-        //
-        //      mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<double>()).Returns(expectedWeather);
-        //      
-        //      var mockSecret = Substitute.For<ISecretService>();
-        //      mockSecret.FetchSpecificSecret(Arg.Any<string>()).Returns("test@example.com");
-        //      
-        //      // EmailService workaround for integration test
-        //      
-        //      var client = CreateClientWithMockService(mockWeather, mockSecret);
-        //      
-        //      try 
-        //      {
-        //         var response = await client.GetAsync("/weather");
-        //         // response.EnsureSuccessStatusCode(); 
-        //      }
-        //      catch
-        //      {
-        //          // Ignore SMTP errors
-        //      }
-        // }
-
         [Fact]
         public async Task GetWeatherByCoordinates_NotFound_Returns404()
         {
@@ -171,19 +165,51 @@ namespace Weather.API.IntegrationTests.Controllers
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        private HttpClient CreateClientWithMockService(
-            ICurrentWeatherData? mockWeather = null,
-            ISecretService? mockSecret = null)
+        [Fact]
+        public async Task GetWeatherByCoordinates_WhenUpstreamTimesOut_Returns503()
+        {
+            var mockWeather = Substitute.For<ICurrentWeatherData>();
+
+            // What the resilience pipeline throws once it has exhausted its retries against a slow
+            // upstream. It is not an HttpRequestException, so without explicit handling it would fall
+            // through to the catch-all and be reported as a 400 - blaming the caller for our outage.
+            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>())
+                .Returns(Task.FromException<WeatherData>(new TimeoutRejectedException()));
+
+            var client = CreateClientWithMockService(mockWeather);
+
+            var response = await client.GetAsync("/weather/coordinates?latitude=0&longitude=0");
+
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetWeatherByCityName_WhenCircuitBreakerIsOpen_Returns503()
+        {
+            var mockWeather = Substitute.For<ICurrentWeatherData>();
+
+            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>())
+                .Returns(Task.FromException<WeatherData>(new BrokenCircuitException()));
+
+            var client = CreateClientWithMockService(mockWeather);
+
+            var response = await client.GetAsync("/weather/city?cityName=Melbourne");
+
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(Constants.CamelCaseJsonOptions);
+            Assert.Equal("Weather provider unavailable.", problem!.Title);
+        }
+
+        private HttpClient CreateClientWithMockService(ICurrentWeatherData? mockWeather = null)
         {
             if (mockWeather == null) mockWeather = Substitute.For<ICurrentWeatherData>();
-            if (mockSecret == null) mockSecret = Substitute.For<ISecretService>();
 
             return _factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureTestServices(services =>
                 {
                     services.AddSingleton(mockWeather);
-                    services.AddSingleton(mockSecret);
                 });
             }).CreateClient();
         }

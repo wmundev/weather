@@ -7,6 +7,7 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("geolocation")]
+    [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class GeolocationController : ControllerBase
     {
         private readonly IGeolocationService _geolocationService;

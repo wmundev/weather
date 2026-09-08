@@ -6,6 +6,7 @@ namespace weather_backend.Controllers
 {
     [Route("api/v1/word")]
     [ApiController]
+    [ProducesResponseType(typeof(ProblemDetails), 500)]
     public sealed class EnglishWordController : ControllerBase
     {
         private readonly string[] _listOfConjunctions = {"and", "or", "but", "nor", "so", "for", "yet"};

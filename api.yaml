@@ -14,6 +14,18 @@ paths:
             type: integer
             format: int32
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
           content:
@@ -50,6 +62,18 @@ paths:
             format: int32
             default: 100
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '400':
           description: Bad Request
           content:
@@ -91,42 +115,52 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/DynamoDbCity'
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                $ref: '#/components/schemas/DynamoDbCity'
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                $ref: '#/components/schemas/DynamoDbCity'
+                $ref: '#/components/schemas/ProblemDetails'
   /api/delegates:
     get:
       tags:
         - Delegate
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /api/email/code:
     get:
       tags:
         - Email
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/EmailCodeEntity'
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                $ref: '#/components/schemas/EmailCodeEntity'
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                $ref: '#/components/schemas/EmailCodeEntity'
+                $ref: '#/components/schemas/ProblemDetails'
   /api/encryption/encrypt:
     get:
       tags:
@@ -138,18 +172,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/EncryptMessageResponse'
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                $ref: '#/components/schemas/EncryptMessageResponse'
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                $ref: '#/components/schemas/EncryptMessageResponse'
+                $ref: '#/components/schemas/ProblemDetails'
   /api/encryption/decrypt:
     post:
       tags:
@@ -166,18 +200,18 @@ paths:
             schema:
               $ref: '#/components/schemas/DecryptMessageRequest'
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/DecryptMessageResponse'
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                $ref: '#/components/schemas/DecryptMessageResponse'
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                $ref: '#/components/schemas/DecryptMessageResponse'
+                $ref: '#/components/schemas/ProblemDetails'
   /api/v1/word/capitalize-first-word:
     get:
       tags:
@@ -188,40 +222,52 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
   /geolocation/ipaddress:
     get:
       tags:
         - Geolocation
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
   /geolocation/location:
     get:
       tags:
         - Geolocation
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
           content:
@@ -251,46 +297,86 @@ paths:
       tags:
         - HelloWorld
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /api/LanguageTranslator/generate:
     post:
       tags:
         - LanguageTranslator
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /api/music/song-title:
     get:
       tags:
         - Music
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
   /feature/pattern:
     get:
       tags:
         - NewFeature
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /feature/password:
     get:
       tags:
         - NewFeature
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /feature/redis:
     post:
       tags:
@@ -307,14 +393,34 @@ paths:
             schema:
               $ref: '#/components/schemas/RedisSaveTestDto'
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
     get:
       tags:
         - NewFeature
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /phone-number/phone:
     get:
       tags:
@@ -325,6 +431,18 @@ paths:
           schema:
             type: string
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
           content:
@@ -360,6 +478,18 @@ paths:
             type: integer
             format: int32
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
           content:
@@ -377,8 +507,18 @@ paths:
       tags:
         - PrimeNumber
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /api/stringbase64/decodebase64:
     get:
       tags:
@@ -389,18 +529,18 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
   /api/stringbase64/encodebase64:
     get:
       tags:
@@ -411,40 +551,52 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
   /api/struc:
     get:
       tags:
         - StrucTest
       responses:
-        '200':
-          description: OK
+        '500':
+          description: Internal Server Error
           content:
             text/plain:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
             text/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ProblemDetails'
   /weather:
     get:
       tags:
         - WeatherForecast
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
           content:
@@ -483,6 +635,18 @@ paths:
           schema:
             type: string
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
           content:
@@ -509,6 +673,18 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
         '404':
           description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '503':
+          description: Service Unavailable
           content:
             text/plain:
               schema:
@@ -546,6 +722,18 @@ paths:
           schema:
             type: string
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
           content:
@@ -572,6 +760,18 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
         '404':
           description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '503':
+          description: Service Unavailable
           content:
             text/plain:
               schema:
@@ -602,6 +802,18 @@ paths:
           schema:
             type: string
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
           content:
@@ -628,6 +840,18 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
         '404':
           description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '503':
+          description: Service Unavailable
           content:
             text/plain:
               schema:
@@ -662,6 +886,18 @@ paths:
           schema:
             type: string
       responses:
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
           content:
@@ -688,6 +924,18 @@ paths:
                 $ref: '#/components/schemas/ProblemDetails'
         '404':
           description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '503':
+          description: Service Unavailable
           content:
             text/plain:
               schema:
@@ -793,69 +1041,6 @@ components:
           type: string
           nullable: true
         nonce:
-          type: string
-          nullable: true
-      additionalProperties: false
-    DecryptMessageResponse:
-      required:
-        - message
-      type: object
-      properties:
-        message:
-          type: string
-          nullable: true
-      additionalProperties: false
-    DynamoDbCity:
-      required:
-        - coordinate
-        - country
-        - id
-        - name
-        - state
-      type: object
-      properties:
-        id:
-          type: string
-          nullable: true
-        name:
-          type: string
-          nullable: true
-        state:
-          type: string
-          nullable: true
-        country:
-          type: string
-          nullable: true
-        coordinate:
-          $ref: '#/components/schemas/Coordinate'
-      additionalProperties: false
-    EmailCodeEntity:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        code:
-          type: string
-          nullable: true
-        email:
-          type: string
-          nullable: true
-      additionalProperties: false
-    EncryptMessageResponse:
-      required:
-        - encryptedMessage
-        - key
-        - nonce
-      type: object
-      properties:
-        encryptedMessage:
-          type: string
-          nullable: true
-        nonce:
-          type: string
-          nullable: true
-        key:
           type: string
           nullable: true
       additionalProperties: false

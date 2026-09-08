@@ -8,6 +8,7 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("api/email")]
+    [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class EmailController : ControllerBase
     {
         private readonly IDynamoDbClient _client;

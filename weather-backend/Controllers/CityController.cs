@@ -11,6 +11,7 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("city")]
+    [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class CityController(CityList cityList) : ControllerBase
     {
         private readonly CityList _cityList = cityList ?? throw new ArgumentNullException(nameof(cityList));

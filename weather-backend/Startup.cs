@@ -10,6 +10,7 @@ using Amazon.Translate;
 using ConfigCat.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -85,6 +86,11 @@ namespace weather_backend
             // bare status codes MVC produces on its own (404 from routing, 400 from model validation).
             services.AddProblemDetails();
             services.AddExceptionHandler<GlobalExceptionHandler>();
+
+            // Order matters at request time, not here: forwarded headers must be applied before the
+            // limiter reads the caller's address, otherwise every request looks like the load balancer.
+            services.AddForwardedHeadersForLoadBalancer();
+            services.AddApiRateLimiting(Configuration);
 
             services.AddAWSService<IAmazonSecurityTokenService>();
 
@@ -225,6 +231,11 @@ namespace weather_backend
             // everywhere else GlobalExceptionHandler writes the ProblemDetails response.
             app.UseExceptionHandler();
 
+            // Before anything reads the caller's address - the rate limiter partitions on it, and
+            // GeolocationService reports it - so the ALB's own private address is replaced by the
+            // client's first. Also feeds UseHttpsRedirection the original scheme.
+            app.UseForwardedHeaders();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -242,6 +253,10 @@ namespace weather_backend
             app.UseLogMiddleware();
 
             app.UseRouting();
+
+            // After UseRouting so the endpoint is known and per-endpoint [EnableRateLimiting] policies
+            // resolve; before the endpoints themselves so rejected requests never reach a controller.
+            app.UseRateLimiter();
 
             app.UseAuthorization();
 

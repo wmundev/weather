@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("hello-world")]
+    [ProducesResponseType(typeof(ProblemDetails), 429)]
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class HelloWorldController : ControllerBase
     {

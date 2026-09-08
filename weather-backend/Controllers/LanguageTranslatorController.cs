@@ -7,6 +7,7 @@ namespace weather_backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ProducesResponseType(typeof(ProblemDetails), 429)]
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class LanguageTranslatorController : ControllerBase
     {

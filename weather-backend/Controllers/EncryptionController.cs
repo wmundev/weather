@@ -9,6 +9,7 @@ namespace weather_backend.Controllers
 {
     [Route("api/encryption")]
     [ApiController]
+    [ProducesResponseType(typeof(ProblemDetails), 429)]
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class EncryptionController : ControllerBase
     {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using weather_backend.Dto;
@@ -8,6 +8,7 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("api/email")]
+    [ProducesResponseType(typeof(ProblemDetails), 429)]
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class EmailController : ControllerBase
     {

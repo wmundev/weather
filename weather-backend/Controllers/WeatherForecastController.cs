@@ -5,10 +5,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Logging;
 using Polly.CircuitBreaker;
 using Polly.Timeout;
 using weather_backend.Dto;
+using weather_backend.Extensions;
 using weather_backend.Models;
 using weather_backend.Services;
 using weather_backend.Services.Interfaces;
@@ -17,6 +19,7 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [ProducesResponseType(typeof(ProblemDetails), 429)]
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class WeatherForecastController : ControllerBase
     {
@@ -39,9 +42,13 @@ namespace weather_backend.Controllers
         /// A <see cref="WeatherData"/> object containing the current weather information for the specified city.
         /// </returns>
         /// <response code="200">Returns the current weather data.</response>
+        /// <response code="429">If the caller has exceeded the stricter limit this endpoint carries.</response>
         [HttpGet]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [Route("/weather")]
+        // Alone among the weather routes this one bypasses the one-hour cache, so every call spends
+        // OpenWeatherMap quota. It gets the tighter bucket rather than the general one.
+        [EnableRateLimiting(RateLimitingExtensions.UncachedPolicy)]
         public async Task<ActionResult<WeatherData>> GetCurrentWeatherDataById()
         {
             var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(Constants.DEFAULT_CITY_ID);

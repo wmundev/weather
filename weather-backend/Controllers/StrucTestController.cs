@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using weather_backend.Structs;
 
 namespace weather_backend.Controllers
 {
     [Route("api/struc")]
     [ApiController]
+    [ProducesResponseType(typeof(ProblemDetails), 429)]
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public sealed class StrucTestController : ControllerBase
     {

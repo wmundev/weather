@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,6 +6,7 @@ namespace weather_backend.Controllers
 {
     [Route("api/stringbase64")]
     [ApiController]
+    [ProducesResponseType(typeof(ProblemDetails), 429)]
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public sealed class StringBase64Controller : ControllerBase
     {

@@ -9,6 +9,7 @@ namespace weather_backend.Controllers
 {
     [ApiController]
     [Route("api/prime-number")]
+    [ProducesResponseType(typeof(ProblemDetails), 429)]
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class PrimeNumberController : ControllerBase
     {

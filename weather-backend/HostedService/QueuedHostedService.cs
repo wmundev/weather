@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -21,10 +21,9 @@ namespace weather_backend.HostedService
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation(
-                $"{nameof(QueuedHostedService)} is running.{Environment.NewLine}" +
-                $"{Environment.NewLine}Tap W to add a work item to the " +
-                $"background queue.{Environment.NewLine}");
+            // The service name is a parameter rather than part of the template: an interpolated string
+            // arrives at the provider already flattened, leaving nothing structured to filter on.
+            _logger.LogInformation("{ServiceName} is running", nameof(QueuedHostedService));
 
             return ProcessTaskQueueAsync(stoppingToken);
         }
@@ -37,15 +36,15 @@ namespace weather_backend.HostedService
                     var workItem =
                         await _taskQueue.DequeueAsync(stoppingToken);
 
-                    Console.WriteLine("dequeue");
+                    _logger.LogDebug("Dequeued a background work item");
                     await workItem(stoppingToken);
                     count += 1;
-                    Console.WriteLine(count);
+                    _logger.LogDebug("Completed background work item {CompletedCount}", count);
                 }
                 catch (OperationCanceledException)
                 {
                     // Prevent throwing if stoppingToken was signaled
-                    Console.WriteLine("huh");
+                    _logger.LogInformation("Background queue processing cancelled during shutdown");
                 }
                 catch (Exception ex)
                 {
@@ -55,12 +54,11 @@ namespace weather_backend.HostedService
 
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation(
-                $"{nameof(QueuedHostedService)} is stopping.");
+            _logger.LogInformation("{ServiceName} is stopping", nameof(QueuedHostedService));
 
             await _taskQueue.CompletionAsync();
 
-            Console.WriteLine("all queue items flushed");
+            _logger.LogInformation("All queued work items flushed after {CompletedCount} completed", count);
 
             await base.StopAsync(stoppingToken);
         }

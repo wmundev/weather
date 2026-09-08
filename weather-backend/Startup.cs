@@ -226,15 +226,21 @@ namespace weather_backend
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Outermost, so it catches everything downstream including the static file and logging
-            // middleware. In Development the developer exception page sits inside it and answers first;
-            // everywhere else GlobalExceptionHandler writes the ProblemDetails response.
-            app.UseExceptionHandler();
-
-            // Before anything reads the caller's address - the rate limiter partitions on it, and
-            // GeolocationService reports it - so the ALB's own private address is replaced by the
-            // client's first. Also feeds UseHttpsRedirection the original scheme.
+            // First, so everything below sees the caller's real address rather than the load balancer's -
+            // the rate limiter partitions on it and GeolocationService reports it. Also feeds
+            // UseHttpsRedirection the original scheme.
             app.UseForwardedHeaders();
+
+            // Outside the exception handler on purpose. Its finally block records the status code, and
+            // from inside it would run before the handler had turned the exception into a 500 - logging
+            // every failed request as though it had succeeded. Out here it also puts the correlation
+            // scope around the handler, so the exception record carries the same id as the request.
+            app.UseLogMiddleware();
+
+            // Catches everything downstream, including the static file middleware. In Development the
+            // developer exception page sits inside it and answers first; everywhere else
+            // GlobalExceptionHandler writes the ProblemDetails response.
+            app.UseExceptionHandler();
 
             if (env.IsDevelopment())
             {
@@ -249,8 +255,6 @@ namespace weather_backend
             }
 
             app.UseStaticFiles();
-
-            app.UseLogMiddleware();
 
             app.UseRouting();
 

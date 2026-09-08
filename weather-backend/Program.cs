@@ -15,6 +15,7 @@ namespace weather_backend
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
+                .ConfigureLogging((context, logging) => logging.AddStructuredLogging(context.HostingEnvironment))
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
         }
     }

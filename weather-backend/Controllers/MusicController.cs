@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using weather_backend.Repository;
 
 namespace weather_backend.Controllers
@@ -13,10 +14,12 @@ namespace weather_backend.Controllers
     public class MusicController : ControllerBase
     {
         private readonly IDynamoDbClient _client;
+        private readonly ILogger<MusicController> _logger;
 
-        public MusicController(IDynamoDbClient client)
+        public MusicController(IDynamoDbClient client, ILogger<MusicController> logger)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -41,10 +44,10 @@ namespace weather_backend.Controllers
             }
             catch (TaskCanceledException e)
             {
-                Console.WriteLine(e.Message);
+                _logger.LogInformation(e, "Song title load was cancelled before it completed");
             }
 
-            return BadRequest(new ProblemDetails {Type = "typeisfailed", Detail = "Failed"});
+            return BadRequest(new ProblemDetails { Type = "typeisfailed", Detail = "Failed" });
         }
     }
 }

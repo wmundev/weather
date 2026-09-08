@@ -11,8 +11,19 @@ namespace weather_test.TestHelpers
     {
         public List<string> Messages { get; } = new();
 
+        /// <summary>
+        /// The named parameters of each record, before the message template is rendered. Asserting here
+        /// rather than on <see cref="Messages"/> is what distinguishes a structured record from a string
+        /// that merely happens to contain the value.
+        /// </summary>
+        public List<IReadOnlyList<KeyValuePair<string, object?>>> Entries { get; } = new();
+
+        /// <summary>State of every scope opened, in the order they were opened.</summary>
+        public List<object> Scopes { get; } = new();
+
         public IDisposable BeginScope<TState>(TState state) where TState : notnull
         {
+            Scopes.Add(state);
             return NullScope.Instance;
         }
 
@@ -25,6 +36,11 @@ namespace weather_test.TestHelpers
             Func<TState, Exception?, string> formatter)
         {
             Messages.Add(formatter(state, exception));
+
+            if (state is IReadOnlyList<KeyValuePair<string, object?>> values)
+            {
+                Entries.Add(values);
+            }
         }
 
         private sealed class NullScope : IDisposable

@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using weather_backend.Services;
 
 namespace weather_backend.Controllers
@@ -11,10 +12,12 @@ namespace weather_backend.Controllers
     public class DelegateController : ControllerBase
     {
         private readonly DelegateService _delegateService;
+        private readonly ILogger<DelegateController> _logger;
 
-        public DelegateController(DelegateService delegateService)
+        public DelegateController(DelegateService delegateService, ILogger<DelegateController> logger)
         {
             _delegateService = delegateService;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         /// <summary>
@@ -26,7 +29,7 @@ namespace weather_backend.Controllers
         [HttpGet]
         public IActionResult TestDelegate()
         {
-            _delegateService.SortThings((i, i1) => { Console.WriteLine(i + i1); });
+            _delegateService.SortThings((i, i1) => { _logger.LogDebug("Delegate pair sum {PairSum}", i + i1); });
             return Ok();
         }
     }

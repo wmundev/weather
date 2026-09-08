@@ -91,11 +91,11 @@ namespace weather_backend.Services
                         // {
                         var newTextToTranslate = textToTranslate.Replace("{", "<span translate=no>");
                         var textext = newTextToTranslate.Replace("}", "</span>");
-                        Console.WriteLine("nice" + textext);
+                        _logger.LogDebug("Translating into {LanguageCode}", language);
                         var translatedText = await TranslateTextAsync(textext, sourceLanguageCode, language);
 
                         var newTranslatedText = translatedText.Replace("<span translate=no>", " {").Replace("</span>", "}");
-                        Console.WriteLine("ok" + newTranslatedText);
+                        _logger.LogDebug("Translated {PropertyKey} into {LanguageCode}", property.Key, language);
 
                         ((IDictionary<String, Object>)languageFileExpandoObject).Add(property.Key, newTranslatedText);
                         // }

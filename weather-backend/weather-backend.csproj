@@ -3,6 +3,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>weather_backend</RootNamespace>
     <Nullable>enable</Nullable>
+    <UserSecretsId>66887dce-0c73-4d4a-a042-434b84113960</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.513.4" />
@@ -32,7 +33,7 @@
     <Folder Include="Services\Scheduler\Jobs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\weather-application\weather-application.csproj"/>
-    <ProjectReference Include="..\weather-repository\weather-repository.csproj"/>
+    <ProjectReference Include="..\weather-application\weather-application.csproj" />
+    <ProjectReference Include="..\weather-repository\weather-repository.csproj" />
   </ItemGroup>
 </Project>

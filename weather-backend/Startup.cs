@@ -50,6 +50,11 @@ namespace weather_backend
             services.AddMemoryCache(options => options.SizeLimit = 1024);
             services.AddHealthChecks();
 
+            // RFC 7807 responses for anything that reaches the top of the pipeline unhandled, plus the
+            // bare status codes MVC produces on its own (404 from routing, 400 from model validation).
+            services.AddProblemDetails();
+            services.AddExceptionHandler<GlobalExceptionHandler>();
+
             services.AddAWSService<IAmazonSecurityTokenService>();
 
             services.AddControllers();
@@ -182,6 +187,11 @@ namespace weather_backend
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Outermost, so it catches everything downstream including the static file and logging
+            // middleware. In Development the developer exception page sits inside it and answers first;
+            // everywhere else GlobalExceptionHandler writes the ProblemDetails response.
+            app.UseExceptionHandler();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

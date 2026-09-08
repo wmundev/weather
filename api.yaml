@@ -26,30 +26,158 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/Academic'
-  /delegate/test:
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /city/all:
     get:
       tags:
-        - Delegate
+        - City
+      parameters:
+        - name: num
+          in: query
+          schema:
+            type: integer
+            format: int32
+            default: 100
       responses:
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '200':
           description: OK
-  /api/Encryption/encrypt:
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/City'
+  '/city/{name}':
     get:
       tags:
-        - Encryption
+        - City
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                type: string
+                $ref: '#/components/schemas/DynamoDbCity'
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/DynamoDbCity'
             text/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/DynamoDbCity'
+  /api/delegates:
+    get:
+      tags:
+        - Delegate
+      responses:
+        '200':
+          description: OK
+  /api/email/code:
+    get:
+      tags:
+        - Email
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/EmailCodeEntity'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailCodeEntity'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/EmailCodeEntity'
+  /api/encryption/encrypt:
+    get:
+      tags:
+        - Encryption
+      parameters:
+        - name: Message
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/EncryptMessageResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncryptMessageResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/EncryptMessageResponse'
+  /api/encryption/decrypt:
+    post:
+      tags:
+        - Encryption
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecryptMessageRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/DecryptMessageRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/DecryptMessageRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/DecryptMessageResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecryptMessageResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/DecryptMessageResponse'
   /api/v1/word/capitalize-first-word:
     get:
       tags:
@@ -106,26 +234,22 @@ paths:
             text/json:
               schema:
                 type: string
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
   /hello-world:
     get:
       tags:
         - HelloWorld
-      responses:
-        '200':
-          description: OK
-  /niceone:
-    get:
-      tags:
-        - Kafka
-      parameters:
-        - name: message
-          in: query
-          schema:
-            type: string
-        - name: topic
-          in: query
-          schema:
-            type: string
       responses:
         '200':
           description: OK
@@ -136,24 +260,7 @@ paths:
       responses:
         '200':
           description: OK
-  /Music/music:
-    get:
-      tags:
-        - Music
-      responses:
-        '200':
-          description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/EmailCodeEntity'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmailCodeEntity'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/EmailCodeEntity'
-  /Music/music/nice:
+  /api/music/song-title:
     get:
       tags:
         - Music
@@ -316,7 +423,7 @@ paths:
             text/json:
               schema:
                 type: string
-  /api/struc/nice:
+  /api/struc:
     get:
       tags:
         - StrucTest
@@ -338,8 +445,8 @@ paths:
       tags:
         - WeatherForecast
       responses:
-        '201':
-          description: Created
+        '200':
+          description: OK
           content:
             text/plain:
               schema:
@@ -350,6 +457,56 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/WeatherData'
+  /weather/coordinates:
+    get:
+      tags:
+        - WeatherForecast
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: units
+          in: query
+          schema:
+            $ref: '#/components/schemas/WeatherUnit'
+        - name: lang
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '404':
           description: Not Found
           content:
@@ -362,64 +519,30 @@ paths:
             text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
-  /city/all:
+  /weather/city:
     get:
       tags:
         - WeatherForecast
       parameters:
-        - name: num
+        - name: cityName
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: stateCode
           in: query
           schema:
-            type: integer
-            format: int32
-            default: 100
-      responses:
-        '200':
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/City'
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/City'
-            text/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/City'
-  /populate:
-    get:
-      tags:
-        - WeatherForecast
-      responses:
-        '200':
-          description: OK
-          content:
-            text/plain:
-              schema:
-                type: integer
-                format: int32
-            application/json:
-              schema:
-                type: integer
-                format: int32
-            text/json:
-              schema:
-                type: integer
-                format: int32
-  '/city/{name}':
-    get:
-      tags:
-        - WeatherForecast
-      parameters:
-        - name: name
-          in: path
-          required: true
+            type: string
+        - name: countryCode
+          in: query
+          schema:
+            type: string
+        - name: units
+          in: query
+          schema:
+            $ref: '#/components/schemas/WeatherUnit'
+        - name: lang
+          in: query
           schema:
             type: string
       responses:
@@ -428,13 +551,153 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/DynamoDbCity'
+                $ref: '#/components/schemas/WeatherData'
             application/json:
               schema:
-                $ref: '#/components/schemas/DynamoDbCity'
+                $ref: '#/components/schemas/WeatherData'
             text/json:
               schema:
-                $ref: '#/components/schemas/DynamoDbCity'
+                $ref: '#/components/schemas/WeatherData'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/weather/city/{cityId}':
+    get:
+      tags:
+        - WeatherForecast
+      parameters:
+        - name: cityId
+          in: path
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: units
+          in: query
+          schema:
+            $ref: '#/components/schemas/WeatherUnit'
+        - name: lang
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  /weather/zip:
+    get:
+      tags:
+        - WeatherForecast
+      parameters:
+        - name: zipCode
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: countryCode
+          in: query
+          schema:
+            type: string
+            default: us
+        - name: units
+          in: query
+          schema:
+            $ref: '#/components/schemas/WeatherUnit'
+        - name: lang
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/WeatherData'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
 components:
   schemas:
     Academic:
@@ -516,6 +779,32 @@ components:
         - 20
       type: integer
       format: int32
+    DecryptMessageRequest:
+      required:
+        - key
+        - message
+        - nonce
+      type: object
+      properties:
+        message:
+          type: string
+          nullable: true
+        key:
+          type: string
+          nullable: true
+        nonce:
+          type: string
+          nullable: true
+      additionalProperties: false
+    DecryptMessageResponse:
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          type: string
+          nullable: true
+      additionalProperties: false
     DynamoDbCity:
       required:
         - coordinate
@@ -553,6 +842,23 @@ components:
           type: string
           nullable: true
       additionalProperties: false
+    EncryptMessageResponse:
+      required:
+        - encryptedMessage
+        - key
+        - nonce
+      type: object
+      properties:
+        encryptedMessage:
+          type: string
+          nullable: true
+        nonce:
+          type: string
+          nullable: true
+        key:
+          type: string
+          nullable: true
+      additionalProperties: false
     MainWeather:
       type: object
       properties:
@@ -574,6 +880,14 @@ components:
         humidity:
           type: integer
           format: int32
+        sea_level:
+          type: integer
+          format: int32
+          nullable: true
+        grnd_level:
+          type: integer
+          format: int32
+          nullable: true
       additionalProperties: false
     PhoneNumberType:
       enum:
@@ -611,6 +925,18 @@ components:
           type: string
           nullable: true
       additionalProperties: { }
+    Rain:
+      type: object
+      properties:
+        1h:
+          type: number
+          format: double
+          nullable: true
+        3h:
+          type: number
+          format: double
+          nullable: true
+      additionalProperties: false
     RedisSaveTestDto:
       required:
         - value
@@ -618,6 +944,18 @@ components:
       properties:
         value:
           type: string
+          nullable: true
+      additionalProperties: false
+    Snow:
+      type: object
+      properties:
+        1h:
+          type: number
+          format: double
+          nullable: true
+        3h:
+          type: number
+          format: double
           nullable: true
       additionalProperties: false
     ValidatePhoneNumberModel:
@@ -652,6 +990,14 @@ components:
           nullable: true
       additionalProperties: false
     WeatherData:
+      required:
+        - clouds
+        - coord
+        - main
+        - name
+        - sys
+        - weather
+        - wind
       type: object
       properties:
         coord:
@@ -661,7 +1007,7 @@ components:
           items:
             $ref: '#/components/schemas/Weather'
           nullable: true
-        baseInfo:
+        base:
           type: string
           nullable: true
         main:
@@ -673,6 +1019,10 @@ components:
           $ref: '#/components/schemas/Wind'
         clouds:
           $ref: '#/components/schemas/Cloud'
+        rain:
+          $ref: '#/components/schemas/Rain'
+        snow:
+          $ref: '#/components/schemas/Snow'
         dt:
           type: integer
           format: int32
@@ -694,10 +1044,8 @@ components:
     WeatherSystem:
       required:
         - country
-        - id
         - sunrise
         - sunset
-        - type
       type: object
       properties:
         type:
@@ -716,6 +1064,13 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    WeatherUnit:
+      enum:
+        - 0
+        - 1
+        - 2
+      type: integer
+      format: int32
     Wind:
       type: object
       properties:
@@ -725,4 +1080,8 @@ components:
         deg:
           type: integer
           format: int32
+        gust:
+          type: number
+          format: double
+          nullable: true
       additionalProperties: false

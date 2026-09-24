@@ -1,9 +1,12 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Polly.CircuitBreaker;
 using Polly.Timeout;
 using NSubstitute;
@@ -155,14 +158,89 @@ namespace Weather.API.IntegrationTests.Controllers
         {
             var mockWeather = Substitute.For<ICurrentWeatherData>();
 
+            // The shape EnsureSuccessStatusCode throws: the upstream status travels on the exception.
             mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>())
-                .Returns(Task.FromException<WeatherData>(new HttpRequestException("Not Found")));
+                .Returns(Task.FromException<WeatherData>(new HttpRequestException("Not Found", null, HttpStatusCode.NotFound)));
 
             var client = CreateClientWithMockService(mockWeather);
 
             var response = await client.GetAsync("/weather/coordinates?latitude=0&longitude=0");
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetWeatherByCoordinates_WhenUpstreamRejectsQuery_Returns400()
+        {
+            var mockWeather = Substitute.For<ICurrentWeatherData>();
+
+            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>())
+                .Returns(Task.FromException<WeatherData>(new HttpRequestException("Bad Request", null, HttpStatusCode.BadRequest)));
+
+            var client = CreateClientWithMockService(mockWeather);
+
+            var response = await client.GetAsync("/weather/coordinates?latitude=0&longitude=0");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(Constants.CamelCaseJsonOptions);
+            Assert.Equal("Invalid weather query.", problem!.Title);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.Unauthorized)]
+        [InlineData(HttpStatusCode.TooManyRequests)]
+        [InlineData(HttpStatusCode.InternalServerError)]
+        public async Task GetWeatherByCityName_WhenUpstreamFailsWithOtherStatus_ShouldReturn502(HttpStatusCode upstreamStatus)
+        {
+            var mockWeather = Substitute.For<ICurrentWeatherData>();
+
+            // A rejected API key used to surface as "city not found"; it is our fault, not the caller's.
+            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>())
+                .Returns(Task.FromException<WeatherData>(new HttpRequestException("upstream said no", null, upstreamStatus)));
+
+            var client = CreateClientWithMockService(mockWeather);
+
+            var response = await client.GetAsync("/weather/city?cityName=Melbourne");
+
+            Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
+            var body = await response.Content.ReadAsStringAsync();
+            Assert.DoesNotContain("upstream said no", body);
+        }
+
+        [Fact]
+        public async Task GetWeatherByZipCode_WhenUpstreamIsUnreachable_ShouldReturn502()
+        {
+            var mockWeather = Substitute.For<ICurrentWeatherData>();
+
+            // A connection failure carries no status code at all.
+            mockWeather.GetCurrentWeatherDataByZipCode(Arg.Any<ZipCodeWeatherRequestDto>())
+                .Returns(Task.FromException<WeatherData>(new HttpRequestException("Connection refused")));
+
+            var client = CreateClientWithMockService(mockWeather);
+
+            var response = await client.GetAsync("/weather/zip?zipCode=94040");
+
+            Assert.Equal(HttpStatusCode.BadGateway, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetWeatherByCityId_WhenServerFaultOccurs_ShouldReturn500WithoutExceptionText()
+        {
+            var mockWeather = Substitute.For<ICurrentWeatherData>();
+
+            // Previously answered 400 with this text in the body - a server misconfiguration blamed on
+            // the caller, and the configuration detail handed to them.
+            mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<CityIdWeatherRequestDto>())
+                .Returns(Task.FromException<WeatherData>(new InvalidOperationException("SSM parameter 'weather_secrets' has no value.")));
+
+            // Production, because Development deliberately shows exception detail to the developer.
+            var client = CreateClientWithMockService(mockWeather, Environments.Production);
+
+            var response = await client.GetAsync("/weather/city/2158177");
+
+            Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+            var body = await response.Content.ReadAsStringAsync();
+            Assert.DoesNotContain("weather_secrets", body);
         }
 
         [Fact]
@@ -201,12 +279,20 @@ namespace Weather.API.IntegrationTests.Controllers
             Assert.Equal("Weather provider unavailable.", problem!.Title);
         }
 
-        private HttpClient CreateClientWithMockService(ICurrentWeatherData? mockWeather = null)
+        private HttpClient CreateClientWithMockService(ICurrentWeatherData? mockWeather = null, string? environment = null)
         {
             if (mockWeather == null) mockWeather = Substitute.For<ICurrentWeatherData>();
 
             return _factory.WithWebHostBuilder(builder =>
             {
+                if (environment is not null)
+                {
+                    builder.UseEnvironment(environment);
+                    // Only appsettings.Development.json names a region; without one the AWS clients the
+                    // host builds at startup refuse to construct. Nothing here calls AWS.
+                    builder.UseSetting("AWS:Region", "us-east-1");
+                }
+
                 builder.ConfigureTestServices(services =>
                 {
                     services.AddSingleton(mockWeather);

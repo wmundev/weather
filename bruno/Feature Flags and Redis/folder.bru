@@ -6,7 +6,10 @@ meta {
 docs {
   `NewFeatureController` - scratch endpoints plus a Redis read/write round-trip.
 
-  The Redis requests need a reachable Redis instance (see the connection string
-  in `appsettings*.json`). Both use the fixed key `foo`, so run **Redis Set**
-  before **Redis Get**.
+  The Redis requests need a reachable Redis instance, set through
+  `Redis:ConnectionString` (for example the `Redis__ConnectionString`
+  environment variable). Redis is optional: with no connection string both
+  Redis requests return `503` while **Pattern** and **Generate Password** still
+  work. Both Redis requests use the fixed key `foo`, so run **Redis Set** before
+  **Redis Get**.
 }

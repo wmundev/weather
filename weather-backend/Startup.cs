@@ -19,6 +19,7 @@ using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Polly;
+using StackExchange.Redis;
 using weather_application;
 using weather_backend.Adapters;
 using weather_backend.Extensions;
@@ -142,31 +143,21 @@ namespace weather_backend
                 services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
             }
 
-            //TODO add back redis if needed
-            // if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != Environments.Development)
-            //     try
-            //     {
-            //         var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions { EndPoints = { "redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379" }, ConnectRetry = 5 });
-            //         services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-            //     }
-            //     catch (RedisConnectionException e)
-            //     {
-            //         // we add redis as optional and not fail if cannot connect
-            //         Console.WriteLine(e.Message);
-            //         Console.WriteLine(e.StackTrace);
-            //     }
-            // else
-            //     try
-            //     {
-            //         var multiplexer = ConnectionMultiplexer.Connect(new ConfigurationOptions { EndPoints = { "redis-test-unenc.fhjziy.ng.0001.use1.cache.amazonaws.com:6379" }, ConnectRetry = 5 });
-            //         services.AddSingleton<IConnectionMultiplexer>(multiplexer);
-            //     }
-            //     catch (RedisConnectionException e)
-            //     {
-            //         // we add redis as optional and not fail if cannot connect
-            //         Console.WriteLine(e.Message);
-            //         Console.WriteLine(e.StackTrace);
-            //     }
+            // Redis is optional. With no connection string nothing is registered, and NewFeatureController
+            // answers 503 on its Redis routes instead of failing to construct - which used to take its
+            // Redis-free routes down with them.
+            var redisConnectionString = Configuration.GetValue<string>("Redis:ConnectionString");
+            if (!string.IsNullOrWhiteSpace(redisConnectionString))
+            {
+                services.AddSingleton<IConnectionMultiplexer>(_ =>
+                {
+                    var redisOptions = ConfigurationOptions.Parse(redisConnectionString);
+                    // Keep retrying in the background rather than throwing if Redis is down when first
+                    // used; commands fail on their own until it is reachable.
+                    redisOptions.AbortOnConnectFail = false;
+                    return ConnectionMultiplexer.Connect(redisOptions);
+                });
+            }
 
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
             services.AddAWSService<IAmazonTranslate>();

@@ -28,5 +28,6 @@ docs {
   `GET /feature/redis`
 
   Reads the key `foo` and returns `{ result, time }`, where `time` is the read
-  latency in milliseconds. Run **Redis Set** first.
+  latency in milliseconds. Run **Redis Set** first. Returns `503` when
+  `Redis:ConnectionString` is not configured.
 }

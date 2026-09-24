@@ -28,5 +28,6 @@ docs {
   `POST /feature/redis`
 
   Writes `value` to Redis under the hard-coded key `foo`. Returns the
-  `StringSetAsync` result (`True`).
+  `StringSetAsync` result (`True`). Returns `503` when `Redis:ConnectionString`
+  is not configured.
 }

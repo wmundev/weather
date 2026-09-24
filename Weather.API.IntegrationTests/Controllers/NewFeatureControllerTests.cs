@@ -1,6 +1,8 @@
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -70,6 +72,42 @@ namespace Weather.API.IntegrationTests.Controllers
             // The response is a JSON object { result = "somevalue", time = ... }
             var content = await response.Content.ReadAsStringAsync();
             Assert.Contains("somevalue", content);
+        }
+
+        // The tests above all register a mock multiplexer, which is how the controller failing to
+        // construct without one - a 500 on every /feature route - went unnoticed.
+        [Theory]
+        [InlineData("/feature/pattern")]
+        [InlineData("/feature/password")]
+        public async Task RedisFreeRoutes_WhenRedisIsNotConfigured_ShouldReturnOk(string route)
+        {
+            var client = _factory.CreateClient();
+
+            var response = await client.GetAsync(route);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task RedisGetTest_WhenRedisIsNotConfigured_ShouldReturn503()
+        {
+            var client = _factory.CreateClient();
+
+            var response = await client.GetAsync("/feature/redis");
+
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(Constants.CamelCaseJsonOptions);
+            Assert.Equal("Redis is not configured.", problem!.Title);
+        }
+
+        [Fact]
+        public async Task RedisSaveTest_WhenRedisIsNotConfigured_ShouldReturn503()
+        {
+            var client = _factory.CreateClient();
+
+            var response = await client.PostAsJsonAsync("/feature/redis", new RedisSaveTestDto {Value = "somevalue"});
+
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
         }
 
         private HttpClient CreateClientWithMockRedis(IConnectionMultiplexer? mockRedis = null)

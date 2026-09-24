@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
+using PhoneNumbers;
 using weather_backend.Models.PhoneService;
 using weather_backend.Services.Interfaces;
 
@@ -27,7 +28,7 @@ namespace weather_backend.Controllers
         /// or an error message if the validation fails.
         /// </returns>
         /// <response code="200">Returns the validation result.</response>
-        /// <response code="400">Returns an error message if the validation fails.</response>
+        /// <response code="400">Returns the parser's error message if the phone number cannot be parsed.</response>
         [HttpGet]
         [Route("phone")]
         [ProducesResponseType(typeof(ValidatePhoneNumberModel), 200)]
@@ -39,7 +40,10 @@ namespace weather_backend.Controllers
                 var validationResult = _phoneService.ValidatePhoneNumber(phone);
                 return Ok(validationResult);
             }
-            catch (Exception e)
+            // Only the parser's own rejection is the caller's fault, and its message is written to be
+            // shown to them. Anything else is a server fault and goes to GlobalExceptionHandler, which
+            // does not echo exception text back.
+            catch (NumberParseException e)
             {
                 return BadRequest(e.Message);
             }

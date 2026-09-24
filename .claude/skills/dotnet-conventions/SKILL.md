@@ -79,7 +79,19 @@ Follow `WeatherForecastController.GetOrFetchAsync`:
 1. Generate a cache key from the request DTO via `IWeatherCacheService.GenerateCacheKey`.
 2. Return the cached value on a hit.
 3. Fetch, then cache, on a miss.
-4. Map `HttpRequestException` → `404`, everything else → `400`.
+4. Map upstream failures by what they mean, not by exception type alone:
+   - `HttpRequestException` with status `404` → `404`; with status `400` → `400`
+     ProblemDetails. Those are the only caller-attributable outcomes.
+   - Any other `HttpRequestException` (a rejected API key, upstream throttling, a
+     5xx, or no status at all) → `502` ProblemDetails.
+   - `TimeoutRejectedException` / `BrokenCircuitException` from the resilience
+     pipeline → `503` ProblemDetails.
+   - Everything else is a server fault: do **not** catch it. Let it reach
+     `GlobalExceptionHandler`, which answers `500` without echoing exception text.
+
+Never return `ex.Message` in a response body - exception text names
+configuration keys and can carry request URLs, and the OpenWeatherMap key travels
+in the query string.
 
 TTL is one hour and the key covers the whole query, units and language included -
 so changing any parameter is a different cache entry.

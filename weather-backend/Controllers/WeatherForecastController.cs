@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -67,12 +68,14 @@ namespace weather_backend.Controllers
         /// <response code="400">If the request parameters are invalid</response>
         /// <response code="404">If weather data cannot be found for the coordinates</response>
         /// <response code="503">If the upstream weather provider is unavailable or the circuit breaker is open</response>
+        /// <response code="502">If the upstream weather provider returned an error other than not found</response>
         [HttpGet]
         [Route("/weather/coordinates")]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status502BadGateway)]
         public async Task<ActionResult<WeatherData>> GetWeatherByCoordinates(
             [FromQuery, Required] double latitude,
             [FromQuery, Required] double longitude,
@@ -101,12 +104,14 @@ namespace weather_backend.Controllers
         /// <response code="400">If the request parameters are invalid</response>
         /// <response code="404">If the city cannot be found</response>
         /// <response code="503">If the upstream weather provider is unavailable or the circuit breaker is open</response>
+        /// <response code="502">If the upstream weather provider returned an error other than not found</response>
         [HttpGet]
         [Route("/weather/city")]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status502BadGateway)]
         public async Task<ActionResult<WeatherData>> GetWeatherByCityName(
             [FromQuery, Required] string cityName,
             [FromQuery] string? stateCode = null,
@@ -141,12 +146,14 @@ namespace weather_backend.Controllers
         /// <response code="400">If the request parameters are invalid</response>
         /// <response code="404">If the city ID cannot be found</response>
         /// <response code="503">If the upstream weather provider is unavailable or the circuit breaker is open</response>
+        /// <response code="502">If the upstream weather provider returned an error other than not found</response>
         [HttpGet]
         [Route("/weather/city/{cityId}")]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status502BadGateway)]
         public async Task<ActionResult<WeatherData>> GetWeatherByCityId(
             [FromRoute, Required] double cityId,
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
@@ -173,12 +180,14 @@ namespace weather_backend.Controllers
         /// <response code="400">If the request parameters are invalid</response>
         /// <response code="404">If the ZIP code cannot be found</response>
         /// <response code="503">If the upstream weather provider is unavailable or the circuit breaker is open</response>
+        /// <response code="502">If the upstream weather provider returned an error other than not found</response>
         [HttpGet]
         [Route("/weather/zip")]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status502BadGateway)]
         public async Task<ActionResult<WeatherData>> GetWeatherByZipCode(
             [FromQuery, Required] string zipCode,
             [FromQuery] string countryCode = "us",
@@ -238,16 +247,38 @@ namespace weather_backend.Controllers
                         Detail = "The upstream weather provider did not respond in time. Please retry shortly."
                     });
             }
-            catch (HttpRequestException ex)
+            // Only an upstream 404 means "no such place". Any other failure status - a rejected API key,
+            // upstream throttling, a 5xx - or a request that never got a status at all is our outage,
+            // not the caller's mistake, and must not be reported as a 404.
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                _logger.LogError(ex, "Failed to fetch weather data for {Query}", logContext);
+                _logger.LogInformation(ex, "Weather provider has no data for {Query}", logContext);
                 return NotFound(new {message = notFoundMessage});
             }
-            catch (Exception ex)
+            catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
             {
-                _logger.LogError(ex, "Error fetching weather data for {Query}", logContext);
-                return BadRequest(new {message = ex.Message});
+                _logger.LogInformation(ex, "Weather provider rejected the query for {Query}", logContext);
+                return BadRequest(new ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Invalid weather query.",
+                    Detail = "The weather provider rejected the query parameters."
+                });
             }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Weather provider request failed with {UpstreamStatus} for {Query}", ex.StatusCode, logContext);
+                return StatusCode(StatusCodes.Status502BadGateway,
+                    new ProblemDetails
+                    {
+                        Status = StatusCodes.Status502BadGateway,
+                        Title = "Weather provider error.",
+                        Detail = "The upstream weather provider returned an error. Please retry shortly."
+                    });
+            }
+            // Anything else - a missing API key, an undeserialisable response - is a server fault. It is
+            // left to GlobalExceptionHandler, which answers 500 without echoing the exception text: those
+            // messages name configuration keys and can carry the request URL.
         }
     }
 }

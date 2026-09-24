@@ -29,6 +29,9 @@ namespace Weather.API.IntegrationTests.Controllers
         [InlineData("83")]
         [InlineData("89")]
         [InlineData("97")]
+        // The largest int, and prime: the old loop ran ~2 billion iterations to answer this. It also sits
+        // at the edge where i * i would overflow.
+        [InlineData("2147483647")]
         public async Task GetPrimeNumber_IsPrime_ReturnsTrue(string input)
         {
             var mockConfigCat = Substitute.For<IConfigCatClient>();
@@ -44,7 +47,11 @@ namespace Weather.API.IntegrationTests.Controllers
 
         [Theory]
         [InlineData("1")]
+        [InlineData("0")]
+        [InlineData("-7")]
+        [InlineData("-2147483648")]
         [InlineData("4")]
+        [InlineData("2147483646")]
         [InlineData("6")]
         [InlineData("9")]
         [InlineData("84")]

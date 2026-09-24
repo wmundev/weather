@@ -194,7 +194,7 @@ Then confirm the count lines up:
 find bruno -name '*.bru' ! -name 'folder.bru' ! -name 'collection.bru' -not -path '*environments*' | wc -l
 ```
 
-At the time of writing that is **51 requests across 17 folders**, covering all
+At the time of writing that is **53 requests across 17 folders**, covering all
 29 routable endpoints (some endpoints have a second request for a negative case).
 
 A run against a live API is the real check. Node is managed by fnm, so activate

@@ -1,0 +1,37 @@
+meta {
+  name: Decrypt Message - Invalid (400)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/api/encryption/decrypt
+  body: json
+  auth: inherit
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "message": "not-base64!",
+    "nonce": "AAAA",
+    "key": "AAAA"
+  }
+}
+
+assert {
+  res.status: eq 400
+}
+
+docs {
+  `POST /api/encryption/decrypt`
+
+  Negative case - returns `400` with a `ProblemDetails` body when any field is
+  not valid Base64, the key or nonce is the wrong length, or the ciphertext
+  fails authentication against the key and nonce.
+
+  Standalone: does not need **Encrypt Message** to run first.
+}

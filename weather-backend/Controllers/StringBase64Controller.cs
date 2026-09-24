@@ -17,11 +17,25 @@ namespace weather_backend.Controllers
         /// <returns>
         /// An <see cref="ActionResult{T}"/> containing the decoded string.
         /// </returns>
+        /// <response code="200">Returns the decoded string.</response>
+        /// <response code="400">If the input is not valid Base64.</response>
         [HttpGet]
         [Route("decodebase64")]
+        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(typeof(ProblemDetails), 400)]
         public ActionResult<string> Decode([FromQuery] string stringToDecode)
         {
-            byte[] bytes = Convert.FromBase64String(stringToDecode);
+            byte[] bytes;
+            try
+            {
+                bytes = Convert.FromBase64String(stringToDecode);
+            }
+            catch (FormatException)
+            {
+                // Malformed input is the caller's mistake, not a server fault.
+                return BadRequest(new ProblemDetails {Title = "Invalid Base64.", Detail = "stringToDecode is not a valid Base64 string."});
+            }
+
             string decodedString = Encoding.UTF8.GetString(bytes);
             return Ok(decodedString);
         }

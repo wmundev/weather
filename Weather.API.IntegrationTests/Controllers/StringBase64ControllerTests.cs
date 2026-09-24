@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using weather_backend;
 using Weather.API.IntegrationTests.setup;
@@ -37,6 +38,18 @@ namespace Weather.API.IntegrationTests.Controllers
 
             response.EnsureSuccessStatusCode();
             Assert.Equal("SGVsbG8gd29ybGQ=", await response.Content.ReadAsStringAsync());
+        }
+
+        [Theory]
+        [InlineData("not-base64!")]
+        [InlineData("abc")]
+        public async Task DecodeBase64_WhenInputIsNotBase64_ShouldReturn400(string input)
+        {
+            var client = _factory.CreateClient();
+
+            var response = await client.GetAsync($"{path}/decodebase64?stringToDecode={input}");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
     }
 }

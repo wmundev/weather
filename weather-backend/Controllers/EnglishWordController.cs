@@ -19,15 +19,19 @@ namespace weather_backend.Controllers
         /// <returns>
         /// An <see cref="ActionResult{String}"/> containing the processed string with the first letter of each word capitalized, except for conjunctions.
         /// </returns>
+        /// <response code="200">Returns the capitalised text.</response>
         [HttpGet]
         [Route("capitalize-first-word")]
+        [ProducesResponseType(typeof(string), 200)]
         public ActionResult<string> CapitalizeFirstWord([FromQuery] string input)
         {
             const char separator = ' ';
             var stringArrayByWhitespace = input.Split(separator);
             var capitalisedStringPerWord = stringArrayByWhitespace.Select(word =>
             {
-                if (_listOfConjunctions.Contains(word))
+                // Consecutive, leading or trailing separators split out empty words; there is nothing to
+                // capitalise in them, and First() on an empty string throws.
+                if (word.Length == 0 || _listOfConjunctions.Contains(word))
                 {
                     return word;
                 }

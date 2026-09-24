@@ -25,12 +25,13 @@ namespace weather_backend.Controllers
         /// </summary>
         /// <param name="number">The number to check for primality.</param>
         /// <returns>
-        /// An <see cref="IActionResult"/> containing "true" if the number is prime, "false" otherwise.
+        /// An <see cref="IActionResult"/> containing <c>true</c> if the number is prime, <c>false</c> otherwise.
         /// </returns>
-        /// <response code="200">Returns the primality result as a string.</response>
+        /// <response code="200">Returns the primality result.</response>
         /// <response code="400">Returns an error message if the feature is not enabled.</response>
         [HttpGet]
-        [ProducesResponseType(typeof(string), 200)]
+        [ProducesResponseType(typeof(bool), 200)]
+        [ProducesResponseType(typeof(string), 400)]
         public async Task<IActionResult> Get([FromQuery(Name = "number")] int number)
         {
             var isMyAwesomeFeatureEnabled = await _configCatClient.GetValueAsync("primenumber", false);
@@ -39,13 +40,17 @@ namespace weather_backend.Controllers
                 return BadRequest("Not enabled");
             }
 
-            if (number == 1)
+            // Primes are greater than 1 by definition; 0 and negatives used to fall through as prime.
+            if (number < 2)
             {
-                return Ok("false");
+                return Ok(false);
             }
 
+            // Trial division only needs to reach the square root: any factor above it pairs with one
+            // below. Counting all the way to the number itself kept a request thread busy for billions of
+            // iterations on a large prime. i <= number / i is the overflow-safe form of i * i <= number.
             var isPrime = true;
-            for (var i = 2; i < number; i++)
+            for (var i = 2; i <= number / i; i++)
             {
                 if (number % i == 0)
                 {

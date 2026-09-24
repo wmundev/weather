@@ -1,0 +1,30 @@
+meta {
+  name: Decode Base64 - Invalid (400)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/api/stringbase64/decodebase64?stringToDecode=not-base64!
+  body: none
+  auth: inherit
+}
+
+params:query {
+  stringToDecode: not-base64!
+}
+
+assert {
+  res.status: eq 400
+}
+
+docs {
+  `GET /api/stringbase64/decodebase64`
+
+  Negative case - input that is not valid Base64 returns `400` with a
+  `ProblemDetails` body.
+
+  | Param            | Required | Notes                   |
+  | ---------------- | -------- | ----------------------- |
+  | `stringToDecode` | yes      | Deliberately malformed  |
+}

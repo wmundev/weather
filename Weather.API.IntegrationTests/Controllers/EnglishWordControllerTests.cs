@@ -38,5 +38,21 @@ namespace Weather.API.IntegrationTests.Controllers
 
             Assert.Equal("Hello World and Goodbye World", await response.Content.ReadAsStringAsync());
         }
+
+        [Theory]
+        [InlineData("hello  world", "Hello  World")]
+        [InlineData(" hello", " Hello")]
+        [InlineData("hello ", "Hello ")]
+        public async Task CapitalizeFirstWord_WhenInputHasEmptyWords_ShouldPreserveSpacing(string input, string expected)
+        {
+            var client = _factory.CreateClient();
+            var query = new Dictionary<string, string> {{"input", input}};
+
+            var response = await client.GetAsync(QueryHelpers.AddQueryString(path, query!));
+
+            // Consecutive or edge spaces used to throw on an empty word and answer 500.
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(expected, await response.Content.ReadAsStringAsync());
+        }
     }
 }

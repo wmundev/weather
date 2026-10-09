@@ -91,3 +91,5 @@ database/dynamodb/docker/dynamodb/shared-local-instance.db
 # Bruno local secrets (collection itself is committed)
 bruno/.env
 bruno/.env.*
+weather-backend/Assets/city.list.json
+weather-backend/database/docker-compose.yml

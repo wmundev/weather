@@ -4,24 +4,24 @@
     <UserSecretsId>66887dce-0c73-4d4a-a042-434b84113960</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.513.4" />
-    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.7.400.2" />
-    <PackageReference Include="AWSSDK.SecurityToken" Version="3.7.504.50" />
-    <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.7.505.15" />
-    <PackageReference Include="AWSSDK.Translate" Version="3.7.501.59" />
-    <PackageReference Include="ConfigCat.Client" Version="9.5.1" />
-    <PackageReference Include="Cronos" Version="0.13.0" />
-    <PackageReference Include="Dapper" Version="2.1.89" />
-    <PackageReference Include="libphonenumber-csharp" Version="9.0.40" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.10.0" />
-    <PackageReference Include="Npgsql" Version="7.0.10" />
-    <PackageReference Include="Sodium.Core" Version="1.4.1" />
-    <PackageReference Include="StackExchange.Redis" Version="2.13.17" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.9.0" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" />
+    <PackageReference Include="AWSSDK.SecurityToken" />
+    <PackageReference Include="AWSSDK.SimpleSystemsManagement" />
+    <PackageReference Include="AWSSDK.Translate" />
+    <PackageReference Include="ConfigCat.Client" />
+    <PackageReference Include="Cronos" />
+    <PackageReference Include="Dapper" />
+    <PackageReference Include="libphonenumber-csharp" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Sodium.Core" />
+    <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" />
     <!-- Newtonsoft.Json is used by LanguageTranslatorService (ExpandoObjectConverter) only;
          the weather models are serialized with System.Text.Json. -->
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
   <ItemGroup>
     <!-- The city dataset must reach the output directory: a <Folder> entry is only an IDE marker and

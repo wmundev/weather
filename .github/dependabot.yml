@@ -12,65 +12,15 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
+  # One entry for the whole solution: versions live in Directory.Packages.props (central package
+  # management) and the local tools in .config/dotnet-tools.json, both at the repository root.
   - package-ecosystem: "nuget"
-    directory: "/weather-backend"
+    directory: "/"
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
     groups:
-      weather_backend_minor_updates:
-        update-types:
-          - "minor"
-          - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types: [ "version-update:semver-major" ]
-  - package-ecosystem: "nuget"
-    directory: "/weather-test"
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 2
-    groups:
-      weather_test_minor_updates:
-        update-types:
-          - "minor"
-          - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types: [ "version-update:semver-major" ]
-  - package-ecosystem: "nuget"
-    directory: "/Weather.CLI.UnitTests"
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 2
-    groups:
-      weather_cli_unittests_minor_updates:
-        update-types:
-          - "minor"
-          - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types: [ "version-update:semver-major" ]
-  - package-ecosystem: "nuget"
-    directory: "/Weather.CLI"
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 5
-    groups:
-      weather_cli_minor_updates:
-        update-types:
-          - "minor"
-          - "patch"
-    ignore:
-      - dependency-name: "*"
-        update-types: [ "version-update:semver-major" ]
-  - package-ecosystem: "nuget"
-    directory: "/Weather.API.IntegrationTests"
-    schedule:
-      interval: "monthly"
-    open-pull-requests-limit: 2
-    groups:
-      weather_api_integrationtests_minor_updates:
+      nuget_minor_updates:
         update-types:
           - "minor"
           - "patch"

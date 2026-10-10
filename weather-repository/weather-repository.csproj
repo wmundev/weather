@@ -6,12 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.12"/>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12"/>
+    <PackageReference Include="Microsoft.Extensions.Configuration"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.513.4" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" />
     <!-- Infrastructure depends on the domain only; it must not reference the application layer. -->
     <ProjectReference Include="..\weather-domain\weather-domain.csproj"/>
   </ItemGroup>

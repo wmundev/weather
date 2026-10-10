@@ -139,7 +139,7 @@ namespace weather_backend.Services
 
         private async Task<string> GetApiKey()
         {
-            var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
+            var apiKey = (await _secretService.GetSecrets()).OpenWeatherApiKey;
 
             return string.IsNullOrEmpty(apiKey)
                 ? throw new InvalidOperationException("OpenWeatherMap API key is not configured.")

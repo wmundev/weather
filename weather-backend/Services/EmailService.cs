@@ -1,11 +1,10 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using weather_backend.Models;
 using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services
@@ -28,12 +27,11 @@ namespace weather_backend.Services
         /// </summary>
         public async Task SendEmail(string subject, string body, string receiver)
         {
-            // Credentials are fetched here rather than in the constructor: FetchSpecificSecret is async,
-            // and blocking on it during construction stalls every request that resolves this service.
-            var senderEmailAddress = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername))
-                                     ?? throw new InvalidOperationException("SMTP username is not configured.");
-            var senderPassword = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPPassword))
-                                 ?? throw new InvalidOperationException("SMTP password is not configured.");
+            // Credentials are fetched here rather than in the constructor: GetSecrets is async, and blocking
+            // on it during construction stalls every request that resolves this service.
+            var secrets = await _secretService.GetSecrets();
+            var senderEmailAddress = secrets.SMTPUsername;
+            var senderPassword = secrets.SMTPPassword;
 
             var emailHost = _configuration.GetValue<string>("SMTPHost")
                             ?? throw new InvalidOperationException("SMTPHost is not configured.");

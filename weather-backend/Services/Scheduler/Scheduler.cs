@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using weather_backend.Models;
 using weather_backend.Services.Interfaces;
 
 namespace weather_backend.Services.Scheduler
@@ -28,11 +27,8 @@ namespace weather_backend.Services.Scheduler
         {
             _logger.LogInformation("Executing schedule");
             var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(Constants.DEFAULT_CITY_ID, cancellationToken);
-            var receiverEmail = await _secretService.FetchSpecificSecret(nameof(AllSecrets.SMTPUsername));
-            if (receiverEmail is null)
-            {
-                throw new InvalidOperationException("Receiver email in secret is null.");
-            }
+            // The digest goes to the sending account itself.
+            var receiverEmail = (await _secretService.GetSecrets()).SMTPUsername;
 
             await _emailService.SendEmail($"{weatherData.name} Current Weather",
                 $"Current Temperature: {weatherData.main.temp}, Humidity: {weatherData.main.humidity}",

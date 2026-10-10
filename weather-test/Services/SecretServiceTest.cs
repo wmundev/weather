@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SimpleSystemsManagement;
@@ -31,13 +31,38 @@ namespace weather_test.Services
         }
 
         [Fact]
-        public async Task FetchSpecificSecret_ReturnsTheRequestedValue()
+        public async Task GetSecrets_WhenTheDocumentIsValid_ShouldReturnEveryValue()
         {
             SetParameterValue(ValidSecretsJson);
 
-            var result = await CreateSut().FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
+            var result = await CreateSut().GetSecrets();
 
-            Assert.Equal("key-123", result);
+            Assert.Equal("key-123", result.OpenWeatherApiKey);
+            Assert.Equal("sender@example.com", result.SMTPUsername);
+            Assert.Equal("hunter2", result.SMTPPassword);
+        }
+
+        [Fact]
+        public async Task GetSecrets_WhenCalledTwice_ShouldReturnTheCachedDocument()
+        {
+            SetParameterValue(ValidSecretsJson);
+            var sut = CreateSut();
+
+            var first = await sut.GetSecrets();
+            var second = await sut.GetSecrets();
+
+            Assert.Same(first, second);
+            await _ssmClient.Received(1).GetParameterAsync(Arg.Any<GetParameterRequest>(), Arg.Any<CancellationToken>());
+        }
+
+        [Fact]
+        public async Task GetSecrets_WhenTheDocumentIsJsonNull_ShouldThrowAConfigurationError()
+        {
+            SetParameterValue("null");
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => CreateSut().GetSecrets());
+
+            Assert.Contains(nameof(AllSecrets), exception.Message, StringComparison.Ordinal);
         }
 
         [Fact]
@@ -77,12 +102,12 @@ namespace weather_test.Services
         }
 
         [Fact]
-        public async Task FetchSpecificSecret_WhenTheDocumentIsIncomplete_ThrowsAConfigurationError()
+        public async Task GetSecrets_WhenTheDocumentIsIncomplete_ThrowsAConfigurationError()
         {
             SetParameterValue("{}");
 
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-                () => CreateSut().FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey)));
+                () => CreateSut().GetSecrets());
 
             Assert.Contains(nameof(AllSecrets), exception.Message, StringComparison.Ordinal);
         }

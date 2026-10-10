@@ -39,6 +39,11 @@ namespace weather_test.Services
             }
             """;
 
+        private static AllSecrets Secrets(string apiKey)
+        {
+            return new AllSecrets {OpenWeatherApiKey = apiKey, SMTPUsername = "sender@example.com", SMTPPassword = "unused"};
+        }
+
         private static (CurrentWeatherData sut, RecordingHttpMessageHandler handler, RecordingLogger<CurrentWeatherData> logger)
             CreateSut(string responseBody = SampleResponse)
         {
@@ -46,7 +51,7 @@ namespace weather_test.Services
             var logger = new RecordingLogger<CurrentWeatherData>();
 
             var secretService = Substitute.For<ISecretService>();
-            secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey)).Returns(ApiKey);
+            secretService.GetSecrets().Returns(Secrets(ApiKey));
 
             var sut = new CurrentWeatherData(new HttpClient(handler), logger, secretService);
             return (sut, handler, logger);
@@ -149,7 +154,7 @@ namespace weather_test.Services
         public async Task GetCurrentWeatherDataByCityId_WhenApiKeyMissing_ShouldThrowInvalidOperation()
         {
             var secretService = Substitute.For<ISecretService>();
-            secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey)).Returns((string?)null);
+            secretService.GetSecrets().Returns(Secrets(""));
             var sut = new CurrentWeatherData(new HttpClient(new RecordingHttpMessageHandler(SampleResponse)),
                 new RecordingLogger<CurrentWeatherData>(), secretService);
 

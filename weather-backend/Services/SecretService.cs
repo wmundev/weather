@@ -12,6 +12,8 @@ namespace weather_backend.Services
 {
     public sealed class SecretService : ISecretService
     {
+        private const string SecretsCacheKey = "secrets:parsed";
+
         private readonly ILogger<SecretService> _logger;
         private readonly SecretMemoryCache _memoryCache;
         private readonly IAmazonSimpleSystemsManagement _ssmClient;
@@ -23,26 +25,38 @@ namespace weather_backend.Services
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<string?> FetchSpecificSecret(string secretKey)
+        public async Task<AllSecrets> GetSecrets()
         {
-            var allSecrets = await FetchSecret(Constants.SECRETS_KEY);
+            // The parsed document is cached, not just the raw string: every weather request reads the API
+            // key, and deserialising the JSON on each of them was wasted work.
+            if (_memoryCache.Cache.TryGetValue(SecretsCacheKey, out AllSecrets? cachedSecrets) && cachedSecrets is not null)
+            {
+                return cachedSecrets;
+            }
 
-            AllSecrets? deserialisedObject;
+            var document = await FetchSecret(Constants.SECRETS_KEY);
+
+            AllSecrets? secrets;
             try
             {
-                deserialisedObject = JsonSerializer.Deserialize<AllSecrets>(allSecrets);
+                secrets = JsonSerializer.Deserialize<AllSecrets>(document);
             }
             catch (JsonException ex)
             {
                 // Every member of AllSecrets is required, so a partial or malformed document throws here.
                 // Surface it as a configuration problem rather than a bare JSON error.
-                throw new InvalidOperationException(
-                    $"SSM parameter '{Constants.SECRETS_KEY}' does not contain a valid {nameof(AllSecrets)} document.", ex);
+                throw InvalidSecretsDocument(ex);
             }
 
-            return typeof(AllSecrets).GetProperty(secretKey)?.GetValue(deserialisedObject)?.ToString();
-        }
+            if (secrets is null)
+            {
+                throw InvalidSecretsDocument(null);
+            }
 
+            _memoryCache.Cache.Set(SecretsCacheKey, secrets, CacheEntryOptions());
+
+            return secrets;
+        }
 
         public async Task<string> FetchSecret(string secretKey)
         {
@@ -65,14 +79,22 @@ namespace weather_backend.Services
                 throw new InvalidOperationException($"SSM parameter '{secretKey}' has no value.");
             }
 
-            // cache secret for 24 hours
-            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetSlidingExpiration(TimeSpan.FromHours(24))
-                .SetSize(1);
-
-            _memoryCache.Cache.Set(cacheKey, fetchedValue, cacheEntryOptions);
+            _memoryCache.Cache.Set(cacheKey, fetchedValue, CacheEntryOptions());
 
             return fetchedValue;
+        }
+
+        private static MemoryCacheEntryOptions CacheEntryOptions()
+        {
+            return new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromHours(24))
+                .SetSize(1);
+        }
+
+        private static InvalidOperationException InvalidSecretsDocument(Exception? innerException)
+        {
+            return new InvalidOperationException(
+                $"SSM parameter '{Constants.SECRETS_KEY}' does not contain a valid {nameof(AllSecrets)} document.", innerException);
         }
 
         private async Task<GetParameterResponse> FetchSecretFromParameterStore(string secretKey)

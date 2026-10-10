@@ -36,12 +36,9 @@ namespace weather_backend
 {
     public class Startup
     {
-        private IWebHostEnvironment _webHostEnvironment;
-
-        public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            _webHostEnvironment = webHostEnvironment;
         }
 
         public IConfiguration Configuration { get; }
@@ -96,7 +93,6 @@ namespace weather_backend
             services.AddAWSService<IAmazonSecurityTokenService>();
 
             services.AddControllers();
-            services.AddHttpClient();
             services.AddHttpClient<IGeolocationService, GeolocationService>("geolocation")
                 .AddStandardResilienceHandler(ConfigureUpstreamResilience);
             services.AddHttpClient<ICurrentWeatherData, CurrentWeatherData>("openweathermap", client =>
@@ -128,20 +124,20 @@ namespace weather_backend
             });
 
 
-            var dynamodbLocalMode = Configuration.GetValue("DynamoDb:LocalMode", false);
-            if (dynamodbLocalMode)
+            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+
+            // Local mode points DynamoDB alone at the container in database/; every other AWS client
+            // keeps the default options.
+            if (Configuration.GetValue("DynamoDb:LocalMode", false))
             {
-                services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
-                var awsOptions = new AWSOptions {DefaultClientConfig = {ServiceURL = "http://localhost:8000"}};
-                services.AddAWSService<IAmazonDynamoDB>(awsOptions);
-                services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
+                services.AddAWSService<IAmazonDynamoDB>(new AWSOptions { DefaultClientConfig = { ServiceURL = "http://localhost:8000" } });
             }
             else
             {
-                services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
                 services.AddAWSService<IAmazonDynamoDB>();
-                services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
             }
+
+            services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
 
             // Redis is optional. With no connection string nothing is registered, and NewFeatureController
             // answers 503 on its Redis routes instead of failing to construct - which used to take its
@@ -189,22 +185,6 @@ namespace weather_backend
                 return new DefaultBackgroundTaskQueue(queueCapacity);
             });
 
-            //TODO: doesn't work, will break email sending
-            // services.AddTransient<SmtpClient>((serviceProvider) =>
-            // {
-            //     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            //     string emailUsername = configuration.GetValue<string>("SMTPUsername");
-            //     string emailPassword = configuration.GetValue<string>("SMTPPassword");
-            //     string emailHost = configuration.GetValue<string>("SMTPHost");
-            //     int emailPort = configuration.GetValue<int>("SMTPPort");
-            //     return new SmtpClient()
-            //     {
-            //         Host = emailHost,
-            //         Port = emailPort,
-            //         Credentials = new NetworkCredential(emailUsername, emailPassword),
-            //         EnableSsl = true
-            //     };
-            // });
             // services.AddSingleton<IKafkaProducer, KafkaProducer>();
             services.AddHostedService<Scheduler>();
             // services.AddHostedService<KafkaHostedService>();

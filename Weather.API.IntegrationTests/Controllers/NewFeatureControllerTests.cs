@@ -24,22 +24,6 @@ namespace Weather.API.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async Task PatternTest()
-        {
-            var client = CreateClientWithMockRedis();
-            var response = await client.GetAsync("/feature/pattern");
-            response.EnsureSuccessStatusCode();
-        }
-
-        [Fact]
-        public async Task GeneratePasswordTest()
-        {
-            var client = CreateClientWithMockRedis();
-            var response = await client.GetAsync("/feature/password");
-            response.EnsureSuccessStatusCode();
-        }
-
-        [Fact]
         public async Task RedisSaveTest()
         {
             var mockRedis = Substitute.For<IConnectionMultiplexer>();
@@ -76,18 +60,6 @@ namespace Weather.API.IntegrationTests.Controllers
 
         // The tests above all register a mock multiplexer, which is how the controller failing to
         // construct without one - a 500 on every /feature route - went unnoticed.
-        [Theory]
-        [InlineData("/feature/pattern")]
-        [InlineData("/feature/password")]
-        public async Task RedisFreeRoutes_WhenRedisIsNotConfigured_ShouldReturnOk(string route)
-        {
-            var client = _factory.CreateClient();
-
-            var response = await client.GetAsync(route);
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
-
         [Fact]
         public async Task RedisGetTest_WhenRedisIsNotConfigured_ShouldReturn503()
         {

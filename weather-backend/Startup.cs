@@ -177,13 +177,11 @@ namespace weather_backend
             services.AddHybridCache();
             services.AddSingleton<IWeatherCacheService, WeatherCacheService>();
 
-            services.AddTransient<ThreadExample>();
             services.AddTransient<IAcademicService, AcademicService>();
 
             services.AddHttpContextAccessor();
 
             services.AddSingleton<IPhoneService, PhoneService>();
-            services.AddSingleton<DelegateService>();
 
             services.AddSingleton<SecretMemoryCache>();
             services.AddSingleton<ISecretService, SecretService>();

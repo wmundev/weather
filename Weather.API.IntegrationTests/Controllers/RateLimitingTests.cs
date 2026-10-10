@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -21,6 +21,9 @@ namespace Weather.API.IntegrationTests.Controllers
 {
     public class RateLimitingTests : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
+        // Any cheap route with no external dependency will do; it only has to reach the pipeline.
+        private const string CheapRoute = "/api/stringbase64/encodebase64?stringToEncode=hello";
+
         private readonly CustomWebApplicationFactory<Startup> _factory;
 
         public RateLimitingTests(CustomWebApplicationFactory<Startup> factory)
@@ -76,7 +79,7 @@ namespace Weather.API.IntegrationTests.Controllers
 
             for (var i = 0; i < 3; i++)
             {
-                var response = await client.GetAsync("/hello-world");
+                var response = await client.GetAsync(CheapRoute);
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
         }
@@ -90,10 +93,10 @@ namespace Weather.API.IntegrationTests.Controllers
                 ["RateLimiting:WindowSeconds"] = "60"
             });
 
-            await client.GetAsync("/hello-world");
-            await client.GetAsync("/hello-world");
+            await client.GetAsync(CheapRoute);
+            await client.GetAsync(CheapRoute);
 
-            var throttled = await client.GetAsync("/hello-world");
+            var throttled = await client.GetAsync(CheapRoute);
 
             Assert.Equal(HttpStatusCode.TooManyRequests, throttled.StatusCode);
 

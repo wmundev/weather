@@ -4,12 +4,11 @@ meta {
 }
 
 docs {
-  `NewFeatureController` - scratch endpoints plus a Redis read/write round-trip.
+  `NewFeatureController` - a Redis read/write round-trip.
 
   The Redis requests need a reachable Redis instance, set through
   `Redis:ConnectionString` (for example the `Redis__ConnectionString`
   environment variable). Redis is optional: with no connection string both
-  Redis requests return `503` while **Pattern** and **Generate Password** still
-  work. Both Redis requests use the fixed key `foo`, so run **Redis Set** before
+  requests return `503`. Both Redis requests use the fixed key `foo`, so run **Redis Set** before
   **Redis Get**.
 }

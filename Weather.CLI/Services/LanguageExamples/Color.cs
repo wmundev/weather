@@ -1,21 +1,16 @@
-﻿namespace weather_backend.Factory
+namespace Weather.CLI.Services.LanguageExamples
 {
-    public class Color
+    /// <summary>
+    /// The builder pattern on an immutable type. Moved from the API, where nothing used it.
+    /// </summary>
+    public sealed class Color(byte red, byte green, byte blue, byte alpha)
     {
-        public Color(byte red, byte green, byte blue, byte alpha)
-        {
-            Red = red;
-            Green = green;
-            Blue = blue;
-            Alpha = alpha;
-        }
+        public byte Red { get; } = red;
+        public byte Green { get; } = green;
+        public byte Blue { get; } = blue;
+        public byte Alpha { get; } = alpha;
 
-        public byte Red { get; }
-        public byte Green { get; }
-        public byte Blue { get; }
-        public byte Alpha { get; }
-
-        public class Builder
+        public sealed class Builder
         {
             private byte _alpha;
             private byte _blue;

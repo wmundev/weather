@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Weather.API.IntegrationTests.setup;
@@ -10,6 +10,9 @@ namespace Weather.API.IntegrationTests.Controllers
 {
     public class CorrelationIdTests : IClassFixture<CustomWebApplicationFactory<Startup>>
     {
+        // Any cheap route with no external dependency will do; it only has to reach the pipeline.
+        private const string CheapRoute = "/api/stringbase64/encodebase64?stringToEncode=hello";
+
         private readonly CustomWebApplicationFactory<Startup> _factory;
 
         public CorrelationIdTests(CustomWebApplicationFactory<Startup> factory)
@@ -29,7 +32,7 @@ namespace Weather.API.IntegrationTests.Controllers
         {
             var client = _factory.CreateClient();
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "/hello-world");
+            var request = new HttpRequestMessage(HttpMethod.Get, CheapRoute);
             request.Headers.Add(LogMiddleware.CorrelationIdHeader, "order-4821");
 
             var response = await client.SendAsync(request);
@@ -42,7 +45,7 @@ namespace Weather.API.IntegrationTests.Controllers
         {
             var client = _factory.CreateClient();
 
-            var response = await client.GetAsync("/hello-world");
+            var response = await client.GetAsync(CheapRoute);
 
             // A caller who did not send one still needs an id to quote when reporting a problem.
             Assert.False(string.IsNullOrEmpty(CorrelationIdOf(response)));
@@ -53,7 +56,7 @@ namespace Weather.API.IntegrationTests.Controllers
         {
             var client = _factory.CreateClient();
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "/hello-world");
+            var request = new HttpRequestMessage(HttpMethod.Get, CheapRoute);
             // TryAddWithoutValidation, because the client would otherwise reject this before it is sent -
             // and the server is what needs to be under test here.
             request.Headers.TryAddWithoutValidation(LogMiddleware.CorrelationIdHeader, "abc\r\nX-Injected: yes");

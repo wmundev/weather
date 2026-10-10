@@ -1,9 +1,7 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using weather_backend.Dto;
 
@@ -15,48 +13,15 @@ namespace weather_backend.Controllers
     [ProducesResponseType(typeof(ProblemDetails), 500)]
     public class NewFeatureController : ControllerBase
     {
-        private readonly ILogger<NewFeatureController> _logger;
         private readonly IConnectionMultiplexer? _redis;
 
-        /// <param name="logger">Logger for this controller.</param>
         /// <param name="redis">
-        /// Null when <c>Redis:ConnectionString</c> is not configured. Optional so that the Redis-free routes
-        /// here keep working without it; the Redis routes answer 503 instead.
+        /// Null when <c>Redis:ConnectionString</c> is not configured. Optional so that the controller still
+        /// constructs without Redis; the routes answer 503 instead.
         /// </param>
-        public NewFeatureController(ILogger<NewFeatureController> logger, IConnectionMultiplexer? redis = null)
+        public NewFeatureController(IConnectionMultiplexer? redis = null)
         {
             _redis = redis;
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <summary>
-        /// Handles the "pattern" route and returns a simple greeting message.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="IActionResult"/> indicating the result of the action.
-        /// </returns>
-        [Route("pattern")]
-        [HttpGet]
-        public IActionResult Pattern()
-        {
-            var greeting = "nice one";
-
-            if (greeting is { } thisisgreeting) _logger.LogDebug("Pattern matched {Greeting}", thisisgreeting);
-
-            return Ok();
-        }
-
-        /// <summary>
-        /// TODO: Generates a password and returns it.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="IActionResult"/> indicating the result of the action.
-        /// </returns>
-        [Route("password")]
-        [HttpGet]
-        public IActionResult GeneratePassword()
-        {
-            return Ok();
         }
 
         /// <summary>
@@ -82,7 +47,6 @@ namespace weather_backend.Controllers
             var db = _redis.GetDatabase();
             var foo = await db.StringSetAsync("foo", value.Value);
             return Ok(foo.ToString());
-            // var pong = await db.PingAsync();
         }
 
         /// <summary>
@@ -112,7 +76,6 @@ namespace weather_backend.Controllers
             watch.Stop();
             var elapsedMs = watch.ElapsedMilliseconds;
             return Ok(new { result = foo.ToString(), time = elapsedMs });
-            // var pong = await db.PingAsync();
         }
 
         private ObjectResult RedisNotConfigured()

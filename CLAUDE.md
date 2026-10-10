@@ -10,7 +10,7 @@ AWS Elastic Beanstalk via `aws-dotnet-deploy`.
 | ------------------------------- | --------------------------------------------------- |
 | `weather-backend/`              | ASP.NET Core API - controllers, services, hosted services |
 | `weather-application/`          | Application services (`EncryptionService`)          |
-| `weather-repository/`           | Data access (`CityRepository`)                      |
+| `weather-repository/`           | Data access (`CityRepository`, `DynamoDbClient`)    |
 | `weather-domain/`               | Entities and contracts shared across projects       |
 | `Weather.CLI/`                  | Console app - algorithm scratchpad                  |
 | `weather-test/`                 | API unit tests                                      |

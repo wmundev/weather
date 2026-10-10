@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using weather_backend.ActionFilter;
-using weather_backend.Dto;
-using weather_backend.Repository;
+using weather_repository.DynamoDb;
+using weather_domain.DatabaseEntities;
 
 namespace weather_backend.Controllers
 {

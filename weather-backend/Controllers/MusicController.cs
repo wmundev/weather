@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using weather_backend.Repository;
+using weather_repository.DynamoDb;
 
 namespace weather_backend.Controllers
 {

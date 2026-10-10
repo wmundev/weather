@@ -1,13 +1,9 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
 using Microsoft.Extensions.Logging;
-using weather_backend.Dto;
 using weather_domain.DatabaseEntities;
 
-namespace weather_backend.Repository
+namespace weather_repository.DynamoDb
 {
     public interface IDynamoDbClient
     {
@@ -18,23 +14,28 @@ namespace weather_backend.Repository
 
     public class DynamoDbClient : IDynamoDbClient
     {
-        private readonly IDynamoDBContext _amazonDynamoDbClient;
+        // The demo tables hold one well-known item each; these are their keys.
+        private const int EmailCodeId = 1177876938;
+        private const string MusicArtist = "Dream Theater";
+        private const string MusicSongTitle = "Surrounded";
+
+        private readonly IDynamoDBContext _dynamoDbContext;
         private readonly ILogger<DynamoDbClient> _logger;
 
-        public DynamoDbClient(ILogger<DynamoDbClient> logger, IDynamoDBContext amazonDynamoDbClient)
+        public DynamoDbClient(ILogger<DynamoDbClient> logger, IDynamoDBContext dynamoDbContext)
         {
-            _logger = logger;
-            _amazonDynamoDbClient = amazonDynamoDbClient;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _dynamoDbContext = dynamoDbContext ?? throw new ArgumentNullException(nameof(dynamoDbContext));
         }
 
-        public async Task<EmailCodeEntity> LoadEmailCode()
+        public Task<EmailCodeEntity> LoadEmailCode()
         {
-            return await _amazonDynamoDbClient.LoadAsync<EmailCodeEntity>(1177876938);
+            return _dynamoDbContext.LoadAsync<EmailCodeEntity>(EmailCodeId);
         }
 
-        public async Task<MusicDto> LoadMusicDto(CancellationToken token = default)
+        public Task<MusicDto> LoadMusicDto(CancellationToken token = default)
         {
-            return await _amazonDynamoDbClient.LoadAsync<MusicDto>("Dream Theater", "Surrounded", token);
+            return _dynamoDbContext.LoadAsync<MusicDto>(MusicArtist, MusicSongTitle, token);
         }
 
         public async Task SaveRecord(DynamoDbCity obj)
@@ -44,7 +45,7 @@ namespace weather_backend.Repository
             for (var attempt = 1; attempt <= maxAttempts; attempt++)
                 try
                 {
-                    await _amazonDynamoDbClient.SaveAsync(obj);
+                    await _dynamoDbContext.SaveAsync(obj);
                     return;
                 }
                 catch (ProvisionedThroughputExceededException exception) when (attempt < maxAttempts)

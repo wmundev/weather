@@ -6,7 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using weather_backend;
-using weather_backend.Repository;
+using weather_repository.DynamoDb;
 using weather_backend.Services;
 using weather_domain.DatabaseEntities;
 using weather_domain.Entities;

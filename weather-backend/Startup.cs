@@ -26,7 +26,7 @@ using weather_backend.Adapters;
 using weather_backend.Extensions;
 using weather_backend.HostedService;
 using weather_backend.Middleware;
-using weather_backend.Repository;
+using weather_repository.DynamoDb;
 using weather_backend.Services;
 using weather_backend.Services.Interfaces;
 using weather_backend.Services.Scheduler;
@@ -169,7 +169,6 @@ namespace weather_backend
 
             services.AddInfrastructureServices(Configuration);
             services.AddApplicationServices(Configuration);
-            services.AddSingleton<IDynamoDbClient, DynamoDbClient>();
             // Singleton: EmailService is stateless now that the SmtpClient is created per send, and the
             // singleton Scheduler depends on it.
             services.AddSingleton<EmailService>();

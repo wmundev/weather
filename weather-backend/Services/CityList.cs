@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using weather_domain.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using weather_backend.Repository;
+using weather_repository.DynamoDb;
 using weather_domain.DatabaseEntities;
 using weather_domain.Entities;
 using weather_repository.City;

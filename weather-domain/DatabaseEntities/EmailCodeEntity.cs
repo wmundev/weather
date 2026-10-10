@@ -1,6 +1,6 @@
 using Amazon.DynamoDBv2.DataModel;
 
-namespace weather_backend.Dto
+namespace weather_domain.DatabaseEntities
 {
     [DynamoDBTable("EmailCode")]
     public sealed class EmailCodeEntity

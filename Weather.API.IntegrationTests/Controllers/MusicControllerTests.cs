@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using weather_backend;
-using weather_backend.Dto;
-using weather_backend.Repository;
+using weather_repository.DynamoDb;
 using Weather.API.IntegrationTests.setup;
 using Xunit;
+using weather_domain.DatabaseEntities;
 
 namespace Weather.API.IntegrationTests.Controllers
 {

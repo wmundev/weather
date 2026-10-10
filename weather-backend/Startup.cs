@@ -145,7 +145,10 @@ namespace weather_backend
                 services.AddAWSService<IAmazonDynamoDB>();
             }
 
-            services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
+            // AWSSDK v4 obsoletes the DynamoDBContext constructors in favour of the builder.
+            services.AddSingleton<IDynamoDBContext>(serviceProvider => new DynamoDBContextBuilder()
+                .WithDynamoDBClient(serviceProvider.GetRequiredService<IAmazonDynamoDB>)
+                .Build());
 
             // Redis is optional. With no connection string nothing is registered, and NewFeatureController
             // answers 503 on its Redis routes instead of failing to construct - which used to take its

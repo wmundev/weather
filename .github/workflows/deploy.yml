@@ -43,6 +43,9 @@ jobs:
       - name: Execute Deployment
         env:
           CONFIG_CAT_SDK_KEY_PROD: ${{ secrets.CONFIG_CAT_SDK_KEY_PROD }}
+          # Read by weather-backend.Deployment/AppStack.cs and set on the Beanstalk environment as
+          # EmailCode__ApiKey, which gates GET /api/email/code.
+          EMAIL_CODE_API_KEY: ${{ secrets.EMAIL_CODE_API_KEY }}
         run: |
           bash ci-scripts/setup_env.sh
           dotnet aws deploy --silent --project-path "weather-backend/weather-backend.csproj" --apply "../weather-backend.Deployment/appsettings.json" --deployment-project "../weather-backend.Deployment"

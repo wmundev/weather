@@ -97,3 +97,6 @@ tooling such as the Bruno CLI.
 - `GET /api/music/song-title` cancels its own DynamoDB load, so its status code
   is a race by design.
 - `KafkaController` is entirely commented out.
+- `GET /api/email/code` needs an `X-Api-Key` header matching `EmailCode:ApiKey`
+  (env var `EmailCode__ApiKey`; set from the `EMAIL_CODE_API_KEY` GitHub secret on
+  deploy). With no key configured it answers `503`.

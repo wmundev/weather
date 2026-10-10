@@ -10,12 +10,24 @@ get {
   auth: inherit
 }
 
-assert {
-  res.status: eq 200
+headers {
+  X-Api-Key: {{emailCodeApiKey}}
 }
 
 docs {
   `GET /api/email/code`
 
-  Loads the `EmailCodeEntity` from DynamoDB.
+  Loads the `EmailCodeEntity` from DynamoDB. Requires the `X-Api-Key` header.
+
+  | Header      | Required | Notes                                         |
+  | ----------- | -------- | --------------------------------------------- |
+  | `X-Api-Key` | yes      | Must equal the API's `EmailCode:ApiKey` value |
+
+  Set `emailCodeApiKey` as a secret in the Bruno environment - it is never
+  written to the `.bru` files. Locally, give the API a key with
+  `dotnet user-secrets set EmailCode:ApiKey <key> --project weather-backend`;
+  in production it comes from the `EMAIL_CODE_API_KEY` GitHub Actions secret.
+
+  No status assert: the result depends on that secret being set, and the API
+  answers `503` when it has no key configured.
 }

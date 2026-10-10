@@ -76,6 +76,26 @@ namespace weather_backend.Deployment
                         Value = "true"
                     });
 
+                    // GET /api/email/code is gated by an API key the app reads from EmailCode:ApiKey. The deploy
+                    // workflow passes it from the EMAIL_CODE_API_KEY GitHub Actions secret; this process inherits
+                    // that environment and sets it on the Beanstalk environment, where ASP.NET Core reads
+                    // EmailCode__ApiKey as EmailCode:ApiKey. Without it the endpoint fails closed with a 503.
+                    var emailCodeApiKey = System.Environment.GetEnvironmentVariable("EMAIL_CODE_API_KEY");
+                    if (string.IsNullOrWhiteSpace(emailCodeApiKey))
+                    {
+                        System.Console.WriteLine("EMAIL_CODE_API_KEY is not set; GET /api/email/code will answer 503.");
+                    }
+                    else
+                    {
+                        optionList.RemoveAll(o => o.Namespace == "aws:elasticbeanstalk:application:environment" && o.OptionName == "EmailCode__ApiKey");
+                        optionList.Add(new CfnEnvironment.OptionSettingProperty
+                        {
+                            Namespace = "aws:elasticbeanstalk:application:environment",
+                            OptionName = "EmailCode__ApiKey",
+                            Value = emailCodeApiKey
+                        });
+                    }
+
                     props.OptionSettings = optionList.ToArray();
                 }
             }

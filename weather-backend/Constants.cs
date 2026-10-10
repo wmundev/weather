@@ -12,7 +12,7 @@ namespace weather_backend
         /// <summary>
         /// OpenWeatherMap city id for Melbourne, used by the daily digest and the legacy /weather endpoint.
         /// </summary>
-        public const double DEFAULT_CITY_ID = 7839805;
+        public const long DEFAULT_CITY_ID = 7839805;
 
         // Cached instances, not properties: System.Text.Json builds and caches serialization metadata per
         // options object, so handing out a fresh instance on every access throws that cache away.

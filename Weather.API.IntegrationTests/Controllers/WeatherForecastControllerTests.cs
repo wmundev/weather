@@ -136,6 +136,20 @@ namespace Weather.API.IntegrationTests.Controllers
             Assert.Equal("CityById", content?.name);
         }
 
+        [Theory]
+        [InlineData("1.5")]
+        [InlineData("melbourne")]
+        public async Task GetWeatherByCityId_WhenTheIdIsNotAnInteger_ShouldReturn404WithoutCallingUpstream(string cityId)
+        {
+            var mockWeather = Substitute.For<ICurrentWeatherData>();
+            var client = CreateClientWithMockService(mockWeather);
+
+            var response = await client.GetAsync($"/weather/city/{cityId}");
+
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+            await mockWeather.DidNotReceiveWithAnyArgs().GetCurrentWeatherDataByCityId(default(CityIdWeatherRequestDto)!, default);
+        }
+
         [Fact]
         public async Task GetCurrentWeatherDataById_ZipCode_ReturnsOk()
         {

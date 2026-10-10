@@ -153,14 +153,14 @@ namespace weather_backend.Controllers
         /// <response code="503">If the upstream weather provider is unavailable or the circuit breaker is open</response>
         /// <response code="502">If the upstream weather provider returned an error other than not found</response>
         [HttpGet]
-        [Route("/weather/city/{cityId}")]
+        [Route("/weather/city/{cityId:long}")]
         [ProducesResponseType(typeof(WeatherData), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status502BadGateway)]
         public async Task<ActionResult<WeatherData>> GetWeatherByCityId(
-            [FromRoute, Required] double cityId,
+            [FromRoute, Required] long cityId,
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
             [FromQuery] string? lang = null,
             CancellationToken cancellationToken = default)

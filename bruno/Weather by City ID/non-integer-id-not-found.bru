@@ -1,0 +1,26 @@
+meta {
+  name: Non-integer ID - Not Found (404)
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/weather/city/:cityId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  cityId: 1.5
+}
+
+assert {
+  res.status: eq 404
+}
+
+docs {
+  `GET /weather/city/{cityId:long}`
+
+  The route constraint only matches whole-number city IDs, so `1.5` matches no
+  route and returns `404` without calling OpenWeatherMap.
+}

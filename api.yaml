@@ -1237,8 +1237,8 @@ paths:
           in: path
           required: true
           schema:
-            type: number
-            format: double
+            type: integer
+            format: int64
         - name: units
           in: query
           schema:

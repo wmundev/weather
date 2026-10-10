@@ -129,7 +129,7 @@ namespace Weather.API.IntegrationTests.Controllers
         public async Task UncachedWeatherEndpoint_ShouldThrottleAheadOfTheGlobalLimit()
         {
             var mockWeather = Substitute.For<ICurrentWeatherData>();
-            mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<double>(), Arg.Any<CancellationToken>())
+            mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<long>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromResult(CreateValidWeatherData("Melbourne")));
 
             // Global limit stays generous: this proves the stricter per-endpoint policy is what bites,

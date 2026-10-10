@@ -31,7 +31,7 @@ namespace weather_backend.Services
         /// <summary>
         /// Legacy method - Get weather data by city ID in metric units
         /// </summary>
-        public Task<WeatherData> GetCurrentWeatherDataByCityId(double cityId, CancellationToken cancellationToken = default)
+        public Task<WeatherData> GetCurrentWeatherDataByCityId(long cityId, CancellationToken cancellationToken = default)
         {
             return GetCurrentWeatherDataByCityId(new CityIdWeatherRequestDto {CityId = cityId, Units = WeatherUnit.Metric}, cancellationToken);
         }

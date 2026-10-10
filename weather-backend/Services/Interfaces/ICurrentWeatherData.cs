@@ -14,7 +14,7 @@ namespace weather_backend.Services.Interfaces
         /// <param name="cityId">The city ID from OpenWeatherMap</param>
         /// <param name="cancellationToken">Cancels the upstream call.</param>
         /// <returns>Weather data in metric units</returns>
-        Task<WeatherData> GetCurrentWeatherDataByCityId(double cityId, CancellationToken cancellationToken = default);
+        Task<WeatherData> GetCurrentWeatherDataByCityId(long cityId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Get current weather data by city ID with custom units and language

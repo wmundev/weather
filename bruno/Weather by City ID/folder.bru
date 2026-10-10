@@ -4,16 +4,18 @@ meta {
 }
 
 docs {
-  `GET /weather/city/{cityId}`
+  `GET /weather/city/{cityId:long}`
 
   Get weather by OpenWeatherMap city ID. The most precise lookup - use it to
   avoid the ambiguity of duplicate city names.
 
   | Param    | In    | Required | Default  | Notes                                |
   | -------- | ----- | -------- | -------- | ------------------------------------ |
-  | `cityId` | path  | yes      | -        | OpenWeatherMap city ID               |
+  | `cityId` | path  | yes      | -        | OpenWeatherMap city ID (integer)     |
   | `units`  | query | no       | `Metric` | `Standard` \| `Metric` \| `Imperial` |
   | `lang`   | query | no       | -        | Two-letter language code             |
+
+  The route only matches whole-number IDs, so `1.5` or `melbourne` is a `404`.
 
   City ID lists are published at http://bulk.openweathermap.org/sample/
 

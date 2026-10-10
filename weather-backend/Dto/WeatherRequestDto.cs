@@ -28,7 +28,7 @@ namespace weather_backend.Dto
 
     public class CityIdWeatherRequestDto : WeatherRequestDto
     {
-        public required double CityId { get; set; }
+        public required long CityId { get; set; }
     }
 
     public class ZipCodeWeatherRequestDto : WeatherRequestDto

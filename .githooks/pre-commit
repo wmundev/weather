@@ -1,39 +1,16 @@
 #!/bin/sh
 #
-# An example hook script to verify what is about to be committed.
-# Called by "git commit" with no arguments.  The hook should
-# exit with non-zero status after issuing an appropriate message if
-# it wants to stop the commit.
+# Regenerates api.yaml and stages it, so the committed spec always matches the code.
+# Enable once per clone with: git config core.hooksPath .githooks
 #
-# To enable this hook, rename this file to "pre-commit".
+# Note: the spec is generated from the working tree, not the index - see the commit-changes skill.
+set -e
 
-# Format code
-#repoTopLevel=`git rev-parse --show-toplevel`
-#filesToFormat=""
-#filesToCommit=""
+repoTopLevel=$(git rev-parse --show-toplevel)
 
-#for file in $(git diff --name-only --cached --diff-filter=ACMRT)
-#    do
-#        filesToFormat+="./"$file";"
-#        filesToCommit+="./"$file" "
-#    done
+if ! "$repoTopLevel/scripts/generate-openapi-docs.sh"; then
+  echo "pre-commit: api.yaml generation failed - fix the build and commit again." >&2
+  exit 1
+fi
 
-#echo "🗂  - Files to be formatted:"
-#echo $filesToFormat
-
-#echo "🏎  - Starting formatting..."
-
-#dotnet tool restore
-#dotnet jb cleanupcode --include="$filesToFormat" "weather.sln"
-
-#echo "✅ - Formatting complete. Adding changes..."
-#git add $filesToCommit
-
-# Generate OpenAPI docs
-(
-  cd $(git rev-parse --show-toplevel)/scripts
-  ./generate-openapi-docs.sh
-  git add ../api.yaml
-)
-
-exit 0
+git add "$repoTopLevel/api.yaml"

@@ -6,7 +6,15 @@
       "version": "2023.3.6",
       "commands": [
         "jb"
-      ]
+      ],
+      "rollForward": false
+    },
+    "swashbuckle.aspnetcore.cli": {
+      "version": "6.9.0",
+      "commands": [
+        "swagger"
+      ],
+      "rollForward": false
     }
   }
 }

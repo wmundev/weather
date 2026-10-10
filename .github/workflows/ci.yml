@@ -74,6 +74,14 @@ jobs:
         run: dotnet test --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
         working-directory: ./Weather.API.IntegrationTests
 
+      # Here rather than in the build job: generating the spec boots the real host, which needs the
+      # ConfigCat key that setup_env.sh writes. Catches commits made without the pre-commit hook,
+      # including Dependabot bumps of Swashbuckle.
+      - name: Check api.yaml is current
+        run: |
+          sh scripts/generate-openapi-docs.sh
+          git diff --exit-code -- api.yaml || { echo "::error file=api.yaml::api.yaml is stale - run scripts/generate-openapi-docs.sh and commit the result."; exit 1; }
+
       - name: Upload integration test coverage
         uses: actions/upload-artifact@v4
         with:

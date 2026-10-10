@@ -19,14 +19,16 @@ hand-edit that disagrees with the code is worse than a stale file.
 cd scripts && ./generate-openapi-docs.sh
 ```
 
-The script installs `Swashbuckle.AspNetCore.Cli` 6.5.0 as a global tool,
-publishes the API in Release to `out/`, and writes `api.yaml` from the `v1`
-Swagger document.
+The script restores `Swashbuckle.AspNetCore.Cli` from the local tool manifest
+(`.config/dotnet-tools.json`, pinned to the same version as the
+`Swashbuckle.AspNetCore` package), publishes the API in Release to `out/`, and
+writes `api.yaml` from the `v1` Swagger document. It exits non-zero on any
+failure.
 
 Equivalent manual steps if the script fails:
 
 ```bash
-dotnet tool install -g --version 6.5.0 Swashbuckle.AspNetCore.Cli
+dotnet tool restore
 ```
 
 ```bash
@@ -34,15 +36,22 @@ dotnet publish -c Release -o out weather-backend/weather-backend.csproj
 ```
 
 ```bash
-swagger tofile --output api.yaml --yaml out/weather-backend.dll v1
+cd out && dotnet tool run swagger tofile --output ../api.yaml --yaml weather-backend.dll v1
 ```
+
+Run the last step from inside `out/`: the CLI boots the real host, and the
+appsettings carrying `ConfigCat:Key` only resolve with `out/` as content root.
+
+When bumping `Swashbuckle.AspNetCore`, bump the CLI in the manifest to match
+(`dotnet tool update swashbuckle.aspnetcore.cli --version <x>`).
 
 `out/` is gitignored; `api.yaml` is committed.
 
 ## The git hook
 
 `.githooks/pre-commit` already runs the script and stages `api.yaml` on every
-commit. Enable it once per clone:
+commit, and blocks the commit if generation fails. CI also regenerates the spec
+and fails if the committed `api.yaml` is stale. Enable it once per clone:
 
 ```bash
 git config core.hooksPath .githooks

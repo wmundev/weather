@@ -62,9 +62,8 @@ description: How changes are committed in this repo - straight onto the trunk br
      commit, then `git stash pop`. If the pop conflicts, stop and tell the user -
      never drop the stash.
    - The hook also stages an `api.yaml` the author had modified by hand.
-   - The hook always exits 0, even when the publish fails, so a broken build
-     leaves `api.yaml` stale without blocking the commit. The gate in step 1 is
-     what actually catches that.
+   - If generation fails (usually a build error) the hook blocks the commit. Fix
+     the build; never bypass it with `--no-verify`.
 6. **Check the result is exactly the change you meant**: `git diff --cached --stat`
    before committing, and `git show --stat HEAD` after - an `api.yaml` change in
    a commit that touched no endpoint means the hook picked up something it

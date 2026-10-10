@@ -13,7 +13,7 @@ description: How changes are committed in this repo - straight onto the trunk br
   committing on a default branch.
 - **Never push.** Not `git push`, not `gh pr create`, not a push to any other
   branch or remote. A push to `main` runs `.github/workflows/ci.yml`, and a
-  green CI run triggers `deploy.yml`, which deploys to AWS ECS. The author
+  green CI run triggers `deploy.yml`, which deploys to AWS Elastic Beanstalk. The author
   reviews the commits locally and pushes them themselves.
 - **Work already on another branch** (an older session, a worktree) goes onto
   `main` by fast-forward: `git checkout main && git merge --ff-only <branch>`,

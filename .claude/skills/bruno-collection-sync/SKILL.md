@@ -176,7 +176,8 @@ Match these; do not invent new ones.
   the `Encryption` and `Text Utilities` folders.
 - **Every request and folder gets a `docs` block.** Include the raw route, a
   parameter table, and any prerequisite (external service, ordering, feature
-  flag). Call out side effects explicitly - `Legacy Endpoint` sends a real email.
+  flag). Call out side effects and costs explicitly - `Legacy Endpoint` bypasses the cache and
+  spends OpenWeatherMap quota on every call.
 
 ## Step 4 - Verify
 

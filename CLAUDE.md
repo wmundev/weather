@@ -1,8 +1,8 @@
 # CLAUDE.md
 
-.NET 10 weather API (`weather-backend`) wrapping OpenWeatherMap with a DynamoDB
+.NET 10 weather API (`weather-backend`) wrapping OpenWeatherMap with an in-memory
 response cache, plus utility endpoints, a CLI, and Terraform infra. Deployed to
-AWS ECS via `aws-dotnet-deploy`.
+AWS Elastic Beanstalk via `aws-dotnet-deploy`.
 
 ## Layout
 
@@ -87,8 +87,9 @@ tooling such as the Bruno CLI.
 
 ## Gotchas
 
-- `GET /weather` is **legacy**: uncached, and **sends a real email** on every
-  call. Never use it for smoke or load testing.
+- `GET /weather` is **legacy** and **uncached** - every call spends OpenWeatherMap
+  quota. Never use it for smoke or load testing. It sends no email; the daily
+  digest email comes from the `Scheduler` hosted service at 22:00 UTC.
 - `GET /api/prime-number` is gated behind the `primenumber` ConfigCat flag and
   returns `400 "Not enabled"` when off.
 - `POST /api/LanguageTranslator/generate` is a deliberate no-op - the AWS

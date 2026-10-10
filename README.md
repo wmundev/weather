@@ -26,7 +26,7 @@ For silent deploy
 dotnet aws deploy --silent --project-path "weather-backend/weather-backend.csproj" --deployment-project "../weather-backend.Deployment" --application-name "weather-backend"
 ```
 
-We use this tool to deploy to aws to AWS ECS - https://github.com/aws/aws-dotnet-deploy
+We use this tool to deploy to AWS Elastic Beanstalk - https://github.com/aws/aws-dotnet-deploy
 
 ## Instructions for debian deploy (deprecated)
 Run the command in a terminal after logging into your server

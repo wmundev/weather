@@ -1,0 +1,29 @@
+meta {
+  name: Melbourne Weather
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/weather
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+docs {
+  `GET /weather`
+
+  Legacy endpoint. Fetches weather for Melbourne (`Constants.DEFAULT_CITY_ID`,
+  city ID `7839805`) in metric units.
+
+  It has **no caching** - every call hits OpenWeatherMap and spends quota, which
+  is why it sits in the stricter `uncached` rate-limit bucket. Do not use it for
+  load or smoke testing.
+
+  It sends no email. The daily Melbourne digest email comes from the `Scheduler`
+  hosted service (22:00 UTC), not from this endpoint.
+}

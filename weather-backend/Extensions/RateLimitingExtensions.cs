@@ -27,7 +27,7 @@ namespace weather_backend.Extensions
         public const string UncachedPolicy = "uncached";
 
         /// <summary>
-        /// Paths that must never be throttled. The ECS/ALB health check polls /health continuously from
+        /// Paths that must never be throttled. The load balancer health check polls /health continuously from
         /// one address; rate limiting it would take healthy tasks out of service under load, which is
         /// exactly when the limiter matters most.
         /// </summary>

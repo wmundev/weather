@@ -26,5 +26,5 @@ docs {
   ASP.NET Core health check endpoint, registered in `Startup.Configure` via
   `endpoints.MapHealthChecks("/health")`. Returns the plain text `Healthy`.
 
-  This is the probe used by the AWS ECS deployment.
+  Use it as the liveness probe. It is exempt from rate limiting.
 }

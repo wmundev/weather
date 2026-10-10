@@ -38,11 +38,11 @@ Both layers are expected, and CI runs them separately.
 test class per controller and new controllers are expected to keep that up.
 
 ```csharp
-public sealed class ThingControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+public sealed class ThingControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
 {
     private readonly HttpClient _client;
 
-    public ThingControllerTests(CustomWebApplicationFactory<Startup> factory)
+    public ThingControllerTests(CustomWebApplicationFactory<Program> factory)
     {
         _client = factory.CreateClient();
     }
@@ -94,7 +94,7 @@ Then run the tests - see the `dotnet-test` skill.
 
 - [ ] Action method with explicit binding attributes and `[ProducesResponseType]`
 - [ ] XML doc comments on the action
-- [ ] Service logic behind an interface, registered in `Startup`
+- [ ] Service logic behind an interface, registered in `Hosting/WeatherApiServices.cs`
 - [ ] Unit tests in `weather-test/`
 - [ ] Integration test in `Weather.API.IntegrationTests/Controllers/`
 - [ ] Bruno request added via `bruno-collection-sync`

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using weather_backend.Configuration;
 
 // Both Microsoft.AspNetCore.HttpOverrides and System.Net define IPNetwork; KnownIPNetworks takes the latter.
@@ -69,12 +70,15 @@ namespace weather_backend.Extensions
         public static IServiceCollection AddApiRateLimiting(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<RateLimitingOptions>(configuration.GetSection(RateLimitingOptions.SectionName));
+            services.AddRateLimiter(_ => { });
 
-            var limits = configuration.GetSection(RateLimitingOptions.SectionName).Get<RateLimitingOptions>()
-                         ?? new RateLimitingOptions();
-
-            return services.AddRateLimiter(options =>
+            // The limits are read through IOptions when the limiter is first built, not from configuration
+            // here at registration. Under minimal hosting, configuration added after registration - such as
+            // a test host's overrides - would otherwise never reach the limiter.
+            services.AddOptions<RateLimiterOptions>().Configure<IOptions<RateLimitingOptions>>((options, limitsOptions) =>
             {
+                var limits = limitsOptions.Value;
+
                 options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
                     IsExempt(context)
                         ? RateLimitPartition.GetNoLimiter("exempt")
@@ -132,6 +136,8 @@ namespace weather_backend.Extensions
                     }, cancellationToken);
                 };
             });
+
+            return services;
         }
 
         private static bool IsExempt(HttpContext context)

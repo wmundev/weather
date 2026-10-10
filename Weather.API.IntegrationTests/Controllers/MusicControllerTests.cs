@@ -12,11 +12,11 @@ using weather_domain.DatabaseEntities;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class MusicControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class MusicControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public MusicControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public MusicControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

@@ -11,11 +11,11 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public sealed class EncryptionControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public sealed class EncryptionControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         private readonly HttpClient _client;
 
-        public EncryptionControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public EncryptionControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _client = factory.CreateClient();
         }

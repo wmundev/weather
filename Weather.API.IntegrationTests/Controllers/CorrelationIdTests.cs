@@ -8,14 +8,14 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class CorrelationIdTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class CorrelationIdTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         // Any cheap route with no external dependency will do; it only has to reach the pipeline.
         private const string CheapRoute = "/api/stringbase64/encodebase64?stringToEncode=hello";
 
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public CorrelationIdTests(CustomWebApplicationFactory<Startup> factory)
+        public CorrelationIdTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

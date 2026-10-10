@@ -7,12 +7,12 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public sealed class EnglishWordControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public sealed class EnglishWordControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         private const string path = "/api/v1/word/capitalize-first-word";
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public EnglishWordControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public EnglishWordControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

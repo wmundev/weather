@@ -48,7 +48,7 @@ dotnet test weather-test --filter "FullyQualifiedName~WeatherCacheServiceTest"
 
 ## Integration tests
 
-These spin up the real host through `CustomWebApplicationFactory<Startup>`, so
+These spin up the real host through `CustomWebApplicationFactory<Program>`, so
 they need AWS credentials (Parameter Store / DynamoDB, `us-east-1`) and the
 ConfigCat SDK key. CI supplies them via `ci-scripts/setup_env.sh` and repository
 secrets.

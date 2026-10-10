@@ -16,12 +16,12 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public sealed class PhoneNumberControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public sealed class PhoneNumberControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         private const string path = "/phone-number";
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public PhoneNumberControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public PhoneNumberControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }

@@ -11,12 +11,12 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public sealed class GeolocationControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public sealed class GeolocationControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         private const string path = "/geolocation";
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public GeolocationControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public GeolocationControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

@@ -6,11 +6,11 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests
 {
-    public sealed class LogMiddlewareTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public sealed class LogMiddlewareTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public LogMiddlewareTests(CustomWebApplicationFactory<Startup> factory)
+        public LogMiddlewareTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

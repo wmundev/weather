@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.DependencyInjection;
 using weather_backend;
+using weather_backend.Hosting;
 using weather_backend.Dto;
 using weather_backend.Models;
 using weather_backend.Services;
@@ -23,7 +24,7 @@ namespace weather_test.Services
             // Registered the way Startup does it, including a size-limited IMemoryCache: with a SizeLimit set,
             // the memory cache throws on any entry that does not declare a size.
             var services = new ServiceCollection();
-            services.AddMemoryCache(options => options.SizeLimit = Startup.SharedMemoryCacheSizeLimitBytes);
+            services.AddMemoryCache(options => options.SizeLimit = WeatherApiServices.SharedMemoryCacheSizeLimitBytes);
             services.AddHybridCache();
             var cache = services.BuildServiceProvider().GetRequiredService<HybridCache>();
 

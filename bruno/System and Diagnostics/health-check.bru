@@ -23,7 +23,7 @@ tests {
 docs {
   `GET /health`
 
-  ASP.NET Core health check endpoint, registered in `Startup.Configure` via
+  ASP.NET Core health check endpoint, registered in `WeatherApiPipeline.UseWeatherApi` via
   `endpoints.MapHealthChecks("/health")`. Returns the plain text `Healthy`.
 
   Use it as the liveness probe. It is exempt from rate limiting.

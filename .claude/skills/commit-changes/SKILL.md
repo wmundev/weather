@@ -27,7 +27,7 @@ description: How changes are committed in this repo - straight onto the trunk br
    - `dotnet build --configuration Release`
    - The unit suites per the `dotnet-test` skill (`weather-test`,
      `Weather.CLI.UnitTests`).
-   - A change to a controller, middleware, `Startup`, or anything else on the
+   - A change to a controller, middleware, `Program.cs` / `Hosting/`, or anything else on the
      request path also needs `Weather.API.IntegrationTests`. If those fail on
      missing AWS / ConfigCat credentials rather than on assertions, say so when
      reporting - don't call the change verified.

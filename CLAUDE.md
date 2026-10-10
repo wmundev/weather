@@ -46,7 +46,7 @@ failure branches. It is committed and expected to stay correct.
 **Any change to a route, HTTP verb, query/route parameter, or request body must
 invoke `bruno-collection-sync` in the same change.** Do not hand-write `.bru`
 files from memory. This covers endpoints registered outside controllers too, such
-as `MapHealthChecks("/health")` in `Startup.Configure`.
+as `MapHealthChecks("/health")` in `weather-backend/Hosting/WeatherApiPipeline.cs`.
 
 The same change should regenerate `api.yaml` - the `pre-commit` hook does this
 automatically once hooks are installed (`git config core.hooksPath .githooks`).

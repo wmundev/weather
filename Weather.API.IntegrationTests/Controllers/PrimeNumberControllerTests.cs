@@ -11,12 +11,12 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public sealed class PrimeNumberControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public sealed class PrimeNumberControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         private const string path = "/api/prime-number";
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public PrimeNumberControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public PrimeNumberControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

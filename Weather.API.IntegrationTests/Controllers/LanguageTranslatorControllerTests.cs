@@ -10,11 +10,11 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class LanguageTranslatorControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class LanguageTranslatorControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public LanguageTranslatorControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public LanguageTranslatorControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

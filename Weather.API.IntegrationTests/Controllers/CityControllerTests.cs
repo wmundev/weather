@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class CityControllerTests(CustomWebApplicationFactory<Startup> factory) : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class CityControllerTests(CustomWebApplicationFactory<Program> factory) : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         [Fact]
         public async Task GetCityInformation()

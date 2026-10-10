@@ -16,7 +16,7 @@ Domain never depends on the API. Keep that direction intact.
 
 **Controllers coordinate; they do not compute.** Logic belongs in a service under
 `weather-backend/Services/` behind an interface in `Services/Interfaces/`,
-registered in `Startup.ConfigureServices`. `weather-application` and
+registered in `AddWeatherApi` (`weather-backend/Hosting/WeatherApiServices.cs`). `weather-application` and
 `weather-repository` register their own services through their
 `DependencyInjection.cs`.
 
@@ -30,6 +30,14 @@ _client = client ?? throw new ArgumentNullException(nameof(client));
 
 Newer files use primary constructors (`CityController(CityList cityList)`) and
 still guard. Either is fine; guard regardless.
+
+The host uses minimal hosting (`Program.cs` + `Hosting/`). Configuration read
+while registering services is evaluated **before** a test host's
+`ConfigureAppConfiguration` overrides apply, so tests cannot change it. Prefer
+binding options (`services.Configure<T>(section)`) and reading `IOptions<T>` or
+`IConfiguration` when the value is used. When a registration genuinely has to
+branch on config (optional Redis, Postgres), tests swap the service with
+`ConfigureTestServices` instead.
 
 ## Model binding
 
@@ -100,7 +108,7 @@ TTL is one hour and the key covers the whole query, units and language included 
 so changing any parameter is a different cache entry.
 
 The shared `IMemoryCache` is size-limited in **approximate bytes**
-(`Startup.SharedMemoryCacheSizeLimitBytes`). Anything else written to it must call
+(`WeatherApiServices.SharedMemoryCacheSizeLimitBytes`). Anything else written to it must call
 `SetSize` with a byte estimate, not `1`.
 
 ## Shared JsonSerializerOptions

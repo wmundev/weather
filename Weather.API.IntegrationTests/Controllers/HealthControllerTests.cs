@@ -5,11 +5,11 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class HealthControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class HealthControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public HealthControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public HealthControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

@@ -1,22 +1,20 @@
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
 using weather_backend.Extensions;
+using weather_backend.Hosting;
 
-namespace weather_backend
-{
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            await CreateHostBuilder(args).Build().RunWithTasksAsync();
-        }
+var builder = WebApplication.CreateBuilder(args);
 
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureLogging((context, logging) => logging.AddStructuredLogging(context.HostingEnvironment))
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
-        }
-    }
-}
+builder.Logging.AddStructuredLogging(builder.Environment);
+builder.Services.AddWeatherApi(builder.Configuration);
+
+var app = builder.Build();
+
+app.UseWeatherApi();
+
+await app.RunWithTasksAsync();
+
+/// <summary>
+/// Declared so the integration tests can use <c>WebApplicationFactory&lt;Program&gt;</c>; top-level statements
+/// otherwise generate an internal Program class.
+/// </summary>
+public partial class Program;

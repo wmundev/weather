@@ -22,11 +22,11 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class WeatherForecastControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class WeatherForecastControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public WeatherForecastControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public WeatherForecastControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

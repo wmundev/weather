@@ -53,7 +53,7 @@ Also capture, per action:
 Skip anything fully commented out (`KafkaController` currently is) - but leave a
 note in the folder docs if a whole controller is disabled.
 
-Endpoints registered outside controllers count too. `Startup.Configure` maps
+Endpoints registered outside controllers count too. `Hosting/WeatherApiPipeline.cs` maps
 `/health` via `endpoints.MapHealthChecks("/health")`; check for new
 `Map*` calls there as well.
 

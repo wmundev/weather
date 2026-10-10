@@ -16,11 +16,11 @@ using weather_domain.DatabaseEntities;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class EmailControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class EmailControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public EmailControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public EmailControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

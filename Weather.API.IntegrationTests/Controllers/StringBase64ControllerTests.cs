@@ -6,12 +6,12 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public sealed class StringBase64ControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public sealed class StringBase64ControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         private const string path = "/api/stringbase64";
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public StringBase64ControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public StringBase64ControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

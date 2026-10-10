@@ -19,14 +19,14 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class RateLimitingTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class RateLimitingTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         // Any cheap route with no external dependency will do; it only has to reach the pipeline.
         private const string CheapRoute = "/api/stringbase64/encodebase64?stringToEncode=hello";
 
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public RateLimitingTests(CustomWebApplicationFactory<Startup> factory)
+        public RateLimitingTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

@@ -1,12 +1,11 @@
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSubstitute;
 using Weather.API.IntegrationTests.setup;
 using weather_backend;
@@ -16,11 +15,11 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class AcademicControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class AcademicControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public AcademicControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public AcademicControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }
@@ -75,9 +74,10 @@ namespace Weather.API.IntegrationTests.Controllers
         [Fact]
         public async Task GetAcademicById_WhenTheDatabaseIsNotConfigured_ShouldReturn503()
         {
+            // Registration reads the connection string eagerly, before a test host's configuration overrides
+            // apply, so remove the service outright: that is the state an unset connection string produces.
             var client = _factory.WithWebHostBuilder(builder =>
-                builder.ConfigureAppConfiguration((_, configuration) =>
-                    configuration.AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Academic"] = "" })))
+                    builder.ConfigureTestServices(services => services.RemoveAll<IAcademicService>()))
                 .CreateClient();
 
             var response = await client.GetAsync("/academic?id=1");

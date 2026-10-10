@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Http;
 using Amazon.DynamoDBv2;
@@ -8,8 +8,6 @@ using Amazon.SecurityToken;
 using Amazon.SimpleSystemsManagement;
 using Amazon.Translate;
 using ConfigCat.Client;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,24 +24,20 @@ using weather_backend.Adapters;
 using weather_backend.Extensions;
 using weather_backend.HostedService;
 using weather_backend.Middleware;
-using weather_repository.DynamoDb;
 using weather_backend.Services;
 using weather_backend.Services.Interfaces;
 using weather_backend.Services.Scheduler;
 using weather_backend.StartupTask;
 using weather_repository;
+using weather_repository.DynamoDb;
 
-namespace weather_backend
+namespace weather_backend.Hosting
 {
-    public class Startup
+    /// <summary>
+    /// Service registration for the API, called from Program.cs.
+    /// </summary>
+    public static class WeatherApiServices
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
         /// <summary>
         /// Upper bound, in approximate bytes, on the shared IMemoryCache.
         /// </summary>
@@ -78,8 +72,7 @@ namespace weather_backend
             options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(15);
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public static IServiceCollection AddWeatherApi(this IServiceCollection services, IConfiguration configuration)
         {
             // A size limit is required to stop route-supplied cache keys (CityList, the weather queries)
             // growing the cache without bound; every entry written to this cache must therefore call SetSize.
@@ -96,7 +89,7 @@ namespace weather_backend
             // Order matters at request time, not here: forwarded headers must be applied before the
             // limiter reads the caller's address, otherwise every request looks like the load balancer.
             services.AddForwardedHeadersForLoadBalancer();
-            services.AddApiRateLimiting(Configuration);
+            services.AddApiRateLimiting(configuration);
 
             services.AddAWSService<IAmazonSecurityTokenService>();
 
@@ -114,8 +107,7 @@ namespace weather_backend
                 .RemoveAllLoggers()
                 .AddStandardResilienceHandler(ConfigureUpstreamResilience);
 
-
-            var configCatSdkKey = Configuration.GetValue<string>("ConfigCat:Key");
+            var configCatSdkKey = configuration.GetValue<string>("ConfigCat:Key");
             if (string.IsNullOrEmpty(configCatSdkKey))
             {
                 throw new InvalidOperationException("ConfigCat SDK Key is missing");
@@ -131,12 +123,11 @@ namespace weather_backend
                 });
             });
 
-
-            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+            services.AddDefaultAWSOptions(configuration.GetAWSOptions());
 
             // Local mode points DynamoDB alone at the container in database/; every other AWS client
             // keeps the default options.
-            if (Configuration.GetValue("DynamoDb:LocalMode", false))
+            if (configuration.GetValue("DynamoDb:LocalMode", false))
             {
                 services.AddAWSService<IAmazonDynamoDB>(new AWSOptions { DefaultClientConfig = { ServiceURL = "http://localhost:8000" } });
             }
@@ -153,7 +144,7 @@ namespace weather_backend
             // Redis is optional. With no connection string nothing is registered, and NewFeatureController
             // answers 503 on its Redis routes instead of failing to construct - which used to take its
             // Redis-free routes down with them.
-            var redisConnectionString = Configuration.GetValue<string>("Redis:ConnectionString");
+            var redisConnectionString = configuration.GetValue<string>("Redis:ConnectionString");
             if (!string.IsNullOrWhiteSpace(redisConnectionString))
             {
                 services.AddSingleton<IConnectionMultiplexer>(_ =>
@@ -170,8 +161,8 @@ namespace weather_backend
             services.AddAWSService<IAmazonTranslate>();
             services.AddSingleton<ILanguageTranslatorService, LanguageTranslatorService>();
 
-            services.AddInfrastructureServices(Configuration);
-            services.AddApplicationServices(Configuration);
+            services.AddInfrastructureServices(configuration);
+            services.AddApplicationServices(configuration);
             // Singleton: EmailService is stateless now that the SmtpClient is created per send, and the
             // singleton Scheduler depends on it.
             services.AddSingleton<EmailService>();
@@ -180,11 +171,10 @@ namespace weather_backend
             services.AddHybridCache();
             services.AddSingleton<IWeatherCacheService, WeatherCacheService>();
 
-
             // Postgres backs /academic only and is optional, like Redis: with no connection string nothing is
             // registered and AcademicController answers 503. NpgsqlDataSource owns the connection pool, so it
             // is a singleton; the container disposes it on shutdown.
-            var academicConnectionString = Configuration.GetConnectionString("Academic");
+            var academicConnectionString = configuration.GetConnectionString("Academic");
             if (!string.IsNullOrWhiteSpace(academicConnectionString))
             {
                 services.AddSingleton(_ => NpgsqlDataSource.Create(academicConnectionString));
@@ -207,58 +197,11 @@ namespace weather_backend
             // services.AddSingleton<IKafkaProducer, KafkaProducer>();
             services.AddHostedService<Scheduler>();
             // services.AddHostedService<KafkaHostedService>();
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "weather_backend", Version = "v1"}); });
+            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo { Title = "weather_backend", Version = "v1" }); });
 
-            //Other registrations
             services.AddStartupTask<WarmupServicesStartupTask>();
-        }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            // First, so everything below sees the caller's real address rather than the load balancer's -
-            // the rate limiter partitions on it and GeolocationService reports it. Also feeds
-            // UseHttpsRedirection the original scheme.
-            app.UseForwardedHeaders();
-
-            // Outside the exception handler on purpose. Its finally block records the status code, and
-            // from inside it would run before the handler had turned the exception into a 500 - logging
-            // every failed request as though it had succeeded. Out here it also puts the correlation
-            // scope around the handler, so the exception record carries the same id as the request.
-            app.UseLogMiddleware();
-
-            // Catches everything downstream, including the static file middleware. In Development the
-            // developer exception page sits inside it and answers first; everywhere else
-            // GlobalExceptionHandler writes the ProblemDetails response.
-            app.UseExceptionHandler();
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "weather_backend v1"));
-            }
-
-            if (!env.IsDevelopment())
-            {
-                app.UseHttpsRedirection();
-            }
-
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
-            // After UseRouting so the endpoint is known and per-endpoint [EnableRateLimiting] policies
-            // resolve; before the endpoints themselves so rejected requests never reach a controller.
-            app.UseRateLimiter();
-
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapHealthChecks("/health");
-            });
+            return services;
         }
     }
 }

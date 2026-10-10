@@ -14,11 +14,11 @@ using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
 {
-    public class NewFeatureControllerTests : IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class NewFeatureControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
-        private readonly CustomWebApplicationFactory<Startup> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
 
-        public NewFeatureControllerTests(CustomWebApplicationFactory<Startup> factory)
+        public NewFeatureControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _factory = factory;
         }

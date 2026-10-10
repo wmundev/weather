@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using weather_backend.Dto;
 using weather_backend.Models;
@@ -16,74 +17,52 @@ namespace weather_backend.Services
     public class CurrentWeatherData : ICurrentWeatherData
     {
         private const string BaseUrl = "https://api.openweathermap.org/data/2.5/weather";
-        private readonly IConfiguration _configuration;
         private readonly HttpClient _httpClient;
         private readonly ILogger<CurrentWeatherData> _logger;
         private readonly ISecretService _secretService;
 
-        public CurrentWeatherData(IConfiguration configuration, HttpClient httpClient, ILogger<CurrentWeatherData> logger, ISecretService secretService)
+        public CurrentWeatherData(HttpClient httpClient, ILogger<CurrentWeatherData> logger, ISecretService secretService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _secretService = secretService ?? throw new ArgumentNullException(nameof(secretService));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
         /// <summary>
         /// Legacy method - Get weather data by city ID in metric units
         /// </summary>
-        public async Task<WeatherData> GetCurrentWeatherDataByCityId(double cityId)
+        public Task<WeatherData> GetCurrentWeatherDataByCityId(double cityId, CancellationToken cancellationToken = default)
         {
-            var request = new CityIdWeatherRequestDto {CityId = cityId, Units = WeatherUnit.Metric};
-            return await GetCurrentWeatherDataByCityId(request);
+            return GetCurrentWeatherDataByCityId(new CityIdWeatherRequestDto {CityId = cityId, Units = WeatherUnit.Metric}, cancellationToken);
         }
 
         /// <summary>
         /// Get current weather data by city ID with custom units and language
         /// </summary>
-        public async Task<WeatherData> GetCurrentWeatherDataByCityId(CityIdWeatherRequestDto request)
+        public Task<WeatherData> GetCurrentWeatherDataByCityId(CityIdWeatherRequestDto request, CancellationToken cancellationToken = default)
         {
-            var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                throw new Exception("OpenWeatherMap API key is not configured");
-            }
+            var cityId = request.CityId.ToString(CultureInfo.InvariantCulture);
 
-            var url = BuildUrl(new() {["id"] = request.CityId.ToString(CultureInfo.InvariantCulture), ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
-
-            return await FetchWeatherData(url, $"cityId={request.CityId.ToString(CultureInfo.InvariantCulture)}");
+            return FetchWeatherData(new() {["id"] = cityId}, request.Units, request.Language, $"cityId={cityId}", cancellationToken);
         }
 
         /// <summary>
         /// Get current weather data by geographic coordinates
         /// </summary>
-        public async Task<WeatherData> GetCurrentWeatherDataByCoordinates(CoordinatesWeatherRequestDto request)
+        public Task<WeatherData> GetCurrentWeatherDataByCoordinates(CoordinatesWeatherRequestDto request, CancellationToken cancellationToken = default)
         {
-            var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                throw new Exception("OpenWeatherMap API key is not configured");
-            }
-
             var latitude = request.Latitude.ToString(CultureInfo.InvariantCulture);
             var longitude = request.Longitude.ToString(CultureInfo.InvariantCulture);
 
-            var url = BuildUrl(new() {["lat"] = latitude, ["lon"] = longitude, ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
-
-            return await FetchWeatherData(url, $"lat={latitude},lon={longitude}");
+            return FetchWeatherData(new() {["lat"] = latitude, ["lon"] = longitude}, request.Units, request.Language,
+                $"lat={latitude},lon={longitude}", cancellationToken);
         }
 
         /// <summary>
         /// Get current weather data by city name
         /// </summary>
-        public async Task<WeatherData> GetCurrentWeatherDataByCityName(CityNameWeatherRequestDto request)
+        public Task<WeatherData> GetCurrentWeatherDataByCityName(CityNameWeatherRequestDto request, CancellationToken cancellationToken = default)
         {
-            var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                throw new Exception("OpenWeatherMap API key is not configured");
-            }
-
             // Build query string: cityName or cityName,countryCode or cityName,stateCode,countryCode
             var queryValue = request.CityName;
             if (!string.IsNullOrEmpty(request.StateCode) && !string.IsNullOrEmpty(request.CountryCode))
@@ -95,33 +74,23 @@ namespace weather_backend.Services
                 queryValue = $"{request.CityName},{request.CountryCode}";
             }
 
-            var url = BuildUrl(new() {["q"] = queryValue, ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
-
-            return await FetchWeatherData(url, $"q={queryValue}");
+            return FetchWeatherData(new() {["q"] = queryValue}, request.Units, request.Language, $"q={queryValue}", cancellationToken);
         }
 
         /// <summary>
         /// Get current weather data by ZIP/postal code
         /// </summary>
-        public async Task<WeatherData> GetCurrentWeatherDataByZipCode(ZipCodeWeatherRequestDto request)
+        public Task<WeatherData> GetCurrentWeatherDataByZipCode(ZipCodeWeatherRequestDto request, CancellationToken cancellationToken = default)
         {
-            var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                throw new Exception("OpenWeatherMap API key is not configured");
-            }
-
             var zipQuery = $"{request.ZipCode},{request.CountryCode}";
 
-            var url = BuildUrl(new() {["zip"] = zipQuery, ["appid"] = apiKey, ["units"] = GetUnitsString(request.Units)}, request.Language);
-
-            return await FetchWeatherData(url, $"zip={zipQuery}");
+            return FetchWeatherData(new() {["zip"] = zipQuery}, request.Units, request.Language, $"zip={zipQuery}", cancellationToken);
         }
 
         /// <summary>
         /// Build URL with query parameters
         /// </summary>
-        private string BuildUrl(Dictionary<string, string> parameters, string? language = null)
+        private static string BuildUrl(Dictionary<string, string> parameters, string? language = null)
         {
             var uriBuilder = new UriBuilder(BaseUrl);
             var queryCollection = HttpUtility.ParseQueryString(uriBuilder.Query);
@@ -143,39 +112,51 @@ namespace weather_backend.Services
         /// <summary>
         /// Fetch weather data from OpenWeatherMap API.
         /// </summary>
-        /// <param name="url">The fully built request URL. Never logged - it carries the API key in the appid parameter.</param>
+        /// <param name="locationParameters">The query parameters that select the location.</param>
+        /// <param name="units">Units of measurement for the response.</param>
+        /// <param name="language">Optional output language.</param>
         /// <param name="queryDescription">A secret-free description of the query, safe to log.</param>
-        private async Task<WeatherData> FetchWeatherData(string url, string queryDescription)
+        /// <param name="cancellationToken">Cancels the upstream call, for example when the caller disconnects.</param>
+        private async Task<WeatherData> FetchWeatherData(Dictionary<string, string> locationParameters, WeatherUnit units, string? language,
+            string queryDescription, CancellationToken cancellationToken)
         {
+            locationParameters["appid"] = await GetApiKey();
+            locationParameters["units"] = GetUnitsString(units);
+
+            // Never logged - the URL carries the API key in the appid parameter.
+            var url = BuildUrl(locationParameters, language);
+
             _logger.LogInformation("Fetching weather data from OpenWeatherMap for {Query}", queryDescription);
 
-            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url);
-            var response = await _httpClient.SendAsync(httpRequestMessage);
-
+            using var response = await _httpClient.GetAsync(url, cancellationToken);
             response.EnsureSuccessStatusCode();
 
-            var stringResponse = await response.Content.ReadAsStringAsync();
-            var weatherData = JsonSerializer.Deserialize<WeatherData>(stringResponse);
+            // Default options, not the web defaults ReadFromJsonAsync would otherwise pick: the models bind by
+            // their exact JSON names.
+            return await response.Content.ReadFromJsonAsync<WeatherData>(JsonSerializerOptions.Default, cancellationToken)
+                   ?? throw new InvalidOperationException("OpenWeatherMap returned an empty weather document.");
+        }
 
-            if (weatherData == null)
-            {
-                throw new Exception("Failed to deserialize weather data");
-            }
+        private async Task<string> GetApiKey()
+        {
+            var apiKey = await _secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey));
 
-            return weatherData;
+            return string.IsNullOrEmpty(apiKey)
+                ? throw new InvalidOperationException("OpenWeatherMap API key is not configured.")
+                : apiKey;
         }
 
         /// <summary>
         /// Convert WeatherUnit enum to API string
         /// </summary>
-        private string GetUnitsString(WeatherUnit unit)
+        private static string GetUnitsString(WeatherUnit unit)
         {
             return unit switch
             {
                 WeatherUnit.Metric => "metric",
                 WeatherUnit.Imperial => "imperial",
                 WeatherUnit.Standard => "standard",
-                _ => "metric"
+                _ => throw new ArgumentOutOfRangeException(nameof(unit), unit, "Unsupported weather unit.")
             };
         }
     }

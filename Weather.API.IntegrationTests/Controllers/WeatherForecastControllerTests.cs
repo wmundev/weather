@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
@@ -69,7 +70,7 @@ namespace Weather.API.IntegrationTests.Controllers
         {
             var mockWeather = Substitute.For<ICurrentWeatherData>();
             var expectedWeather = CreateValidWeatherData("Melbourne");
-            mockWeather.GetCurrentWeatherDataByCityId(weather_backend.Constants.DEFAULT_CITY_ID).Returns(expectedWeather);
+            mockWeather.GetCurrentWeatherDataByCityId(weather_backend.Constants.DEFAULT_CITY_ID, Arg.Any<CancellationToken>()).Returns(expectedWeather);
 
             var client = CreateClientWithMockService(mockWeather);
 
@@ -78,7 +79,7 @@ namespace Weather.API.IntegrationTests.Controllers
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadFromJsonAsync<WeatherData>();
             Assert.Equal("Melbourne", content?.name);
-            await mockWeather.Received(1).GetCurrentWeatherDataByCityId(weather_backend.Constants.DEFAULT_CITY_ID);
+            await mockWeather.Received(1).GetCurrentWeatherDataByCityId(weather_backend.Constants.DEFAULT_CITY_ID, Arg.Any<CancellationToken>());
         }
 
         [Fact]
@@ -87,7 +88,7 @@ namespace Weather.API.IntegrationTests.Controllers
             var mockWeather = Substitute.For<ICurrentWeatherData>();
             var expectedWeather = CreateValidWeatherData("Coordinates City");
 
-            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(expectedWeather);
 
             var client = CreateClientWithMockService(mockWeather);
@@ -105,7 +106,7 @@ namespace Weather.API.IntegrationTests.Controllers
             var mockWeather = Substitute.For<ICurrentWeatherData>();
             var expectedWeather = CreateValidWeatherData("London");
 
-            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(expectedWeather);
 
             var client = CreateClientWithMockService(mockWeather);
@@ -123,7 +124,7 @@ namespace Weather.API.IntegrationTests.Controllers
             var mockWeather = Substitute.For<ICurrentWeatherData>();
             var expectedWeather = CreateValidWeatherData("CityById");
 
-            mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<CityIdWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<CityIdWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(expectedWeather);
 
             var client = CreateClientWithMockService(mockWeather);
@@ -141,7 +142,7 @@ namespace Weather.API.IntegrationTests.Controllers
             var mockWeather = Substitute.For<ICurrentWeatherData>();
             var expectedWeather = CreateValidWeatherData("Zip City");
 
-            mockWeather.GetCurrentWeatherDataByZipCode(Arg.Any<ZipCodeWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByZipCode(Arg.Any<ZipCodeWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(expectedWeather);
 
             var client = CreateClientWithMockService(mockWeather);
@@ -159,7 +160,7 @@ namespace Weather.API.IntegrationTests.Controllers
             var mockWeather = Substitute.For<ICurrentWeatherData>();
 
             // The shape EnsureSuccessStatusCode throws: the upstream status travels on the exception.
-            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromException<WeatherData>(new HttpRequestException("Not Found", null, HttpStatusCode.NotFound)));
 
             var client = CreateClientWithMockService(mockWeather);
@@ -174,7 +175,7 @@ namespace Weather.API.IntegrationTests.Controllers
         {
             var mockWeather = Substitute.For<ICurrentWeatherData>();
 
-            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromException<WeatherData>(new HttpRequestException("Bad Request", null, HttpStatusCode.BadRequest)));
 
             var client = CreateClientWithMockService(mockWeather);
@@ -195,7 +196,7 @@ namespace Weather.API.IntegrationTests.Controllers
             var mockWeather = Substitute.For<ICurrentWeatherData>();
 
             // A rejected API key used to surface as "city not found"; it is our fault, not the caller's.
-            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromException<WeatherData>(new HttpRequestException("upstream said no", null, upstreamStatus)));
 
             var client = CreateClientWithMockService(mockWeather);
@@ -213,7 +214,7 @@ namespace Weather.API.IntegrationTests.Controllers
             var mockWeather = Substitute.For<ICurrentWeatherData>();
 
             // A connection failure carries no status code at all.
-            mockWeather.GetCurrentWeatherDataByZipCode(Arg.Any<ZipCodeWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByZipCode(Arg.Any<ZipCodeWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromException<WeatherData>(new HttpRequestException("Connection refused")));
 
             var client = CreateClientWithMockService(mockWeather);
@@ -230,7 +231,7 @@ namespace Weather.API.IntegrationTests.Controllers
 
             // Previously answered 400 with this text in the body - a server misconfiguration blamed on
             // the caller, and the configuration detail handed to them.
-            mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<CityIdWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<CityIdWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromException<WeatherData>(new InvalidOperationException("SSM parameter 'weather_secrets' has no value.")));
 
             // Production, because Development deliberately shows exception detail to the developer.
@@ -251,7 +252,7 @@ namespace Weather.API.IntegrationTests.Controllers
             // What the resilience pipeline throws once it has exhausted its retries against a slow
             // upstream. It is not an HttpRequestException, so without explicit handling it would fall
             // through to the catch-all and be reported as a 400 - blaming the caller for our outage.
-            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCoordinates(Arg.Any<CoordinatesWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromException<WeatherData>(new TimeoutRejectedException()));
 
             var client = CreateClientWithMockService(mockWeather);
@@ -266,7 +267,7 @@ namespace Weather.API.IntegrationTests.Controllers
         {
             var mockWeather = Substitute.For<ICurrentWeatherData>();
 
-            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromException<WeatherData>(new BrokenCircuitException()));
 
             var client = CreateClientWithMockService(mockWeather);

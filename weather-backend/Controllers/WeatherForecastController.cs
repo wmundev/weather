@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -50,9 +51,9 @@ namespace weather_backend.Controllers
         // Alone among the weather routes this one bypasses the one-hour cache, so every call spends
         // OpenWeatherMap quota. It gets the tighter bucket rather than the general one.
         [EnableRateLimiting(RateLimitingExtensions.UncachedPolicy)]
-        public async Task<ActionResult<WeatherData>> GetCurrentWeatherDataById()
+        public async Task<ActionResult<WeatherData>> GetCurrentWeatherDataById(CancellationToken cancellationToken)
         {
-            var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(Constants.DEFAULT_CITY_ID);
+            var weatherData = await _currentWeatherData.GetCurrentWeatherDataByCityId(Constants.DEFAULT_CITY_ID, cancellationToken);
             return Ok(weatherData);
         }
 
@@ -80,13 +81,14 @@ namespace weather_backend.Controllers
             [FromQuery, Required] double latitude,
             [FromQuery, Required] double longitude,
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
-            [FromQuery] string? lang = null)
+            [FromQuery] string? lang = null,
+            CancellationToken cancellationToken = default)
         {
             var request = new CoordinatesWeatherRequestDto {Latitude = latitude, Longitude = longitude, Units = units, Language = lang};
 
             return await GetOrFetchAsync(
                 _weatherCacheService.GenerateCacheKey(request),
-                () => _currentWeatherData.GetCurrentWeatherDataByCoordinates(request),
+                () => _currentWeatherData.GetCurrentWeatherDataByCoordinates(request, cancellationToken),
                 $"coordinates {latitude}, {longitude}",
                 "Weather data not found for the specified coordinates");
         }
@@ -117,7 +119,8 @@ namespace weather_backend.Controllers
             [FromQuery] string? stateCode = null,
             [FromQuery] string? countryCode = null,
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
-            [FromQuery] string? lang = null)
+            [FromQuery] string? lang = null,
+            CancellationToken cancellationToken = default)
         {
             var request = new CityNameWeatherRequestDto
             {
@@ -130,7 +133,7 @@ namespace weather_backend.Controllers
 
             return await GetOrFetchAsync(
                 _weatherCacheService.GenerateCacheKey(request),
-                () => _currentWeatherData.GetCurrentWeatherDataByCityName(request),
+                () => _currentWeatherData.GetCurrentWeatherDataByCityName(request, cancellationToken),
                 $"city {cityName}",
                 $"Weather data not found for city: {cityName}");
         }
@@ -157,13 +160,14 @@ namespace weather_backend.Controllers
         public async Task<ActionResult<WeatherData>> GetWeatherByCityId(
             [FromRoute, Required] double cityId,
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
-            [FromQuery] string? lang = null)
+            [FromQuery] string? lang = null,
+            CancellationToken cancellationToken = default)
         {
             var request = new CityIdWeatherRequestDto {CityId = cityId, Units = units, Language = lang};
 
             return await GetOrFetchAsync(
                 _weatherCacheService.GenerateCacheKey(request),
-                () => _currentWeatherData.GetCurrentWeatherDataByCityId(request),
+                () => _currentWeatherData.GetCurrentWeatherDataByCityId(request, cancellationToken),
                 $"city ID {cityId}",
                 $"Weather data not found for city ID: {cityId}");
         }
@@ -192,13 +196,14 @@ namespace weather_backend.Controllers
             [FromQuery, Required] string zipCode,
             [FromQuery] string countryCode = "us",
             [FromQuery] WeatherUnit units = WeatherUnit.Metric,
-            [FromQuery] string? lang = null)
+            [FromQuery] string? lang = null,
+            CancellationToken cancellationToken = default)
         {
             var request = new ZipCodeWeatherRequestDto {ZipCode = zipCode, CountryCode = countryCode, Units = units, Language = lang};
 
             return await GetOrFetchAsync(
                 _weatherCacheService.GenerateCacheKey(request),
-                () => _currentWeatherData.GetCurrentWeatherDataByZipCode(request),
+                () => _currentWeatherData.GetCurrentWeatherDataByZipCode(request, cancellationToken),
                 $"ZIP code {zipCode}",
                 $"Weather data not found for ZIP code: {zipCode}");
         }

@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
@@ -128,7 +129,7 @@ namespace Weather.API.IntegrationTests.Controllers
         public async Task UncachedWeatherEndpoint_ShouldThrottleAheadOfTheGlobalLimit()
         {
             var mockWeather = Substitute.For<ICurrentWeatherData>();
-            mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<double>())
+            mockWeather.GetCurrentWeatherDataByCityId(Arg.Any<double>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromResult(CreateValidWeatherData("Melbourne")));
 
             // Global limit stays generous: this proves the stricter per-endpoint policy is what bites,
@@ -152,7 +153,7 @@ namespace Weather.API.IntegrationTests.Controllers
         public async Task CachedWeatherEndpoint_ShouldNotInheritTheUncachedPolicy()
         {
             var mockWeather = Substitute.For<ICurrentWeatherData>();
-            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>())
+            mockWeather.GetCurrentWeatherDataByCityName(Arg.Any<CityNameWeatherRequestDto>(), Arg.Any<CancellationToken>())
                 .Returns(Task.FromResult(CreateValidWeatherData("Melbourne")));
 
             var client = CreateClientWithLimits(new Dictionary<string, string?>

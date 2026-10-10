@@ -1,9 +1,8 @@
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
 using NSubstitute;
 using weather_backend.Dto;
 using weather_backend.Models;
@@ -49,11 +48,7 @@ namespace weather_test.Services
             var secretService = Substitute.For<ISecretService>();
             secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey)).Returns(ApiKey);
 
-            IConfiguration configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string?>())
-                .Build();
-
-            var sut = new CurrentWeatherData(configuration, new HttpClient(handler), logger, secretService);
+            var sut = new CurrentWeatherData(new HttpClient(handler), logger, secretService);
             return (sut, handler, logger);
         }
 
@@ -137,6 +132,29 @@ namespace weather_test.Services
             Assert.Equal(77, result.main.humidity);
             Assert.Equal("AU", result.sys.country);
             Assert.Equal(-37.8131, result.coord.Latitude);
+        }
+
+        [Fact]
+        public async Task GetCurrentWeatherDataByCityId_WhenCancelled_ShouldThrowOperationCanceled()
+        {
+            var (sut, _, _) = CreateSut();
+            using var cancellation = new CancellationTokenSource();
+            await cancellation.CancelAsync();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+                sut.GetCurrentWeatherDataByCityId(new CityIdWeatherRequestDto {CityId = 7839805}, cancellation.Token));
+        }
+
+        [Fact]
+        public async Task GetCurrentWeatherDataByCityId_WhenApiKeyMissing_ShouldThrowInvalidOperation()
+        {
+            var secretService = Substitute.For<ISecretService>();
+            secretService.FetchSpecificSecret(nameof(AllSecrets.OpenWeatherApiKey)).Returns((string?)null);
+            var sut = new CurrentWeatherData(new HttpClient(new RecordingHttpMessageHandler(SampleResponse)),
+                new RecordingLogger<CurrentWeatherData>(), secretService);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                sut.GetCurrentWeatherDataByCityId(new CityIdWeatherRequestDto {CityId = 7839805}));
         }
 
         [Fact]

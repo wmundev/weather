@@ -1,14 +1,17 @@
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
+using Weather.API.IntegrationTests.setup;
 using weather_backend;
 using weather_backend.Models;
 using weather_backend.Services.Interfaces;
-using Weather.API.IntegrationTests.setup;
 using Xunit;
 
 namespace Weather.API.IntegrationTests.Controllers
@@ -37,7 +40,7 @@ namespace Weather.API.IntegrationTests.Controllers
                 TITLE = "Dr."
             };
 
-            mockService.GetAcademicById(100).Returns(expectedAcademic);
+            mockService.GetAcademicByIdAsync(100, Arg.Any<CancellationToken>()).Returns(expectedAcademic);
 
             var client = CreateClientWithMockService(mockService);
 
@@ -58,7 +61,7 @@ namespace Weather.API.IntegrationTests.Controllers
         {
             // Arrange
             var mockService = Substitute.For<IAcademicService>();
-            mockService.GetAcademicById(Arg.Any<int>()).Returns((Academic?) null);
+            mockService.GetAcademicByIdAsync(Arg.Any<int>(), Arg.Any<CancellationToken>()).Returns((Academic?)null);
 
             var client = CreateClientWithMockService(mockService);
 
@@ -67,6 +70,31 @@ namespace Weather.API.IntegrationTests.Controllers
 
             // Assert: the service used to call First() on an empty result, which surfaced as a 500.
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetAcademicById_WhenTheDatabaseIsNotConfigured_ShouldReturn503()
+        {
+            var client = _factory.WithWebHostBuilder(builder =>
+                builder.ConfigureAppConfiguration((_, configuration) =>
+                    configuration.AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:Academic"] = "" })))
+                .CreateClient();
+
+            var response = await client.GetAsync("/academic?id=1");
+
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetAcademicById_WhenTheIdIsMissing_ShouldReturn400()
+        {
+            var mockService = Substitute.For<IAcademicService>();
+            var client = CreateClientWithMockService(mockService);
+
+            var response = await client.GetAsync("/academic");
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            await mockService.DidNotReceiveWithAnyArgs().GetAcademicByIdAsync(default, default);
         }
 
         private HttpClient CreateClientWithMockService(IAcademicService? mockService = null)

@@ -4,5 +4,14 @@ meta {
 }
 
 docs {
-  `AcademicController` - lookup over the in-memory academic records.
+  `AcademicController` - lookup over the Postgres `academic` table seeded by
+  `weather-backend/database/create/academics-create.sql`.
+
+  Postgres is optional. Set `ConnectionStrings:Academic` to enable it, for example:
+
+  `dotnet user-secrets set ConnectionStrings:Academic "Host=127.0.0.1;Port=5432;Username=weather_user;Password=<password>;Database=weather" --project weather-backend`
+
+  against the container in `weather-backend/database/docker-compose.yml`. Without
+  a connection string the endpoint answers `503`. The container takes a while on
+  first start to load the seed file and refuses TCP connections until it has.
 }

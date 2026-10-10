@@ -100,3 +100,6 @@ tooling such as the Bruno CLI.
 - `GET /api/email/code` needs an `X-Api-Key` header matching `EmailCode:ApiKey`
   (env var `EmailCode__ApiKey`; set from the `EMAIL_CODE_API_KEY` GitHub secret on
   deploy). With no key configured it answers `503`.
+- `GET /academic` reads Postgres via `ConnectionStrings:Academic` and answers `503`
+  when it is unset (as in production). The local container is
+  `weather-backend/database/docker-compose.yml`.

@@ -18,6 +18,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Npgsql;
 using Polly;
 using StackExchange.Redis;
 using weather_application;
@@ -177,7 +178,16 @@ namespace weather_backend
             services.AddHybridCache();
             services.AddSingleton<IWeatherCacheService, WeatherCacheService>();
 
-            services.AddTransient<IAcademicService, AcademicService>();
+
+            // Postgres backs /academic only and is optional, like Redis: with no connection string nothing is
+            // registered and AcademicController answers 503. NpgsqlDataSource owns the connection pool, so it
+            // is a singleton; the container disposes it on shutdown.
+            var academicConnectionString = Configuration.GetConnectionString("Academic");
+            if (!string.IsNullOrWhiteSpace(academicConnectionString))
+            {
+                services.AddSingleton(_ => NpgsqlDataSource.Create(academicConnectionString));
+                services.AddSingleton<IAcademicService, AcademicService>();
+            }
 
             services.AddHttpContextAccessor();
 

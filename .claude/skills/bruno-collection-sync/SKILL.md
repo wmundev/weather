@@ -195,7 +195,7 @@ Then confirm the count lines up:
 find bruno -name '*.bru' ! -name 'folder.bru' ! -name 'collection.bru' -not -path '*environments*' | wc -l
 ```
 
-At the time of writing that is **50 requests across 17 folders**, covering all
+At the time of writing that is **51 requests across 17 folders**, covering all
 24 routable endpoints - 23 controller actions plus `/health`. Some endpoints have a
 second request for a negative case.
 

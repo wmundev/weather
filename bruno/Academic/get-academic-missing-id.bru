@@ -1,0 +1,23 @@
+meta {
+  name: Get Academic - Missing Id (400)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/academic
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 400
+}
+
+docs {
+  `GET /academic` without `id`.
+
+  `id` is `[Required]`, so model validation rejects the request with a `400`
+  before the database is touched - this holds even when Postgres is not
+  configured.
+}

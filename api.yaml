@@ -10,6 +10,7 @@ paths:
       parameters:
         - name: id
           in: query
+          required: true
           schema:
             type: integer
             format: int32
@@ -52,6 +53,18 @@ paths:
                 $ref: '#/components/schemas/Academic'
         '404':
           description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '503':
+          description: Service Unavailable
           content:
             text/plain:
               schema:
@@ -1337,10 +1350,6 @@ components:
       required:
         - acnum
         - deptnum
-        - famname
-        - givename
-        - initials
-        - title
       type: object
       properties:
         acnum:

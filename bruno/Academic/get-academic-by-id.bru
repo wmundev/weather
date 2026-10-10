@@ -5,13 +5,13 @@ meta {
 }
 
 get {
-  url: {{baseUrl}}/academic?id=1
+  url: {{baseUrl}}/academic?id=100
   body: none
   auth: inherit
 }
 
 params:query {
-  id: 1
+  id: 100
 }
 
 docs {
@@ -19,8 +19,10 @@ docs {
 
   | Param | Required | Notes                    |
   | ----- | -------- | ------------------------ |
-  | `id`  | yes      | Academic record ID       |
+  | `id`  | yes      | Academic `ACNUM`         |
 
-  Returns the `Academic` record, or `404` when no record matches the ID. No
-  status assertion is set because the seeded IDs depend on `AcademicService`.
+  Returns the `Academic` record, `404` when no record has that ID, or `503` when
+  `ConnectionStrings:Academic` is not configured. The seed data starts at
+  `ACNUM` 100. No status assertion, since the result depends on Postgres being
+  configured and seeded.
 }

@@ -35,11 +35,15 @@ namespace weather_test.TestHelpers
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
             Func<TState, Exception?, string> formatter)
         {
-            Messages.Add(formatter(state, exception));
-
-            if (state is IReadOnlyList<KeyValuePair<string, object?>> values)
+            // Locked because hosted services log from their own threads while the test thread does too.
+            lock (Messages)
             {
-                Entries.Add(values);
+                Messages.Add(formatter(state, exception));
+
+                if (state is IReadOnlyList<KeyValuePair<string, object?>> values)
+                {
+                    Entries.Add(values);
+                }
             }
         }
 

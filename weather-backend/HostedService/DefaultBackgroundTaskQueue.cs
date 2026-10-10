@@ -14,8 +14,10 @@ namespace weather_backend.HostedService
             BoundedChannelOptions options = new(capacity)
             {
                 FullMode = BoundedChannelFullMode.Wait,
+                // One QueuedHostedService reads; any number of request threads may write. SingleWriter = true
+                // promises the channel a single writer, and breaking that promise is undefined behaviour.
                 SingleReader = true,
-                SingleWriter = true
+                SingleWriter = false
             };
             _queue = Channel.CreateBounded<Func<CancellationToken, ValueTask>>(options);
         }

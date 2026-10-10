@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -41,10 +42,15 @@ namespace weather_backend.HostedService
                     count += 1;
                     _logger.LogDebug("Completed background work item {CompletedCount}", count);
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {
-                    // Prevent throwing if stoppingToken was signaled
                     _logger.LogInformation("Background queue processing cancelled during shutdown");
+                }
+                catch (ChannelClosedException)
+                {
+                    // StopAsync completed the queue and every item has been drained. Without this the loop
+                    // would catch the closed-channel error below and spin, logging it, until cancellation.
+                    return;
                 }
                 catch (Exception ex)
                 {

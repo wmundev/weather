@@ -66,7 +66,8 @@ namespace weather_backend.Services
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetSlidingExpiration(TimeSpan.FromSeconds(60))
                     .SetAbsoluteExpiration(TimeSpan.FromSeconds(120))
-                    .SetSize(1);
+                    // The shared cache is sized in approximate bytes; a city record is well under a kilobyte.
+                    .SetSize(1024);
 
                 _memoryCache.Set(cacheKey, result, cacheEntryOptions);
             }

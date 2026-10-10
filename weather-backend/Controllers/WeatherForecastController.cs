@@ -88,9 +88,10 @@ namespace weather_backend.Controllers
 
             return await GetOrFetchAsync(
                 _weatherCacheService.GenerateCacheKey(request),
-                () => _currentWeatherData.GetCurrentWeatherDataByCoordinates(request, cancellationToken),
+                token => _currentWeatherData.GetCurrentWeatherDataByCoordinates(request, token),
                 $"coordinates {latitude}, {longitude}",
-                "Weather data not found for the specified coordinates");
+                "Weather data not found for the specified coordinates",
+                cancellationToken);
         }
 
         /// <summary>
@@ -133,9 +134,10 @@ namespace weather_backend.Controllers
 
             return await GetOrFetchAsync(
                 _weatherCacheService.GenerateCacheKey(request),
-                () => _currentWeatherData.GetCurrentWeatherDataByCityName(request, cancellationToken),
+                token => _currentWeatherData.GetCurrentWeatherDataByCityName(request, token),
                 $"city {cityName}",
-                $"Weather data not found for city: {cityName}");
+                $"Weather data not found for city: {cityName}",
+                cancellationToken);
         }
 
         /// <summary>
@@ -167,9 +169,10 @@ namespace weather_backend.Controllers
 
             return await GetOrFetchAsync(
                 _weatherCacheService.GenerateCacheKey(request),
-                () => _currentWeatherData.GetCurrentWeatherDataByCityId(request, cancellationToken),
+                token => _currentWeatherData.GetCurrentWeatherDataByCityId(request, token),
                 $"city ID {cityId}",
-                $"Weather data not found for city ID: {cityId}");
+                $"Weather data not found for city ID: {cityId}",
+                cancellationToken);
         }
 
         /// <summary>
@@ -203,9 +206,10 @@ namespace weather_backend.Controllers
 
             return await GetOrFetchAsync(
                 _weatherCacheService.GenerateCacheKey(request),
-                () => _currentWeatherData.GetCurrentWeatherDataByZipCode(request, cancellationToken),
+                token => _currentWeatherData.GetCurrentWeatherDataByZipCode(request, token),
                 $"ZIP code {zipCode}",
-                $"Weather data not found for ZIP code: {zipCode}");
+                $"Weather data not found for ZIP code: {zipCode}",
+                cancellationToken);
         }
 
         /// <summary>
@@ -215,27 +219,17 @@ namespace weather_backend.Controllers
         /// <param name="fetch">Fetches fresh data when the cache misses.</param>
         /// <param name="logContext">Description of the query used in log messages.</param>
         /// <param name="notFoundMessage">Message returned when the upstream API has no data for the query.</param>
+        /// <param name="cancellationToken">The request's abort token.</param>
         private async Task<ActionResult<WeatherData>> GetOrFetchAsync(
             string cacheKey,
-            Func<Task<WeatherData>> fetch,
+            Func<CancellationToken, Task<WeatherData>> fetch,
             string logContext,
-            string notFoundMessage)
+            string notFoundMessage,
+            CancellationToken cancellationToken)
         {
             try
             {
-                var cachedData = _weatherCacheService.GetCachedWeatherData(cacheKey);
-                if (cachedData != null)
-                {
-                    _logger.LogInformation("Returning cached weather data for {Query}", logContext);
-                    return Ok(cachedData);
-                }
-
-                _logger.LogInformation("Cache miss - fetching fresh weather data for {Query}", logContext);
-                var weatherData = await fetch();
-
-                _weatherCacheService.CacheWeatherData(cacheKey, weatherData);
-
-                return Ok(weatherData);
+                return Ok(await _weatherCacheService.GetOrFetchAsync(cacheKey, fetch, cancellationToken));
             }
             // Ordered before the HttpRequestException catch: the resilience pipeline gives up on its own
             // terms rather than by returning a status code, so an upstream that is slow or has tripped the

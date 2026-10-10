@@ -1,5 +1,10 @@
+using System;
 using System.Globalization;
-using Microsoft.Extensions.Caching.Memory;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.DependencyInjection;
+using weather_backend;
 using weather_backend.Dto;
 using weather_backend.Models;
 using weather_backend.Services;
@@ -11,12 +16,18 @@ namespace weather_test.Services
 {
     public sealed class WeatherCacheServiceTest
     {
-        private readonly MemoryCache _memoryCache = new(new MemoryCacheOptions {SizeLimit = 16});
         private readonly WeatherCacheService _sut;
 
         public WeatherCacheServiceTest()
         {
-            _sut = new WeatherCacheService(_memoryCache, new RecordingLogger<WeatherCacheService>());
+            // Registered the way Startup does it, including a size-limited IMemoryCache: with a SizeLimit set,
+            // the memory cache throws on any entry that does not declare a size.
+            var services = new ServiceCollection();
+            services.AddMemoryCache(options => options.SizeLimit = Startup.SharedMemoryCacheSizeLimitBytes);
+            services.AddHybridCache();
+            var cache = services.BuildServiceProvider().GetRequiredService<HybridCache>();
+
+            _sut = new WeatherCacheService(cache, new RecordingLogger<WeatherCacheService>());
         }
 
         private static WeatherData CreateWeatherData(string name = "Melbourne")
@@ -85,44 +96,89 @@ namespace weather_test.Services
         }
 
         [Fact]
-        public void CacheWeatherData_ThenGetCachedWeatherData_ReturnsTheStoredData()
+        public async Task GetOrFetchAsync_WhenCalledTwiceWithTheSameKey_ShouldFetchOnce()
         {
-            var key = _sut.GenerateCacheKey(new CityIdWeatherRequestDto {CityId = 7839805});
+            var fetches = 0;
+            Task<WeatherData> Fetch(CancellationToken _)
+            {
+                Interlocked.Increment(ref fetches);
+                return Task.FromResult(CreateWeatherData());
+            }
 
-            _sut.CacheWeatherData(key, CreateWeatherData());
-            var result = _sut.GetCachedWeatherData(key);
+            var first = await _sut.GetOrFetchAsync("cityid:7839805:metric:none", Fetch);
+            var second = await _sut.GetOrFetchAsync("cityid:7839805:metric:none", Fetch);
 
-            Assert.NotNull(result);
-            Assert.Equal("Melbourne", result.name);
-            Assert.Equal(15.5, result.main.temp);
+            Assert.Equal(1, fetches);
+            Assert.Equal("Melbourne", first.name);
+            Assert.Equal(15.5, second.main.temp);
         }
 
         [Fact]
-        public void GetCachedWeatherData_WhenTheKeyIsUnknown_ReturnsNull()
+        public async Task GetOrFetchAsync_WhenConcurrentCallersMissTheSameKey_ShouldShareOneFetch()
         {
-            Assert.Null(_sut.GetCachedWeatherData("cityid:1:metric:none"));
+            var fetches = 0;
+            var release = new TaskCompletionSource<WeatherData>(TaskCreationOptions.RunContinuationsAsynchronously);
+            Task<WeatherData> Fetch(CancellationToken _)
+            {
+                Interlocked.Increment(ref fetches);
+                return release.Task;
+            }
+
+            var callers = new Task<WeatherData>[5];
+            for (var i = 0; i < callers.Length; i++)
+            {
+                callers[i] = _sut.GetOrFetchAsync("cityid:7839805:metric:none", Fetch).AsTask();
+            }
+
+            release.SetResult(CreateWeatherData());
+            var results = await Task.WhenAll(callers);
+
+            Assert.Equal(1, fetches);
+            Assert.All(results, result => Assert.Equal("Melbourne", result.name));
         }
 
         [Fact]
-        public void GetCachedWeatherData_DoesNotReturnDataCachedUnderADifferentKey()
+        public async Task GetOrFetchAsync_WithTheSharedCacheSizeLimit_ShouldKeepManyEntries()
         {
-            var melbourneKey = _sut.GenerateCacheKey(new CityIdWeatherRequestDto {CityId = 7839805});
-            var londonKey = _sut.GenerateCacheKey(new CityIdWeatherRequestDto {CityId = 2643743});
+            // HybridCache sizes entries by payload bytes. Under the old entry-count limit of 1024, two or three
+            // responses filled the shared cache and every further entry was evicted on arrival.
+            var fetches = 0;
+            Task<WeatherData> Fetch(CancellationToken _)
+            {
+                Interlocked.Increment(ref fetches);
+                return Task.FromResult(CreateWeatherData());
+            }
 
-            _sut.CacheWeatherData(melbourneKey, CreateWeatherData());
+            for (var pass = 0; pass < 2; pass++)
+            {
+                for (var cityId = 0; cityId < 200; cityId++)
+                {
+                    await _sut.GetOrFetchAsync($"cityid:{cityId}:metric:none", Fetch);
+                }
+            }
 
-            Assert.Null(_sut.GetCachedWeatherData(londonKey));
+            Assert.Equal(200, fetches);
         }
 
         [Fact]
-        public void CacheWeatherData_SetsAnEntrySizeSoTheSharedCacheStaysBounded()
+        public async Task GetOrFetchAsync_ShouldNotReturnDataCachedUnderADifferentKey()
         {
-            // The shared cache is configured with a SizeLimit, which makes Set throw if an entry has no
-            // size. Cache keys come from caller-supplied query parameters, so this bound matters.
-            var exception = Record.Exception(() =>
-                _sut.CacheWeatherData(_sut.GenerateCacheKey(new CityIdWeatherRequestDto {CityId = 1}), CreateWeatherData()));
+            await _sut.GetOrFetchAsync("cityid:7839805:metric:none", _ => Task.FromResult(CreateWeatherData("Melbourne")));
 
-            Assert.Null(exception);
+            var london = await _sut.GetOrFetchAsync("cityid:2643743:metric:none", _ => Task.FromResult(CreateWeatherData("London")));
+
+            Assert.Equal("London", london.name);
+        }
+
+        [Fact]
+        public async Task GetOrFetchAsync_WhenTheFetchFails_ShouldNotCacheTheFailure()
+        {
+            await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                await _sut.GetOrFetchAsync("cityid:1:metric:none", _ => throw new InvalidOperationException("upstream down")));
+
+            var result = await _sut.GetOrFetchAsync("cityid:1:metric:none", _ => Task.FromResult(CreateWeatherData("Recovered")));
+
+            Assert.Equal("Recovered", result.name);
         }
     }
 }

@@ -44,6 +44,11 @@ namespace weather_backend
         public IConfiguration Configuration { get; }
 
         /// <summary>
+        /// Upper bound, in approximate bytes, on the shared IMemoryCache.
+        /// </summary>
+        public const long SharedMemoryCacheSizeLimitBytes = 16 * 1024 * 1024;
+
+        /// <summary>
         /// Retry, circuit breaker and timeouts for the third-party APIs this service calls. Both
         /// upstreams are read-only GETs, so replaying a request is safe.
         /// </summary>
@@ -75,9 +80,11 @@ namespace weather_backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // A size limit is required to stop route-supplied cache keys (see CityList) growing the
-            // cache without bound; every entry written to this cache must therefore call SetSize.
-            services.AddMemoryCache(options => options.SizeLimit = 1024);
+            // A size limit is required to stop route-supplied cache keys (CityList, the weather queries)
+            // growing the cache without bound; every entry written to this cache must therefore call SetSize.
+            // Sizes are approximate bytes: HybridCache, which keeps the weather responses here, sizes each
+            // entry by its serialized payload, so an entry-count limit would hold only a handful of them.
+            services.AddMemoryCache(options => options.SizeLimit = SharedMemoryCacheSizeLimitBytes);
             services.AddHealthChecks();
 
             // RFC 7807 responses for anything that reaches the top of the pipeline unhandled, plus the
@@ -166,6 +173,8 @@ namespace weather_backend
             // singleton Scheduler depends on it.
             services.AddSingleton<EmailService>();
             services.AddTransient<CityList>();
+            // HybridCache keeps its in-process tier in the shared IMemoryCache registered above.
+            services.AddHybridCache();
             services.AddSingleton<IWeatherCacheService, WeatherCacheService>();
 
             services.AddTransient<ThreadExample>();

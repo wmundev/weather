@@ -77,8 +77,11 @@ work. Reserve absolute method routes for holding an existing public URL stable.
 Follow `WeatherForecastController.GetOrFetchAsync`:
 
 1. Generate a cache key from the request DTO via `IWeatherCacheService.GenerateCacheKey`.
-2. Return the cached value on a hit.
-3. Fetch, then cache, on a miss.
+2. Call `IWeatherCacheService.GetOrFetchAsync(key, token => fetch(token), cancellationToken)`. It is
+   backed by `HybridCache`: a hit returns the cached value, and concurrent misses for the same key
+   share one upstream call. Failures are never cached. Don't hand-roll a get-then-set.
+3. Pass the action's `CancellationToken` through - HybridCache only cancels the shared fetch once
+   every waiting caller has gone.
 4. Map upstream failures by what they mean, not by exception type alone:
    - `HttpRequestException` with status `404` → `404`; with status `400` → `400`
      ProblemDetails. Those are the only caller-attributable outcomes.
@@ -95,6 +98,10 @@ in the query string.
 
 TTL is one hour and the key covers the whole query, units and language included -
 so changing any parameter is a different cache entry.
+
+The shared `IMemoryCache` is size-limited in **approximate bytes**
+(`Startup.SharedMemoryCacheSizeLimitBytes`). Anything else written to it must call
+`SetSize` with a byte estimate, not `1`.
 
 ## Shared JsonSerializerOptions
 

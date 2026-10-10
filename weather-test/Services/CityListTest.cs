@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using weather_backend;
 using weather_backend.Repository;
 using weather_backend.Services;
 using weather_domain.DatabaseEntities;
@@ -29,7 +30,7 @@ namespace weather_test.Services
 
             // A real cache, not a substitute: these tests are about caching behaviour, and a substitute
             // would report a hit or a miss regardless of what was actually stored.
-            _mockMemoryCache = new MemoryCache(new MemoryCacheOptions {SizeLimit = 16});
+            _mockMemoryCache = new MemoryCache(new MemoryCacheOptions {SizeLimit = Startup.SharedMemoryCacheSizeLimitBytes});
             _mockCityRepository = Substitute.For<ICityRepository>();
 
             _cityList = new CityList(_mockLogger, _dynamoDbClient, _mockMemoryCache, _mockCityRepository);

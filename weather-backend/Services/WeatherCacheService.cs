@@ -1,6 +1,8 @@
 using System;
 using System.Globalization;
-using Microsoft.Extensions.Caching.Memory;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using weather_backend.Dto;
 using weather_backend.Models;
@@ -10,14 +12,12 @@ namespace weather_backend.Services
     public interface IWeatherCacheService
     {
         /// <summary>
-        /// Get cached weather data if available and not expired
+        /// Returns the cached weather data for <paramref name="cacheKey"/>, or runs <paramref name="fetch"/> and caches
+        /// its result for an hour. Concurrent misses for the same key share a single fetch.
         /// </summary>
-        WeatherData? GetCachedWeatherData(string cacheKey);
-
-        /// <summary>
-        /// Save weather data to cache with 1-hour TTL
-        /// </summary>
-        void CacheWeatherData(string cacheKey, WeatherData weatherData);
+        /// <remarks>Failures are not cached: a fetch that throws leaves the key empty for the next caller.</remarks>
+        ValueTask<WeatherData> GetOrFetchAsync(string cacheKey, Func<CancellationToken, Task<WeatherData>> fetch,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Generate cache key for coordinates query
@@ -45,35 +45,41 @@ namespace weather_backend.Services
     /// The cache is per instance and does not survive a restart; it exists to keep repeated identical
     /// queries off the upstream API, not to be a durable store.
     /// </summary>
+    /// <remarks>
+    /// Backed by <see cref="HybridCache"/> rather than a bare IMemoryCache get-then-set, which let every request
+    /// that arrived during a miss make its own upstream call. HybridCache runs one fetch per key and hands the
+    /// result to every waiting caller.
+    /// </remarks>
     public class WeatherCacheService : IWeatherCacheService
     {
-        private static readonly TimeSpan CacheTimeToLive = TimeSpan.FromHours(1);
-
-        private readonly ILogger<WeatherCacheService> _logger;
-        private readonly IMemoryCache _memoryCache;
-
-        public WeatherCacheService(IMemoryCache memoryCache, ILogger<WeatherCacheService> logger)
+        private static readonly HybridCacheEntryOptions EntryOptions = new()
         {
-            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+            Expiration = TimeSpan.FromHours(1),
+            LocalCacheExpiration = TimeSpan.FromHours(1)
+        };
+
+        private readonly HybridCache _cache;
+        private readonly ILogger<WeatherCacheService> _logger;
+
+        public WeatherCacheService(HybridCache cache, ILogger<WeatherCacheService> logger)
+        {
+            _cache = cache ?? throw new ArgumentNullException(nameof(cache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public WeatherData? GetCachedWeatherData(string cacheKey)
+        public ValueTask<WeatherData> GetOrFetchAsync(string cacheKey, Func<CancellationToken, Task<WeatherData>> fetch,
+            CancellationToken cancellationToken = default)
         {
-            return _memoryCache.TryGetValue(cacheKey, out WeatherData? cachedData) ? cachedData : null;
-        }
-
-        public void CacheWeatherData(string cacheKey, WeatherData weatherData)
-        {
-            // Cache keys are built from caller-supplied query parameters, so entries carry a size and
-            // the shared cache enforces a limit on how many can accumulate.
-            var cacheEntryOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(CacheTimeToLive)
-                .SetSize(1);
-
-            _memoryCache.Set(cacheKey, weatherData, cacheEntryOptions);
-
-            _logger.LogDebug("Cached weather data for key {CacheKey}", cacheKey);
+            return _cache.GetOrCreateAsync(
+                cacheKey,
+                (fetch, cacheKey, _logger),
+                static async (state, token) =>
+                {
+                    state._logger.LogInformation("Cache miss - fetching fresh weather data for {CacheKey}", state.cacheKey);
+                    return await state.fetch(token);
+                },
+                EntryOptions,
+                cancellationToken: cancellationToken);
         }
 
         public string GenerateCacheKey(CoordinatesWeatherRequestDto request)

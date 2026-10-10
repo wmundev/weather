@@ -1,8 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
     <RootNamespace>weather_backend</RootNamespace>
-    <Nullable>enable</Nullable>
     <UserSecretsId>66887dce-0c73-4d4a-a042-434b84113960</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>

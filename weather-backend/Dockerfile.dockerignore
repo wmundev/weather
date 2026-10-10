@@ -1,0 +1,11 @@
+# Used by BuildKit for weather-backend/Dockerfile, whose context is the repository root.
+# Host build output would otherwise overwrite the container's restore and publish.
+**/bin/
+**/obj/
+**/node_modules/
+**/coverage/
+out/
+.git/
+.idea/
+weather-backend.Deployment/
+bruno/

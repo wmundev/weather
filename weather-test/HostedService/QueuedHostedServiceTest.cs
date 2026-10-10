@@ -36,6 +36,18 @@ namespace weather_test.HostedService
         }
 
         [Fact]
+        public async Task StopAsync_WhenCalledTwice_ShouldNotThrow()
+        {
+            var sut = new QueuedHostedService(new DefaultBackgroundTaskQueue(10), new RecordingLogger<QueuedHostedService>());
+            await sut.StartAsync(CancellationToken.None);
+
+            await sut.StopAsync(CancellationToken.None);
+            var exception = await Record.ExceptionAsync(() => sut.StopAsync(CancellationToken.None));
+
+            Assert.Null(exception);
+        }
+
+        [Fact]
         public async Task QueueBackgroundWorkItemAsync_WhenManyThreadsWrite_ShouldDeliverEveryItem()
         {
             var queue = new DefaultBackgroundTaskQueue(1000);

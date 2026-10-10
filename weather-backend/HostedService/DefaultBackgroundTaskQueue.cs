@@ -41,7 +41,9 @@ namespace weather_backend.HostedService
 
         public async Task CompletionAsync()
         {
-            _queue.Writer.Complete();
+            // TryComplete, not Complete: a host may stop its hosted services more than once (the test host
+            // does when it is disposed), and Complete throws on a channel that is already closed.
+            _queue.Writer.TryComplete();
             await _queue.Reader.Completion;
         }
     }

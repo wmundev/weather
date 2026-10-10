@@ -36,6 +36,7 @@ prefer them over improvising.
 | `dotnet-conventions`    | Writing or modifying any C# here                              |
 | `dotnet-test`           | Running tests or checking coverage                            |
 | `openapi-docs`          | Regenerating `api.yaml`                                       |
+| `commit-changes`        | Committing - straight to `main`, never pushed, only this change's paths |
 
 ## Endpoint changes require the Bruno sync skill
 
